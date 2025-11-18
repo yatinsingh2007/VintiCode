@@ -1,12 +1,14 @@
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import api from "@/lib/axios";
 
 export default async function NotFoundPage() {
-  const cookieStore = await cookies()
-  const authToken = cookieStore.get("token")?.value;
-  if (authToken) {
-    redirect("/dashboard/home");
+  const resp = await api.get("/auth/verify" , {
+    withCredentials : true
+  });
+
+  if (resp.data.authenticated) {
+    redirect("/dashboard");
   } else {
-    redirect("/auth");
+    redirect("/login");
   }
 }

@@ -129,4 +129,34 @@ auth.get("/logout", checkUserAuthentication, async (req, res) => {
   }
 });
 
+auth.get("/verify" , async (req , res) => {
+  try{
+    const { token } = req.cookies;
+    if (!token){
+      return res.status(200).json({
+        "authenticated" : false
+      })
+    }
+    const decoded = jwt.verify(token , process.env.JWT_SECRET);
+    const ourUser = await prisma.user.findUnique({
+      where : {
+        id : decoded.id
+      }
+    })
+    if (!ourUser){
+      return res.status(200).json({
+        "authenticated" : false
+      })
+    }
+    return res.status(200).json({
+      "authenticated" : true
+    })
+  }catch(err){
+    console.log(err);
+    return res.status(500).json({
+      "error" : "Internal Server Error"
+    })
+  }
+})
+
 module.exports = { auth };
