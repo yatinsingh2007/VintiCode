@@ -7,6 +7,6 @@ export default async function NotFoundPage() {
   if (authToken) {
     redirect("/dashboard/home");
   } else {
-    redirect("/login");
+    redirect("/auth");
   }
 }
