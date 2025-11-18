@@ -36,8 +36,12 @@ app.get('/api', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  res.send('VintiCode Backend is running.');
+  return res.send('VintiCode Backend is running.');
 });
+
+app.use((req , res) => {
+  return res.status(404).json({ message: 'Route not found' });
+})
 
 
 module.exports = app;
