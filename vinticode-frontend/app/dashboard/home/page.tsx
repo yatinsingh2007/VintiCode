@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
 import { Logo, LogoIcon } from "@/components/Logo";
 import { Search, X, CheckCircle2 } from "lucide-react";
+import { redirect } from "next/navigation";
 import {
   IconArrowLeft,
   IconBrandTabler,
@@ -184,7 +185,12 @@ const Dashboard: React.FC<DashboardProps> = ({
     const fetchQuestions = async () => {
       setLoading(true);
       try {
-        const resp = await api.get(`/dashboard/home`);
+        const resp = await api.get(`/dashboard/home` , {
+          withCredentials : true
+        });
+        if (resp.status === 401){
+          redirect("/auth");
+        }
         const questions = resp.data.questions || resp.data || [];
 
         setAllQuestions(questions);
