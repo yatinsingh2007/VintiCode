@@ -9,6 +9,6 @@ export default async function NotFoundPage() {
   if (resp.data.authenticated) {
     redirect("/dashboard");
   } else {
-    redirect("/login");
+    redirect("/auth");
   }
 }
