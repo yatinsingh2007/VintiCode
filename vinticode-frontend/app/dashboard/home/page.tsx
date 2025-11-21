@@ -4,6 +4,7 @@ import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
 import { Logo, LogoIcon } from "@/components/Logo";
 import { Search, X, CheckCircle2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 import {
   IconArrowLeft,
   IconBrandTabler,
@@ -180,33 +181,35 @@ const Dashboard: React.FC<DashboardProps> = ({
   const router = useRouter();
   const itemsPerPage = 9;
 
-  useEffect(() => {
-    const fetchQuestions = async () => {
-      setLoading(true);
-      try {
-        const resp = await api.get(`/dashboard/home` , {
-          withCredentials : true
-        });
-        if (resp.status == 401){
+useEffect(() => {
+  const fetchQuestions = async () => {
+    setLoading(true);
+    try {
+      const resp = await api.get(`/dashboard/home`, {
+        withCredentials: true
+      });
+
+      const questions = resp.data.questions || resp.data || [];
+      setAllQuestions(questions);
+      setData(questions);
+
+    } catch (err: unknown) {
+      toast.error("Failed to fetch data");
+
+      if (axios.isAxiosError(err)) {
+        if (err.response?.status === 401) {
           router.push("/auth");
-          return
+          return;
         }
-        const questions = resp.data.questions || resp.data || [];
-
-        setAllQuestions(questions);
-        setData(questions);
-        return
-      } catch (err : unknown) {
-        toast.error("Failed to fetch data");
-        return;
-      } finally {
-        setLoading(false);
-        return;
       }
-    };
 
-    fetchQuestions();
-  }, []);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchQuestions();
+}, []);
 
   useEffect(() => {
     let filtered = [...allQuestions];
