@@ -5,6 +5,11 @@ require('dotenv').config();
 
 const checkUserAuthentication = async (req , res , next) => {
     const { token } = req.cookies;
+    if (!token){
+        return res.status(401).json({
+            "error" : "User Anauthorized"
+        })
+    }
     console.log("Middleware Token: " , token);
 
     try {
