@@ -15,7 +15,7 @@ const checkUserAuthentication = async (req , res , next) => {
             }
         });
         if (!ourUser){
-            return res.status(404).json(
+            return res.status(401).json(
                 { error: "User not found" }
             );
         }
