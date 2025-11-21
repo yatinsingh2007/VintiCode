@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
 import { Logo, LogoIcon } from "@/components/Logo";
 import { Search, X, CheckCircle2 } from "lucide-react";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import {
   IconArrowLeft,
   IconBrandTabler,
@@ -12,7 +12,6 @@ import {
 import { cn } from "@/lib/utils";
 import api from "@/lib/axios";
 import { toast } from "react-hot-toast";
-import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Select,
@@ -188,17 +187,21 @@ const Dashboard: React.FC<DashboardProps> = ({
         const resp = await api.get(`/dashboard/home` , {
           withCredentials : true
         });
-        if (resp.status === 401){
-          redirect("/auth");
+        if (resp.status == 401){
+          router.push("/auth");
+          return
         }
         const questions = resp.data.questions || resp.data || [];
 
         setAllQuestions(questions);
         setData(questions);
+        return
       } catch (err : unknown) {
         toast.error("Failed to fetch data");
+        return;
       } finally {
         setLoading(false);
+        return;
       }
     };
 
