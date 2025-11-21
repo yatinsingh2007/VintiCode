@@ -10,7 +10,6 @@ const checkUserAuthentication = async (req , res , next) => {
             "error" : "User Anauthorized"
         })
     }
-    console.log("Middleware Token: " , token);
 
     try {
         const decoded = jwt.verify(token , process.env.JWT_SECRET);

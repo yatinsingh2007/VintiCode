@@ -221,10 +221,10 @@ export default function Dashboard() {
   return (
     <PanelGroup direction="horizontal">
       <Panel defaultSize={40}>
-        <div className="sticky top-0 z-20 flex items-center gap-3 border-b border-neutral-800 bg-[#111]/90 px-4 py-3 backdrop-blur">
+        <div className="sticky top-0 z-20 flex items-center gap-3 border-b border-neutral-800/50 bg-gradient-to-r from-neutral-950 via-neutral-900 to-neutral-950 backdrop-blur-md px-4 py-3 shadow-lg">
           <Button
             variant="ghost"
-            className="h-9 gap-2 rounded-md border border-neutral-800 bg-neutral-900/50 px-3 text-neutral-200 hover:bg-neutral-800"
+            className="h-9 gap-2 rounded-lg border border-neutral-700/50 bg-neutral-900/50 px-3 text-neutral-200 hover:bg-neutral-800 hover:border-blue-500/30 transition-all"
             onClick={() => router.push("/dashboard/home")}
           >
             <ArrowLeft className="h-4 w-4" /> Back
@@ -232,62 +232,61 @@ export default function Dashboard() {
 
           {questionData.title && (
             <div className="ml-1 flex items-center gap-2">
-              <h1 className="text-base font-semibold text-white md:text-lg">
+              <h1 className="text-base font-semibold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent md:text-lg">
                 {questionData.title}
               </h1>
               {questionData.done && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-green-900/60 px-2 py-0.5 text-[10px] font-medium text-green-200">
-                  <CheckCircle2 className="h-3 w-3" /> Done
+                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 text-[10px] font-medium text-emerald-400">
+                  <CheckCircle2 className="h-3 w-3" /> Solved
                 </span>
               )}
             </div>
           )}
         </div>
 
-        <div className="p-6 text-white overflow-y-auto h-[calc(100vh-48px)] bg-[#111]">
+        <div className="p-6 text-white overflow-y-auto h-[calc(100vh-48px)] bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950">
           {questionData.title ? (
             <>
               <span
-                className={`${
-                  questionData.difficulty === "Easy"
-                    ? "bg-green-900 text-green-200"
+                className={`${questionData.difficulty === "Easy"
+                    ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-sm shadow-emerald-500/10"
                     : questionData.difficulty === "Medium"
-                    ? "bg-yellow-900 text-yellow-200"
-                    : "bg-red-900 text-red-200"
-                } inline-flex rounded-full px-3 py-1 text-xs font-medium`}
+                      ? "bg-amber-500/10 text-amber-400 border border-amber-500/20 shadow-sm shadow-amber-500/10"
+                      : "bg-rose-500/10 text-rose-400 border border-rose-500/20 shadow-sm shadow-rose-500/10"
+                  } inline-flex rounded-full px-3 py-1.5 text-xs font-medium`}
               >
                 {questionData.difficulty}
               </span>
 
-              <div className="mt-4 rounded-2xl border border-neutral-800 bg-neutral-900/50 p-4">
-                <h3 className="text-base font-semibold text-white">Description</h3>
-                <p className="mt-2 text-sm text-neutral-300">
+              <div className="mt-4 rounded-xl border border-neutral-800/50 bg-gradient-to-br from-neutral-900/60 to-neutral-900/40 backdrop-blur-sm p-5 shadow-lg">
+                <h3 className="text-base font-semibold text-white mb-2">Description</h3>
+                <p className="text-sm text-neutral-400 leading-relaxed">
                   {questionData.description}
                 </p>
               </div>
 
               <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div className="rounded-2xl border border-neutral-800 bg-neutral-900/40 p-4">
-                  <h3 className="text-sm font-semibold text-white">Input Format</h3>
-                  <pre className="text-xs text-neutral-300 whitespace-pre-wrap">
+                <div className="rounded-xl border border-neutral-800/50 bg-gradient-to-br from-neutral-900/50 to-neutral-900/30 backdrop-blur-sm p-4 shadow-md">
+                  <h3 className="text-sm font-semibold text-blue-400 mb-2">Input Format</h3>
+                  <pre className="text-xs text-neutral-300 whitespace-pre-wrap leading-relaxed">
                     {questionData.input_format}
                   </pre>
                 </div>
-                <div className="rounded-2xl border border-neutral-800 bg-neutral-900/40 p-4">
-                  <h3 className="text-sm font-semibold text-white">Output Format</h3>
-                  <pre className="text-xs text-neutral-300 whitespace-pre-wrap">
+                <div className="rounded-xl border border-neutral-800/50 bg-gradient-to-br from-neutral-900/50 to-neutral-900/30 backdrop-blur-sm p-4 shadow-md">
+                  <h3 className="text-sm font-semibold text-cyan-400 mb-2">Output Format</h3>
+                  <pre className="text-xs text-neutral-300 whitespace-pre-wrap leading-relaxed">
                     {questionData.output_format}
                   </pre>
                 </div>
               </div>
 
               <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div className="rounded-2xl border border-neutral-800 bg-neutral-900/60 p-4">
-                  <div className="mb-2 flex items-center justify-between">
+                <div className="rounded-xl border border-neutral-800/50 bg-gradient-to-br from-neutral-900/60 to-neutral-900/40 backdrop-blur-sm p-4 shadow-md">
+                  <div className="mb-3 flex items-center justify-between">
                     <h3 className="text-sm font-semibold text-white">Sample Input</h3>
                     <Button
                       variant="ghost"
-                      className="h-8 rounded-md border border-neutral-800 bg-neutral-800/60 px-2 text-xs text-neutral-200"
+                      className="h-7 rounded-lg border border-neutral-700/50 bg-neutral-800/50 px-3 text-xs text-neutral-200 hover:bg-neutral-700 hover:border-blue-500/30 transition-all"
                       onClick={() => {
                         navigator.clipboard.writeText(
                           questionData.sample_input || ""
@@ -298,19 +297,19 @@ export default function Dashboard() {
                       Copy
                     </Button>
                   </div>
-                  <pre className="bg-[#1a1a1a] p-3 text-xs text-neutral-200 rounded-md">
+                  <pre className="bg-neutral-950/50 border border-neutral-800/30 p-3 text-xs text-neutral-200 rounded-lg">
                     {questionData.sample_input}
                   </pre>
                 </div>
 
-                <div className="rounded-2xl border border-neutral-800 bg-neutral-900/60 p-4">
-                  <div className="mb-2 flex items-center justify-between">
+                <div className="rounded-xl border border-neutral-800/50 bg-gradient-to-br from-neutral-900/60 to-neutral-900/40 backdrop-blur-sm p-4 shadow-md">
+                  <div className="mb-3 flex items-center justify-between">
                     <h3 className="text-sm font-semibold text-white">
                       Sample Output
                     </h3>
                     <Button
                       variant="ghost"
-                      className="h-8 rounded-md border border-neutral-800 bg-neutral-800/60 px-2 text-xs text-neutral-200"
+                      className="h-7 rounded-lg border border-neutral-700/50 bg-neutral-800/50 px-3 text-xs text-neutral-200 hover:bg-neutral-700 hover:border-blue-500/30 transition-all"
                       onClick={() => {
                         navigator.clipboard.writeText(
                           questionData.sample_output || ""
@@ -321,31 +320,31 @@ export default function Dashboard() {
                       Copy
                     </Button>
                   </div>
-                  <pre className="bg-[#1a1a1a] p-3 text-xs text-neutral-200 rounded-md">
+                  <pre className="bg-neutral-950/50 border border-neutral-800/30 p-3 text-xs text-neutral-200 rounded-lg">
                     {questionData.sample_output}
                   </pre>
                 </div>
               </div>
 
-              <div className="mt-6 rounded-2xl border border-neutral-800 bg-neutral-900/60 p-4">
-                <h3 className="text-base font-semibold text-white mb-3">
+              <div className="mt-6 rounded-xl border border-neutral-800/50 bg-gradient-to-br from-neutral-900/60 to-neutral-900/40 backdrop-blur-sm p-5 shadow-lg">
+                <h3 className="text-base font-semibold text-white mb-4">
                   Test Cases
                 </h3>
 
-                <div className="space-y-2">
+                <div className="space-y-2.5">
                   {questionData.test_cases.map((testCase, index) => {
                     const status = testcaseStatus[index];
 
                     return (
                       <div
                         key={index}
-                        className="flex items-center justify-between border border-neutral-700 rounded-md p-3 bg-neutral-800/40"
+                        className="flex items-center justify-between border border-neutral-700/50 rounded-lg p-3.5 bg-neutral-800/30 hover:bg-neutral-800/50 transition-colors"
                       >
                         <div>
-                          <p className="text-sm text-gray-300">
+                          <p className="text-sm font-medium text-neutral-200">
                             Test Case {index + 1}
                           </p>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-xs text-neutral-500 mt-0.5">
                             Input:{" "}
                             {testCase.input.length > 15
                               ? testCase.input.slice(0, 15) + "..."
@@ -354,22 +353,22 @@ export default function Dashboard() {
                         </div>
 
                         {status === "pending" && (
-                          <span className="text-gray-500 text-sm">Pending</span>
+                          <span className="text-neutral-500 text-xs px-2.5 py-1 bg-neutral-700/30 rounded-full">Pending</span>
                         )}
 
                         {status === "loading" && (
-                          <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/70 border-t-transparent"></span>
+                          <span className="h-5 w-5 animate-spin rounded-full border-2 border-blue-400/70 border-t-transparent"></span>
                         )}
 
                         {status === "accepted" && (
-                          <span className="text-green-400 text-lg font-bold">
-                            ✓
+                          <span className="flex items-center gap-1.5 text-emerald-400 text-xs font-medium bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
+                            <CheckCircle2 className="h-3.5 w-3.5" /> Passed
                           </span>
                         )}
 
                         {status === "failed" && (
-                          <span className="text-red-400 text-lg font-bold">
-                            ✗
+                          <span className="flex items-center gap-1.5 text-rose-400 text-xs font-medium bg-rose-500/10 px-2.5 py-1 rounded-full border border-rose-500/20">
+                            ✗ Failed
                           </span>
                         )}
                       </div>
@@ -395,8 +394,8 @@ export default function Dashboard() {
       <Panel defaultSize={60}>
         <PanelGroup direction="vertical">
           <Panel defaultSize={70}>
-            <div className="flex flex-col h-full bg-[#0f0f0f]">
-              <div className="flex items-center justify-between px-4 py-2 bg-[#1e1e1e] border-b border-gray-700">
+            <div className="flex flex-col h-full bg-gradient-to-br from-neutral-950 to-neutral-900">
+              <div className="flex items-center justify-between px-4 py-3 bg-neutral-900/50 backdrop-blur-md border-b border-neutral-800/50">
                 <div className="flex items-center gap-3">
                   <Select
                     onValueChange={(value) => {
@@ -407,10 +406,10 @@ export default function Dashboard() {
                     }}
                     value={language.language}
                   >
-                    <SelectTrigger className="w-[180px] bg-[#1e1e1e]/80 border-gray-600 text-white">
+                    <SelectTrigger className="w-[180px] bg-neutral-900/50 border-neutral-700/50 text-white rounded-lg hover:border-blue-500/30 transition-all">
                       <SelectValue placeholder="Select language" />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#1e1e1e] text-white border-gray-700">
+                    <SelectContent className="bg-neutral-900 text-white border-neutral-800 rounded-lg">
                       {languages.map((lang) => (
                         <SelectItem key={lang.id} value={lang.language}>
                           {lang.language.toUpperCase()}
@@ -423,10 +422,10 @@ export default function Dashboard() {
                     onValueChange={(value) => setFontSize(parseInt(value))}
                     value={fontSize.toString()}
                   >
-                    <SelectTrigger className="w-[120px] bg-[#1e1e1e]/80 border-gray-600 text-white">
+                    <SelectTrigger className="w-[120px] bg-neutral-900/50 border-neutral-700/50 text-white rounded-lg hover:border-blue-500/30 transition-all">
                       <SelectValue placeholder="Font Size" />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#1e1e1e] text-white border-gray-700">
+                    <SelectContent className="bg-neutral-900 text-white border-neutral-800 rounded-lg">
                       {[12, 14, 16, 18, 20, 22, 24].map((size) => (
                         <SelectItem key={size} value={size.toString()}>
                           {size}px
@@ -440,7 +439,7 @@ export default function Dashboard() {
                   <Button
                     onClick={handleRun}
                     disabled={rloader}
-                    className="bg-blue-600 text-white font-semibold disabled:opacity-70"
+                    className="bg-blue-600 hover:bg-blue-500 text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed rounded-lg shadow-lg shadow-blue-600/20 transition-all"
                   >
                     {rloader ? "Running..." : "Run"}
                   </Button>
@@ -448,7 +447,7 @@ export default function Dashboard() {
                   <Button
                     onClick={handleSubmit}
                     disabled={sloader}
-                    className="bg-emerald-600 text-white font-semibold disabled:opacity-70"
+                    className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed rounded-lg shadow-lg shadow-emerald-600/20 transition-all"
                   >
                     {sloader ? "Submitting..." : "Submit"}
                   </Button>
@@ -473,41 +472,40 @@ export default function Dashboard() {
           <PanelResizeHandle className="h-1 bg-gray-700" />
 
           <Panel defaultSize={30}>
-            <div className="h-full bg-black text-white border-t border-gray-700 p-4 overflow-auto">
+            <div className="h-full bg-gradient-to-br from-neutral-950 to-neutral-900 text-white border-t border-neutral-800/50 p-4 overflow-auto">
 
-              {/* ⭐ Custom Input Box Restored */}
-              <div className="mb-3">
-                <h3 className="text-gray-300 mb-1">Custom Input</h3>
+              <div className="mb-4">
+                <h3 className="text-neutral-300 font-medium mb-2 text-sm">Custom Input</h3>
                 <textarea
                   value={customInput}
                   onChange={(e) => setCustomInput(e.target.value)}
-                  className="w-full h-24 bg-[#1a1a1a] border border-gray-700 rounded-md p-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-600"
+                  className="w-full h-24 bg-neutral-900/50 border border-neutral-700/50 rounded-lg p-3 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/50 transition-all"
                   placeholder="Enter custom input here..."
                 ></textarea>
               </div>
 
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-gray-300">Output</h3>
-                <span className="text-[10px] bg-neutral-800 px-2 py-0.5 rounded-full">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-neutral-300 font-medium text-sm">Output</h3>
+                <span className="text-[10px] bg-neutral-800/50 border border-neutral-700/30 px-2.5 py-1 rounded-full text-neutral-400">
                   {output?.status?.description || "Idle"}
                 </span>
               </div>
 
-              <pre className="text-green-400 whitespace-pre-wrap">
+              <pre className="text-emerald-400 whitespace-pre-wrap bg-neutral-900/30 border border-neutral-800/30 rounded-lg p-3 text-sm">
                 {output.stdout || "Output will appear here..."}
               </pre>
 
               {output.stderr && (
-                <div className="mt-2 text-red-400">
-                  <h4>Stderr</h4>
-                  <pre>{output.stderr}</pre>
+                <div className="mt-3 p-3 bg-rose-500/5 border border-rose-500/20 rounded-lg">
+                  <h4 className="text-rose-400 font-medium text-sm mb-2">Error Output</h4>
+                  <pre className="text-rose-300 text-xs whitespace-pre-wrap">{output.stderr}</pre>
                 </div>
               )}
 
               {output.compile_output && (
-                <div className="mt-2 text-yellow-300">
-                  <h4>Compile Output</h4>
-                  <pre>{output.compile_output}</pre>
+                <div className="mt-3 p-3 bg-amber-500/5 border border-amber-500/20 rounded-lg">
+                  <h4 className="text-amber-400 font-medium text-sm mb-2">Compile Output</h4>
+                  <pre className="text-amber-300 text-xs whitespace-pre-wrap">{output.compile_output}</pre>
                 </div>
               )}
             </div>
