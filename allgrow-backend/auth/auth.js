@@ -111,22 +111,15 @@ auth.post("/login", async (req, res) => {
   }
 });
 
-auth.get("/logout", checkUserAuthentication, async (req, res) => {
-  try {
-    res.clearCookie("token" , {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-    });
-    return res.status(200).json({
-      message: "Logout successful",
+auth.get("/logout", checkUserAuthentication, (req, res) => {
+    res.cookie("token" , null , {
+      expires : new Date(Date.now()) ,
+      httpOnly : true ,
+      secure : true ,
+      sameSite : "none"
+    }).status(200).json({
+      message : "Logout successful"
     })
-  } catch (err) {
-    console.log(err);
-    return res.status(500).json({
-      error: "Internal Server Error",
-    });
-  }
 });
 
 auth.get("/verify" , async (req , res) => {
