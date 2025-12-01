@@ -97,7 +97,7 @@ function SidebarDemoInner() {
                           try {
                             await api.get("/auth/logout");
                             toast.success("Logged out successfully");
-                            router.push("/auth");
+                            router.push("/");
                           } catch (err: unknown) {
                             toast.error("Logout failed");
                           }
