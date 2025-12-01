@@ -7,6 +7,7 @@ import TextType from "@/components/TextType";
 import { BackgroundLines } from "@/components/ui/background-lines";
 import { useEffect } from "react";
 import api from "@/lib/axios";
+import toast from "react-hot-toast";
 
 export default function BackgroundLinesDemo() {
   const router = useRouter();
@@ -14,13 +15,19 @@ export default function BackgroundLinesDemo() {
   useEffect(() => {
     (async() => {
       try{
-        const response = await api.get("/");
-        if (response.status === 200) {
+        toast.loading("Loading");
+        setTimeout(async () => {
+          const response = await api.get("/");
+          if (response.status === 200) {
           router.push("/dashboard/home");
           return;
         }
         return;
-      }catch(err){
+        }, 2000);
+        toast.success("Welcome Back!");
+        toast.dismiss();
+        return;
+      }catch(err : unknown){
         console.error("Error fetching data from backend: ", err);
         return;
       }
