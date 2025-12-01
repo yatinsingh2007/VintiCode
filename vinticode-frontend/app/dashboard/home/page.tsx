@@ -95,9 +95,11 @@ function SidebarDemoInner() {
                         key={idx}
                         onClick={async (e) => {
                           try {
-                            await api.get("/auth/logout");
+                            const res = await api.get("/auth/logout");
                             toast.success("Logged out successfully");
-                            router.push("/");
+                            if (res.status === 200) {
+                              router.push("/");
+                            }
                           } catch (err: unknown) {
                             toast.error("Logout failed");
                           }
