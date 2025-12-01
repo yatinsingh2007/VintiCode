@@ -100,6 +100,7 @@ auth.post("/login", async (req, res) => {
         secure: true,
         sameSite: "none",
         maxAge: 7 * 24 * 60 * 60 * 1000,
+        path: "/",
       })
       .status(200)
       .json({
@@ -112,44 +113,47 @@ auth.post("/login", async (req, res) => {
 });
 
 auth.get("/logout", checkUserAuthentication, (req, res) => {
-    res.cookie("token" , null , {
-      expires : new Date(Date.now()) ,
-      httpOnly : true ,
-      secure : true ,
-      sameSite : "none"
-    }).status(200).json({
-      message : "Logout successful"
+  res
+    .clearCookie("token", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      path: "/",
     })
+    .status(200)
+    .json({
+      message: "Logout successful",
+    });
 });
 
-auth.get("/verify" , async (req , res) => {
-  try{
+auth.get("/verify", async (req, res) => {
+  try {
     const { token } = req.cookies;
-    if (!token){
+    if (!token) {
       return res.status(200).json({
-        "authenticated" : false
-      })
+        authenticated: false,
+      });
     }
-    const decoded = jwt.verify(token , process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const ourUser = await prisma.user.findUnique({
-      where : {
-        id : decoded.id
-      }
-    })
-    if (!ourUser){
+      where: {
+        id: decoded.id,
+      },
+    });
+    if (!ourUser) {
       return res.status(200).json({
-        "authenticated" : false
-      })
+        authenticated: false,
+      });
     }
     return res.status(200).json({
-      "authenticated" : true
-    })
-  }catch(err){
+      authenticated: true,
+    });
+  } catch (err) {
     console.log(err);
     return res.status(500).json({
-      "error" : "Internal Server Error"
-    })
+      error: "Internal Server Error",
+    });
   }
-})
+});
 
 module.exports = { auth };
