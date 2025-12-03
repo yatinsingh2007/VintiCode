@@ -138,7 +138,6 @@ export default function Dashboard() {
   const handleRun = async () => {
     try {
       setRloader(true);
-      // Reset output before running
       setOutput({
         stdout: "",
         stderr: "",

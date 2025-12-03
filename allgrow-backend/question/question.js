@@ -18,9 +18,9 @@ question.post("/runCode/:id", async (req, res) => {
   const { v4: uuidv4 } = await import("uuid");
   const { code, language_id, input } = req.body;
   const { id: questionId } = req.params;
+  const submissionId = uuidv4();
 
   try {
-    const submissionId = uuidv4();
     await redis.set(
       `submission:${submissionId}`,
       JSON.stringify({
@@ -31,7 +31,7 @@ question.post("/runCode/:id", async (req, res) => {
       300
     );
     const submitRes = await api.post(
-      `${process.env.JUDGE0_API}?base64_encoded=false&wait=false`,
+      `${process.env.JUDGE0_API}/submissions/?base64_encoded=false&wait=false`,
       {
         source_code: code,
         language_id: language_id,
@@ -62,7 +62,7 @@ question.post("/runCode/:id", async (req, res) => {
       await new Promise((r) => setTimeout(r, 1200));
 
       const pollRes = await api.get(
-        `${process.env.JUDGE0_API}/${token}?base64_encoded=false`,
+        `${process.env.JUDGE0_API}/submissions/${token}?base64_encoded=false`,
         {
           headers: {
             "X-RapidAPI-Host": JSON.parse(process.env[`USER_${randomInt}`])[

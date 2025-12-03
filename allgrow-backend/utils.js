@@ -1,7 +1,9 @@
+require('dotenv').config()
 const axios = require('axios');
 
 const api = axios.create({
-    host : "https://judge0-ce.p.rapidapi.com"
+    baseURL : `${process.env.JUDGE0_API}`,
+    timeout : 10000
 })
 
 module.exports = { api }
