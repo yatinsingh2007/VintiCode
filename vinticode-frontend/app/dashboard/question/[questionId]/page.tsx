@@ -160,15 +160,13 @@ export default function Dashboard() {
         }
       );
       setOutput(response.data.result);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
       if (axios.isAxiosError(err)) {
         const errorData = err?.response?.data;
-        // If the backend returns structured error data (stderr, compile_output, etc.)
         if (errorData?.result) {
           setOutput(errorData.result);
         } else if (errorData?.error) {
-          // Fallback if just an error message string is returned
           setOutput(prev => ({ ...prev, stderr: errorData.error, status: { id: 1, description: "Error" } }));
         } else {
           toast.error("Code execution failed");
