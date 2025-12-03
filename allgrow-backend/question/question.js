@@ -12,10 +12,10 @@ const { judgeQueue } = require("../queue/judgeQueue");
 
 const { redis } = require("../redis/redis");
 
-const { v4: uuidv4 } = await import("uuid");
 
 question.post("/runCode/:id", async (req, res) => {
   const randomInt = Math.floor(Math.random() * 5) + 1;
+  const { v4: uuidv4 } = await import("uuid");
   const { code, language_id, input } = req.body;
   const { id: questionId } = req.params;
 
