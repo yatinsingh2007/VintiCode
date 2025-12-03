@@ -159,9 +159,53 @@ export default function Dashboard() {
           language_id: language.id,
         }
       );
-      setOutput(response.data.result);
+
+      const submissionId = response.data.submissionId;
+      const MAX_RETRIES = 20;
+      let retries = 0;
+
+      const pollResult = async () => {
+        if (retries >= MAX_RETRIES) {
+          setOutput((prev) => ({
+            ...prev,
+            status: { id: 1, description: "Timeout" },
+            stderr: "Execution timed out. Please try again.",
+          }));
+          setRloader(false);
+          return;
+        }
+
+        try {
+          const resultResp = await api.get(`/questions/runCode/result/${submissionId}`);
+          const data = resultResp.data;
+
+          if (data.status === "processing") {
+            retries++;
+            setTimeout(pollResult, 1000);
+          } else if (data.status === "completed") {
+            setOutput(data.result);
+            setRloader(false);
+          } else if (data.status === "failed") {
+            setOutput(prev => ({
+              ...prev,
+              stderr: data.result?.stderr || "Execution failed",
+              status: { id: 1, description: "Error" }
+            }));
+            setRloader(false);
+          } else {
+            retries++;
+            setTimeout(pollResult, 1000);
+          }
+        } catch (pollErr) {
+          toast.error("Failed to fetch results");
+          setRloader(false);
+        }
+      };
+      setTimeout(pollResult, 1000);
+
     } catch (err: unknown) {
       console.error(err);
+      setRloader(false);
       if (axios.isAxiosError(err)) {
         const errorData = err?.response?.data;
         if (errorData?.result) {
@@ -174,8 +218,6 @@ export default function Dashboard() {
       } else {
         toast.error("Please try running the code again");
       }
-    } finally {
-      setRloader(false);
     }
   };
 
@@ -218,7 +260,6 @@ export default function Dashboard() {
           );
         }
 
-        // Also check for compilation/runtime errors in submission
         if (data?.error || data?.stderr || data?.compile_output) {
           setOutput({
             stdout: "",
@@ -230,7 +271,6 @@ export default function Dashboard() {
             token: "",
             status: { id: 1, description: "Submission Error" }
           });
-          // Open the output panel if it's not visible (optional, but good UX)
         }
 
         if (!data?.results && !data?.stderr && !data?.compile_output) {
