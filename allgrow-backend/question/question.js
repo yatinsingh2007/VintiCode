@@ -31,7 +31,7 @@ question.post("/runCode/:id", async (req, res) => {
       300
     );
     const submitRes = await api.post(
-      `${process.env.JUDGE0_API}/submissions/?base64_encoded=false&wait=false`,
+      `/submissions/?base64_encoded=false&wait=false`,
       {
         source_code: code,
         language_id: language_id,
@@ -62,7 +62,7 @@ question.post("/runCode/:id", async (req, res) => {
       await new Promise((r) => setTimeout(r, 1200));
 
       const pollRes = await api.get(
-        `${process.env.JUDGE0_API}/submissions/${token}?base64_encoded=false`,
+        `/submissions/${token}?base64_encoded=false`,
         {
           headers: {
             "X-RapidAPI-Host": JSON.parse(process.env[`USER_${randomInt}`])[
