@@ -16,7 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { ArrowLeft, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Play, Send, Terminal, AlertCircle } from "lucide-react";
 
 interface languageDetails {
   language: string;
@@ -138,6 +138,18 @@ export default function Dashboard() {
   const handleRun = async () => {
     try {
       setRloader(true);
+      // Reset output before running
+      setOutput({
+        stdout: "",
+        stderr: "",
+        compile_output: "",
+        message: "",
+        time: "",
+        memory: 0,
+        token: "",
+        status: { id: 0, description: "Processing..." },
+      });
+
       const response = await api.post(
         `/questions/runCode/${questionData.id}`,
         {
@@ -148,10 +160,19 @@ export default function Dashboard() {
         }
       );
       setOutput(response.data.result);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
       if (axios.isAxiosError(err)) {
-        toast.error(err?.response?.data?.error || "Code execution failed");
+        const errorData = err?.response?.data;
+        // If the backend returns structured error data (stderr, compile_output, etc.)
+        if (errorData?.result) {
+          setOutput(errorData.result);
+        } else if (errorData?.error) {
+          // Fallback if just an error message string is returned
+          setOutput(prev => ({ ...prev, stderr: errorData.error, status: { id: 1, description: "Error" } }));
+        } else {
+          toast.error("Code execution failed");
+        }
       } else {
         toast.error("Please try running the code again");
       }
@@ -163,7 +184,6 @@ export default function Dashboard() {
   const handleSubmit = async () => {
     try {
       setSloader(true);
-
       setTestcaseStatus(testcaseStatus.map(() => "loading"));
 
       const resp = await api.post(
@@ -187,16 +207,37 @@ export default function Dashboard() {
     } catch (err: unknown) {
       console.error(err);
 
-      if (axios.isAxiosError(err) && err.response?.data?.results) {
-        const results = err.response.data.results;
+      if (axios.isAxiosError(err)) {
+        const data = err.response?.data;
 
-        setSubmissionOutput(results);
+        if (data?.results) {
+          const results = data.results;
+          setSubmissionOutput(results);
+          setTestcaseStatus(
+            results.map((r: string) =>
+              r === "Accepted" ? "accepted" : "failed"
+            )
+          );
+        }
 
-        setTestcaseStatus(
-          results.map((r: string) =>
-            r === "Accepted" ? "accepted" : "failed"
-          )
-        );
+        // Also check for compilation/runtime errors in submission
+        if (data?.error || data?.stderr || data?.compile_output) {
+          setOutput({
+            stdout: "",
+            stderr: data?.stderr || data?.error || "",
+            compile_output: data?.compile_output || "",
+            message: data?.message || "",
+            time: "",
+            memory: 0,
+            token: "",
+            status: { id: 1, description: "Submission Error" }
+          });
+          // Open the output panel if it's not visible (optional, but good UX)
+        }
+
+        if (!data?.results && !data?.stderr && !data?.compile_output) {
+          toast.error("Submission failed!");
+        }
       } else {
         toast.error("Submission failed!");
       }
@@ -219,199 +260,199 @@ export default function Dashboard() {
   ];
 
   return (
-    <PanelGroup direction="horizontal">
-      <Panel defaultSize={40}>
-        <div className="sticky top-0 z-20 flex items-center gap-3 border-b border-neutral-800/50 bg-gradient-to-r from-neutral-950 via-neutral-900 to-neutral-950 backdrop-blur-md px-4 py-3 shadow-lg">
-          <Button
-            variant="ghost"
-            className="h-9 gap-2 rounded-lg border border-neutral-700/50 bg-neutral-900/50 px-3 text-neutral-200 hover:bg-neutral-800 hover:border-blue-500/30 transition-all"
-            onClick={() => router.push("/dashboard/home")}
-          >
-            <ArrowLeft className="h-4 w-4" /> Back
-          </Button>
+    <PanelGroup direction="horizontal" className="h-screen w-full bg-neutral-950 text-white overflow-hidden">
+      <Panel defaultSize={40} minSize={20}>
+        <div className="flex flex-col h-full border-r border-neutral-800/50">
+          {/* Header */}
+          <div className="flex-none flex items-center gap-3 border-b border-neutral-800/50 bg-neutral-900/50 backdrop-blur-md px-4 py-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="gap-2 text-neutral-400 hover:text-white hover:bg-neutral-800"
+              onClick={() => router.push("/dashboard/home")}
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
 
-          {questionData.title && (
-            <div className="ml-1 flex items-center gap-2">
-              <h1 className="text-base font-semibold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent md:text-lg">
-                {questionData.title}
-              </h1>
-              {questionData.done && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 text-[10px] font-medium text-emerald-400">
-                  <CheckCircle2 className="h-3 w-3" /> Solved
-                </span>
-              )}
-            </div>
-          )}
-        </div>
-
-        <div className="p-6 text-white overflow-y-auto h-[calc(100vh-48px)] bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950">
-          {questionData.title ? (
-            <>
-              <span
-                className={`${questionData.difficulty === "Easy"
-                    ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-sm shadow-emerald-500/10"
-                    : questionData.difficulty === "Medium"
-                      ? "bg-amber-500/10 text-amber-400 border border-amber-500/20 shadow-sm shadow-amber-500/10"
-                      : "bg-rose-500/10 text-rose-400 border border-rose-500/20 shadow-sm shadow-rose-500/10"
-                  } inline-flex rounded-full px-3 py-1.5 text-xs font-medium`}
-              >
-                {questionData.difficulty}
-              </span>
-
-              <div className="mt-4 rounded-xl border border-neutral-800/50 bg-gradient-to-br from-neutral-900/60 to-neutral-900/40 backdrop-blur-sm p-5 shadow-lg">
-                <h3 className="text-base font-semibold text-white mb-2">Description</h3>
-                <p className="text-sm text-neutral-400 leading-relaxed">
-                  {questionData.description}
-                </p>
+            {questionData.title && (
+              <div className="flex items-center gap-3 overflow-hidden">
+                <h1 className="truncate text-sm font-semibold text-white md:text-base">
+                  {questionData.title}
+                </h1>
+                {questionData.done && (
+                  <span className="flex-none inline-flex items-center gap-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 text-[10px] font-medium text-emerald-400">
+                    <CheckCircle2 className="h-3 w-3" /> Solved
+                  </span>
+                )}
               </div>
+            )}
+          </div>
 
-              <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div className="rounded-xl border border-neutral-800/50 bg-gradient-to-br from-neutral-900/50 to-neutral-900/30 backdrop-blur-sm p-4 shadow-md">
-                  <h3 className="text-sm font-semibold text-blue-400 mb-2">Input Format</h3>
-                  <pre className="text-xs text-neutral-300 whitespace-pre-wrap leading-relaxed">
-                    {questionData.input_format}
-                  </pre>
-                </div>
-                <div className="rounded-xl border border-neutral-800/50 bg-gradient-to-br from-neutral-900/50 to-neutral-900/30 backdrop-blur-sm p-4 shadow-md">
-                  <h3 className="text-sm font-semibold text-cyan-400 mb-2">Output Format</h3>
-                  <pre className="text-xs text-neutral-300 whitespace-pre-wrap leading-relaxed">
-                    {questionData.output_format}
-                  </pre>
-                </div>
-              </div>
-
-              <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div className="rounded-xl border border-neutral-800/50 bg-gradient-to-br from-neutral-900/60 to-neutral-900/40 backdrop-blur-sm p-4 shadow-md">
-                  <div className="mb-3 flex items-center justify-between">
-                    <h3 className="text-sm font-semibold text-white">Sample Input</h3>
-                    <Button
-                      variant="ghost"
-                      className="h-7 rounded-lg border border-neutral-700/50 bg-neutral-800/50 px-3 text-xs text-neutral-200 hover:bg-neutral-700 hover:border-blue-500/30 transition-all"
-                      onClick={() => {
-                        navigator.clipboard.writeText(
-                          questionData.sample_input || ""
-                        );
-                        toast.success("Sample input copied");
-                      }}
-                    >
-                      Copy
-                    </Button>
-                  </div>
-                  <pre className="bg-neutral-950/50 border border-neutral-800/30 p-3 text-xs text-neutral-200 rounded-lg">
-                    {questionData.sample_input}
-                  </pre>
+          {/* Problem Content */}
+          <div className="flex-1 overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-neutral-800 scrollbar-track-transparent">
+            {questionData.title ? (
+              <div className="space-y-6 max-w-3xl mx-auto">
+                <div>
+                  <span
+                    className={`${questionData.difficulty === "Easy"
+                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                        : questionData.difficulty === "Medium"
+                          ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                          : "bg-rose-500/10 text-rose-400 border-rose-500/20"
+                      } inline-flex rounded-full border px-2.5 py-1 text-xs font-medium`}
+                  >
+                    {questionData.difficulty}
+                  </span>
                 </div>
 
-                <div className="rounded-xl border border-neutral-800/50 bg-gradient-to-br from-neutral-900/60 to-neutral-900/40 backdrop-blur-sm p-4 shadow-md">
-                  <div className="mb-3 flex items-center justify-between">
-                    <h3 className="text-sm font-semibold text-white">
-                      Sample Output
+                <div className="prose prose-invert prose-sm max-w-none">
+                  <p className="text-neutral-300 leading-relaxed text-sm">
+                    {questionData.description}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
+                      Input Format
                     </h3>
-                    <Button
-                      variant="ghost"
-                      className="h-7 rounded-lg border border-neutral-700/50 bg-neutral-800/50 px-3 text-xs text-neutral-200 hover:bg-neutral-700 hover:border-blue-500/30 transition-all"
-                      onClick={() => {
-                        navigator.clipboard.writeText(
-                          questionData.sample_output || ""
-                        );
-                        toast.success("Sample output copied");
-                      }}
-                    >
-                      Copy
-                    </Button>
+                    <div className="rounded-lg border border-neutral-800 bg-neutral-900/50 p-3">
+                      <pre className="text-xs text-neutral-300 whitespace-pre-wrap font-mono">
+                        {questionData.input_format}
+                      </pre>
+                    </div>
                   </div>
-                  <pre className="bg-neutral-950/50 border border-neutral-800/30 p-3 text-xs text-neutral-200 rounded-lg">
-                    {questionData.sample_output}
-                  </pre>
+                  <div className="space-y-2">
+                    <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
+                      Output Format
+                    </h3>
+                    <div className="rounded-lg border border-neutral-800 bg-neutral-900/50 p-3">
+                      <pre className="text-xs text-neutral-300 whitespace-pre-wrap font-mono">
+                        {questionData.output_format}
+                      </pre>
+                    </div>
+                  </div>
                 </div>
-              </div>
 
-              <div className="mt-6 rounded-xl border border-neutral-800/50 bg-gradient-to-br from-neutral-900/60 to-neutral-900/40 backdrop-blur-sm p-5 shadow-lg">
-                <h3 className="text-base font-semibold text-white mb-4">
-                  Test Cases
-                </h3>
-
-                <div className="space-y-2.5">
-                  {questionData.test_cases.map((testCase, index) => {
-                    const status = testcaseStatus[index];
-
-                    return (
-                      <div
-                        key={index}
-                        className="flex items-center justify-between border border-neutral-700/50 rounded-lg p-3.5 bg-neutral-800/30 hover:bg-neutral-800/50 transition-colors"
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
+                        Sample Input
+                      </h3>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 text-xs text-neutral-400 hover:text-white"
+                        onClick={() => {
+                          navigator.clipboard.writeText(questionData.sample_input || "");
+                          toast.success("Copied");
+                        }}
                       >
-                        <div>
-                          <p className="text-sm font-medium text-neutral-200">
-                            Test Case {index + 1}
-                          </p>
-                          <p className="text-xs text-neutral-500 mt-0.5">
-                            Input:{" "}
-                            {testCase.input.length > 15
-                              ? testCase.input.slice(0, 15) + "..."
-                              : testCase.input}
-                          </p>
-                        </div>
+                        Copy
+                      </Button>
+                    </div>
+                    <div className="rounded-lg border border-neutral-800 bg-neutral-900/50 p-3">
+                      <pre className="text-xs text-neutral-300 font-mono">
+                        {questionData.sample_input}
+                      </pre>
+                    </div>
+                  </div>
 
-                        {status === "pending" && (
-                          <span className="text-neutral-500 text-xs px-2.5 py-1 bg-neutral-700/30 rounded-full">Pending</span>
-                        )}
-
-                        {status === "loading" && (
-                          <span className="h-5 w-5 animate-spin rounded-full border-2 border-blue-400/70 border-t-transparent"></span>
-                        )}
-
-                        {status === "accepted" && (
-                          <span className="flex items-center gap-1.5 text-emerald-400 text-xs font-medium bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
-                            <CheckCircle2 className="h-3.5 w-3.5" /> Passed
-                          </span>
-                        )}
-
-                        {status === "failed" && (
-                          <span className="flex items-center gap-1.5 text-rose-400 text-xs font-medium bg-rose-500/10 px-2.5 py-1 rounded-full border border-rose-500/20">
-                            ✗ Failed
-                          </span>
-                        )}
-                      </div>
-                    );
-                  })}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
+                        Sample Output
+                      </h3>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 text-xs text-neutral-400 hover:text-white"
+                        onClick={() => {
+                          navigator.clipboard.writeText(questionData.sample_output || "");
+                          toast.success("Copied");
+                        }}
+                      >
+                        Copy
+                      </Button>
+                    </div>
+                    <div className="rounded-lg border border-neutral-800 bg-neutral-900/50 p-3">
+                      <pre className="text-xs text-neutral-300 font-mono">
+                        {questionData.sample_output}
+                      </pre>
+                    </div>
+                  </div>
                 </div>
+
+                {/* Test Cases Status */}
+                {questionData.test_cases.length > 0 && (
+                  <div className="space-y-3 pt-4 border-t border-neutral-800/50">
+                    <h3 className="text-sm font-medium text-white">Test Cases</h3>
+                    <div className="grid grid-cols-1 gap-2">
+                      {questionData.test_cases.map((testCase, index) => {
+                        const status = testcaseStatus[index];
+                        return (
+                          <div
+                            key={index}
+                            className="flex items-center justify-between rounded-md border border-neutral-800 bg-neutral-900/30 px-3 py-2"
+                          >
+                            <span className="text-xs text-neutral-400">Case {index + 1}</span>
+                            {status === "pending" && (
+                              <span className="text-[10px] text-neutral-600">Pending</span>
+                            )}
+                            {status === "loading" && (
+                              <span className="h-3 w-3 animate-spin rounded-full border-2 border-neutral-600 border-t-transparent"></span>
+                            )}
+                            {status === "accepted" && (
+                              <span className="flex items-center gap-1 text-[10px] font-medium text-emerald-400">
+                                <CheckCircle2 className="h-3 w-3" /> Passed
+                              </span>
+                            )}
+                            {status === "failed" && (
+                              <span className="flex items-center gap-1 text-[10px] font-medium text-rose-400">
+                                <AlertCircle className="h-3 w-3" /> Failed
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
-            </>
-          ) : (
-            <div className="space-y-4">
-              <Skeleton className="h-8 w-3/4 bg-gray-700 rounded-md" />
-              <Skeleton className="h-5 w-24 bg-gray-700 rounded-md" />
-              <Skeleton className="h-24 w-full bg-gray-700 rounded-md" />
-              <Skeleton className="h-6 w-40 bg-gray-700 rounded-md" />
-              <Skeleton className="h-12 w-full bg-gray-700 rounded-md" />
-            </div>
-          )}
+            ) : (
+              <div className="space-y-4">
+                <Skeleton className="h-8 w-3/4 bg-neutral-800" />
+                <Skeleton className="h-4 w-1/4 bg-neutral-800" />
+                <Skeleton className="h-32 w-full bg-neutral-800" />
+              </div>
+            )}
+          </div>
         </div>
       </Panel>
 
-      <PanelResizeHandle className="w-1 bg-gray-700" />
+      <PanelResizeHandle className="w-1 bg-neutral-900 hover:bg-blue-500/50 transition-colors" />
 
       <Panel defaultSize={60}>
         <PanelGroup direction="vertical">
-          <Panel defaultSize={70}>
-            <div className="flex flex-col h-full bg-gradient-to-br from-neutral-950 to-neutral-900">
-              <div className="flex items-center justify-between px-4 py-3 bg-neutral-900/50 backdrop-blur-md border-b border-neutral-800/50">
+          <Panel defaultSize={70} minSize={30}>
+            <div className="flex flex-col h-full">
+              {/* Editor Toolbar */}
+              <div className="flex-none flex items-center justify-between border-b border-neutral-800/50 bg-neutral-900/50 px-4 py-2">
                 <div className="flex items-center gap-3">
                   <Select
                     onValueChange={(value) => {
-                      const selected = languages.find(
-                        (lang) => lang.language === value
-                      );
+                      const selected = languages.find((lang) => lang.language === value);
                       if (selected) setLanguage(selected);
                     }}
                     value={language.language}
                   >
-                    <SelectTrigger className="w-[180px] bg-neutral-900/50 border-neutral-700/50 text-white rounded-lg hover:border-blue-500/30 transition-all">
-                      <SelectValue placeholder="Select language" />
+                    <SelectTrigger className="h-8 w-[140px] border-neutral-700 bg-neutral-800 text-xs text-white focus:ring-0">
+                      <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-neutral-900 text-white border-neutral-800 rounded-lg">
+                    <SelectContent className="border-neutral-800 bg-neutral-900 text-white">
                       {languages.map((lang) => (
-                        <SelectItem key={lang.id} value={lang.language}>
+                        <SelectItem key={lang.id} value={lang.language} className="text-xs">
                           {lang.language.toUpperCase()}
                         </SelectItem>
                       ))}
@@ -422,12 +463,12 @@ export default function Dashboard() {
                     onValueChange={(value) => setFontSize(parseInt(value))}
                     value={fontSize.toString()}
                   >
-                    <SelectTrigger className="w-[120px] bg-neutral-900/50 border-neutral-700/50 text-white rounded-lg hover:border-blue-500/30 transition-all">
-                      <SelectValue placeholder="Font Size" />
+                    <SelectTrigger className="h-8 w-[100px] border-neutral-700 bg-neutral-800 text-xs text-white focus:ring-0">
+                      <SelectValue placeholder="Size" />
                     </SelectTrigger>
-                    <SelectContent className="bg-neutral-900 text-white border-neutral-800 rounded-lg">
+                    <SelectContent className="border-neutral-800 bg-neutral-900 text-white">
                       {[12, 14, 16, 18, 20, 22, 24].map((size) => (
-                        <SelectItem key={size} value={size.toString()}>
+                        <SelectItem key={size} value={size.toString()} className="text-xs">
                           {size}px
                         </SelectItem>
                       ))}
@@ -435,79 +476,132 @@ export default function Dashboard() {
                   </Select>
                 </div>
 
-                <div className="flex gap-3">
+                <div className="flex items-center gap-2">
                   <Button
                     onClick={handleRun}
                     disabled={rloader}
-                    className="bg-blue-600 hover:bg-blue-500 text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed rounded-lg shadow-lg shadow-blue-600/20 transition-all"
+                    size="sm"
+                    className="h-8 bg-blue-600/10 text-blue-400 hover:bg-blue-600/20 hover:text-blue-300 border border-blue-600/20"
                   >
-                    {rloader ? "Running..." : "Run"}
+                    {rloader ? (
+                      <span className="animate-spin mr-2">⟳</span>
+                    ) : (
+                      <Play className="mr-1.5 h-3.5 w-3.5" />
+                    )}
+                    Run
                   </Button>
 
                   <Button
                     onClick={handleSubmit}
                     disabled={sloader}
-                    className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed rounded-lg shadow-lg shadow-emerald-600/20 transition-all"
+                    size="sm"
+                    className="h-8 bg-emerald-600 text-white hover:bg-emerald-500 shadow-lg shadow-emerald-900/20"
                   >
-                    {sloader ? "Submitting..." : "Submit"}
+                    {sloader ? (
+                      <span className="animate-spin mr-2">⟳</span>
+                    ) : (
+                      <Send className="mr-1.5 h-3.5 w-3.5" />
+                    )}
+                    Submit
                   </Button>
                 </div>
               </div>
 
-              <Editor
-                height="100%"
-                language={language.language}
-                theme="vs-dark"
-                value={code}
-                onChange={handleCodeChange}
-                options={{
-                  fontSize,
-                  minimap: { enabled: false },
-                  scrollBeyondLastLine: false,
-                }}
-              />
+              {/* Editor */}
+              <div className="flex-1 relative">
+                <Editor
+                  height="100%"
+                  language={language.language}
+                  theme="vs-dark"
+                  value={code}
+                  onChange={handleCodeChange}
+                  options={{
+                    fontSize,
+                    minimap: { enabled: false },
+                    scrollBeyondLastLine: false,
+                    padding: { top: 16, bottom: 16 },
+                    fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
+                  }}
+                />
+              </div>
             </div>
           </Panel>
 
-          <PanelResizeHandle className="h-1 bg-gray-700" />
+          <PanelResizeHandle className="h-1 bg-neutral-900 hover:bg-blue-500/50 transition-colors" />
 
-          <Panel defaultSize={30}>
-            <div className="h-full bg-gradient-to-br from-neutral-950 to-neutral-900 text-white border-t border-neutral-800/50 p-4 overflow-auto">
-
-              <div className="mb-4">
-                <h3 className="text-neutral-300 font-medium mb-2 text-sm">Custom Input</h3>
-                <textarea
-                  value={customInput}
-                  onChange={(e) => setCustomInput(e.target.value)}
-                  className="w-full h-24 bg-neutral-900/50 border border-neutral-700/50 rounded-lg p-3 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/50 transition-all"
-                  placeholder="Enter custom input here..."
-                ></textarea>
+          <Panel defaultSize={30} minSize={20}>
+            <div className="flex flex-col h-full bg-[#1e1e1e] border-t border-neutral-800">
+              <div className="flex-none flex items-center justify-between px-4 py-2 bg-neutral-900 border-b border-neutral-800">
+                <div className="flex items-center gap-2 text-neutral-400">
+                  <Terminal className="h-4 w-4" />
+                  <span className="text-xs font-medium uppercase tracking-wider">Console</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full border ${output?.status?.description === "Accepted" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" :
+                      output?.status?.id !== 3 && output?.status?.id !== 0 ? "bg-rose-500/10 text-rose-400 border-rose-500/20" :
+                        "bg-neutral-800 text-neutral-400 border-neutral-700"
+                    }`}>
+                    {output?.status?.description || "Ready"}
+                  </span>
+                </div>
               </div>
 
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-neutral-300 font-medium text-sm">Output</h3>
-                <span className="text-[10px] bg-neutral-800/50 border border-neutral-700/30 px-2.5 py-1 rounded-full text-neutral-400">
-                  {output?.status?.description || "Idle"}
-                </span>
+              <div className="flex-1 p-4 overflow-auto font-mono text-sm">
+                <div className="grid grid-cols-1 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-xs text-neutral-500 font-medium">Input</label>
+                    <textarea
+                      value={customInput}
+                      onChange={(e) => setCustomInput(e.target.value)}
+                      className="w-full h-20 bg-neutral-900/50 border border-neutral-800 rounded p-2 text-neutral-300 focus:outline-none focus:border-blue-500/50 text-xs resize-none"
+                      placeholder="Enter custom input..."
+                      spellCheck={false}
+                    />
+                  </div>
+
+                  {(output.stdout || (!output.stderr && !output.compile_output && !output.message)) && (
+                    <div className="space-y-2">
+                      <label className="text-xs text-neutral-500 font-medium">Output</label>
+                      <div className="bg-neutral-900/50 border border-neutral-800 rounded p-3 min-h-[3rem]">
+                        <pre className="text-neutral-300 whitespace-pre-wrap break-all">
+                          {output.stdout || <span className="text-neutral-600 italic">Run code to see output...</span>}
+                        </pre>
+                      </div>
+                    </div>
+                  )}
+
+                  {output.stderr && (
+                    <div className="space-y-2">
+                      <label className="text-xs text-rose-500 font-medium flex items-center gap-1">
+                        <AlertCircle className="h-3 w-3" /> Standard Error
+                      </label>
+                      <div className="bg-rose-950/10 border border-rose-900/20 rounded p-3">
+                        <pre className="text-rose-400 whitespace-pre-wrap break-all">{output.stderr}</pre>
+                      </div>
+                    </div>
+                  )}
+
+                  {output.compile_output && (
+                    <div className="space-y-2">
+                      <label className="text-xs text-amber-500 font-medium flex items-center gap-1">
+                        <AlertCircle className="h-3 w-3" /> Compilation Error
+                      </label>
+                      <div className="bg-amber-950/10 border border-amber-900/20 rounded p-3">
+                        <pre className="text-amber-400 whitespace-pre-wrap break-all">{output.compile_output}</pre>
+                      </div>
+                    </div>
+                  )}
+
+                  {output.message && (
+                    <div className="space-y-2">
+                      <label className="text-xs text-blue-500 font-medium">System Message</label>
+                      <div className="bg-blue-950/10 border border-blue-900/20 rounded p-3">
+                        <pre className="text-blue-400 whitespace-pre-wrap break-all">{output.message}</pre>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
-
-              <pre className="text-emerald-400 whitespace-pre-wrap bg-neutral-900/30 border border-neutral-800/30 rounded-lg p-3 text-sm">
-                {output.stdout || "Output will appear here..."}
-              </pre>
-
-              {output.stderr && (
-                <div className="mt-3 p-3 bg-rose-500/5 border border-rose-500/20 rounded-lg">
-                  <h4 className="text-rose-400 font-medium text-sm mb-2">Error Output</h4>
-                  <pre className="text-rose-300 text-xs whitespace-pre-wrap">{output.stderr}</pre>
-                </div>
-              )}
-
-              {output.compile_output && (
-                <div className="mt-3 p-3 bg-amber-500/5 border border-amber-500/20 rounded-lg">
-                  <h4 className="text-amber-400 font-medium text-sm mb-2">Compile Output</h4>
-                  <pre className="text-amber-300 text-xs whitespace-pre-wrap">{output.compile_output}</pre>
-                </div>
-              )}
             </div>
           </Panel>
         </PanelGroup>
