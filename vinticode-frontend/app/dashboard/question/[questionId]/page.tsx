@@ -258,7 +258,7 @@ export default function Dashboard() {
   ];
 
   return (
-    <PanelGroup direction="horizontal" className="h-screen w-full bg-neutral-950 text-white overflow-hidden">
+    <PanelGroup direction="horizontal" className="fixed inset-0 h-dvh w-screen bg-neutral-950 text-white overflow-hidden z-50">
       <Panel defaultSize={40} minSize={20}>
         <div className="flex flex-col h-full border-r border-neutral-800/50">
           <div className="flex-none flex items-center gap-3 border-b border-neutral-800/50 bg-neutral-900/50 backdrop-blur-md px-4 py-3">
@@ -291,10 +291,10 @@ export default function Dashboard() {
                 <div>
                   <span
                     className={`${questionData.difficulty === "Easy"
-                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                        : questionData.difficulty === "Medium"
-                          ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
-                          : "bg-rose-500/10 text-rose-400 border-rose-500/20"
+                      ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                      : questionData.difficulty === "Medium"
+                        ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                        : "bg-rose-500/10 text-rose-400 border-rose-500/20"
                       } inline-flex rounded-full border px-2.5 py-1 text-xs font-medium`}
                   >
                     {questionData.difficulty}
@@ -531,8 +531,8 @@ export default function Dashboard() {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className={`text-[10px] px-2 py-0.5 rounded-full border ${output?.status?.description === "Accepted" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" :
-                      output?.status?.id !== 3 && output?.status?.id !== 0 ? "bg-rose-500/10 text-rose-400 border-rose-500/20" :
-                        "bg-neutral-800 text-neutral-400 border-neutral-700"
+                    output?.status?.id !== 3 && output?.status?.id !== 0 ? "bg-rose-500/10 text-rose-400 border-rose-500/20" :
+                      "bg-neutral-800 text-neutral-400 border-neutral-700"
                     }`}>
                     {output?.status?.description || "Ready"}
                   </span>
