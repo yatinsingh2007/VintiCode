@@ -263,7 +263,6 @@ export default function Dashboard() {
     <PanelGroup direction="horizontal" className="h-screen w-full bg-neutral-950 text-white overflow-hidden">
       <Panel defaultSize={40} minSize={20}>
         <div className="flex flex-col h-full border-r border-neutral-800/50">
-          {/* Header */}
           <div className="flex-none flex items-center gap-3 border-b border-neutral-800/50 bg-neutral-900/50 backdrop-blur-md px-4 py-3">
             <Button
               variant="ghost"
@@ -288,7 +287,6 @@ export default function Dashboard() {
             )}
           </div>
 
-          {/* Problem Content */}
           <div className="flex-1 overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-neutral-800 scrollbar-track-transparent">
             {questionData.title ? (
               <div className="space-y-6 max-w-3xl mx-auto">
@@ -384,7 +382,6 @@ export default function Dashboard() {
                   </div>
                 </div>
 
-                {/* Test Cases Status */}
                 {questionData.test_cases.length > 0 && (
                   <div className="space-y-3 pt-4 border-t border-neutral-800/50">
                     <h3 className="text-sm font-medium text-white">Test Cases</h3>
@@ -437,7 +434,6 @@ export default function Dashboard() {
         <PanelGroup direction="vertical">
           <Panel defaultSize={70} minSize={30}>
             <div className="flex flex-col h-full">
-              {/* Editor Toolbar */}
               <div className="flex-none flex items-center justify-between border-b border-neutral-800/50 bg-neutral-900/50 px-4 py-2">
                 <div className="flex items-center gap-3">
                   <Select
@@ -507,7 +503,6 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              {/* Editor */}
               <div className="flex-1 relative">
                 <Editor
                   height="100%"
