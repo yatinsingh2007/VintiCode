@@ -8,6 +8,7 @@ const { auth } = require('./auth/auth');
 const { question } = require('./question/question');
 const { checkUserAuthentication } = require('./middleware/middleware');
 const { profile } = require('./profile/profile');
+const { runSubmission } = require('./controllers/runSubmission');
 
 const app = express();
 const FRONTEND_PORT = process.env.FRONTEND_PORT || 3000;
@@ -20,6 +21,7 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
+app.post('/api/run-submission/:submissionId', runSubmission);
 
 app.use('/api/auth', auth);
 app.use('/api/dashboard', checkUserAuthentication, dashboard);

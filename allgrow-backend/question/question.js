@@ -1,19 +1,17 @@
 require("dotenv").config();
 
 const express = require("express");
-
 const { prisma } = require("../prisma/prismaClient");
+const { runSubmission } = require("../controllers/runSubmission");
+const { api } = require("../utils");
+const { redis } = require("../redis/redis");
 
 const question = express.Router();
-
-const { api } = require("../utils");
-
-
-const { redis } = require("../redis/redis");
 
 question.post("/runCode/:id", async (req, res) => {
   const randomInt = Math.floor(Math.random() * 5) + 1;
   const { v4: uuidv4 } = await import("uuid");
+
   const { code, language_id, input } = req.body;
   const { id: questionId } = req.params;
   const submissionId = uuidv4();
@@ -23,17 +21,18 @@ question.post("/runCode/:id", async (req, res) => {
       `submission:${submissionId}`,
       JSON.stringify({
         status: "processing",
-        questionId: questionId,
+        questionId,
       }),
       "EX",
       300
     );
+
     const submitRes = await api.post(
-      `/submissions/?base64_encoded=false&wait=false`,
+      "/submissions?base64_encoded=false&wait=false",
       {
         source_code: code,
-        language_id: language_id,
-        stdin: input ? input : "",
+        language_id,
+        stdin: input || "",
         cpu_time_limit: 2,
         wall_time_limit: 4,
       },
@@ -107,7 +106,7 @@ question.post("/runCode/:id", async (req, res) => {
       `submission:${submissionId}`,
       JSON.stringify({
         status: "completed",
-        result: result,
+        result,
       }),
       "EX",
       600
@@ -116,6 +115,7 @@ question.post("/runCode/:id", async (req, res) => {
     return res.status(200).json({ submissionId });
   } catch (err) {
     console.error("Run Error:", err?.response?.data || err.message);
+
     await redis.set(
       `submission:${submissionId}`,
       JSON.stringify({
@@ -129,12 +129,13 @@ question.post("/runCode/:id", async (req, res) => {
       "EX",
       300
     );
+
     return res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
 question.get("/runCode/result/:submissionId", async (req, res) => {
-  const submissionId = req.params.submissionId;
+  const { submissionId } = req.params;
 
   const data = await redis.get(`submission:${submissionId}`);
 
@@ -145,54 +146,60 @@ question.get("/runCode/result/:submissionId", async (req, res) => {
   return res.status(200).json(JSON.parse(data));
 });
 
+
 question.post("/submitCode/:id", async (req, res) => {
   const { v4: uuidv4 } = await import("uuid");
   const submissionId = uuidv4();
 
   const userId = req.user.id;
-
   const { code, language_id } = req.body;
   const { id } = req.params;
+
   try {
     const questionData = await prisma.questions.findUnique({
-      where: {
-        id: id,
-      },
+      where: { id },
     });
+
     if (!questionData) {
-      return res.status(404).json({
-        error: "Question Not Found",
-      });
+      return res.status(404).json({ error: "Question Not Found" });
     }
+
     const testCases = questionData.test_cases;
+
     await redis.set(
-      `submission:${submissionId}`,
+      `submissions:${submissionId}`,
       JSON.stringify({
         status: "queued",
         questionId: id,
         code,
         language_id,
         testCases,
-        userId
+        userId,
       }),
       "EX",
       1800
     );
 
-    await redis.lpush("queue:submissions", submissionId);
-    return res.status(200).json({ submissionId, status: "queued" });
-  } catch (err) {
-    console.log(err);
-    return res.status(500).json({
-      error: "Internal Server Error",
+    fetch(
+      `${process.env.BACKEND_URL}/api/run-submission/${submissionId}`,
+      { method: "POST" }
+    ).catch(console.error);
+
+    return res.status(200).json({
+      submissionId,
+      status: "queued",
     });
+
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
 question.get("/submission/result/:submissionId", async (req, res) => {
   const { submissionId } = req.params;
 
-  const data = await redis.get(`submission:${submissionId}`);
+  const data = await redis.get(`submissions:${submissionId}`);
 
   if (!data) {
     return res.status(404).json({ status: "not_found" });
@@ -205,68 +212,58 @@ question.get("/submissions/:id", async (req, res) => {
   try {
     const ourUser = req.user;
     const { id } = req.params;
+
     const data = await prisma.submissions.findMany({
       where: {
         userId: ourUser.id,
         questionId: id,
       },
-      include: {
-        question: true,
-      },
-      orderBy: {
-        createdAt: "asc",
-      },
+      include: { question: true },
+      orderBy: { createdAt: "asc" },
     });
-    return res.status(200).json({
-      submissions: data,
-    });
+
+    return res.status(200).json({ submissions: data });
   } catch (err) {
     console.log(err);
-    return res.status(500).json({
-      error: "Internal Server Error",
-    });
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
 question.get("/submission/:id", async (req, res) => {
   try {
     const { id } = req.params;
+
     const submissionData = await prisma.submissions.findUnique({
-      where: {
-        id: id,
-      },
+      where: { id },
     });
+
     return res.status(200).json(submissionData);
   } catch (err) {
     console.log(err);
-    return res.status(500).json({
-      error: "Internal Server Error",
-    });
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
 question.get("/latestSubmission/:id", async (req, res) => {
   try {
     const { id } = req.params;
+
     const latestSubmission = await prisma.submissions.findFirst({
       where: {
         userId: req.user.id,
         questionId: id,
       },
-      orderBy: {
-        createdAt: "desc",
-      },
+      orderBy: { createdAt: "desc" },
     });
-    if (!latestSubmission)
-      return res.status(404).json({
-        error: "Submission not Found",
-      });
+
+    if (!latestSubmission) {
+      return res.status(404).json({ error: "Submission not Found" });
+    }
+
     return res.status(200).json(latestSubmission);
   } catch (err) {
     console.log(err);
-    return res.status(500).json({
-      error: "Internal Server Error",
-    });
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
