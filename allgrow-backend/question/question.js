@@ -8,10 +8,8 @@ const question = express.Router();
 
 const { api } = require("../utils");
 
-const { judgeQueue } = require("../queue/judgeQueue");
 
 const { redis } = require("../redis/redis");
-
 
 question.post("/runCode/:id", async (req, res) => {
   const randomInt = Math.floor(Math.random() * 5) + 1;
@@ -105,23 +103,32 @@ question.post("/runCode/:id", async (req, res) => {
       break;
     }
 
-    await redis.set(`submission:${submissionId}` , JSON.stringify({
-      status : "completed",
-      result : result
-    }) , "EX" , 600)
+    await redis.set(
+      `submission:${submissionId}`,
+      JSON.stringify({
+        status: "completed",
+        result: result,
+      }),
+      "EX",
+      600
+    );
 
     return res.status(200).json({ submissionId });
-
   } catch (err) {
     console.error("Run Error:", err?.response?.data || err.message);
-    await redis.set(`submission:${submissionId}` , JSON.stringify({
-      status : "failed",
-      result : {
-        status : "failed",
-        stdout : "",
-        stderr : "Internal Server Error"
-      }
-    }) , "EX" , 300)
+    await redis.set(
+      `submission:${submissionId}`,
+      JSON.stringify({
+        status: "failed",
+        result: {
+          status: "failed",
+          stdout: "",
+          stderr: "Internal Server Error",
+        },
+      }),
+      "EX",
+      300
+    );
     return res.status(500).json({ error: "Internal Server Error" });
   }
 });
@@ -139,9 +146,13 @@ question.get("/runCode/result/:submissionId", async (req, res) => {
 });
 
 question.post("/submitCode/:id", async (req, res) => {
+  const { v4: uuidv4 } = await import("uuid");
+  const submissionId = uuidv4();
+
+  const userId = req.user.id;
+
   const { code, language_id } = req.body;
   const { id } = req.params;
-  const randomInt = Math.floor(Math.random() * 5) + 1;
   try {
     const questionData = await prisma.questions.findUnique({
       where: {
@@ -154,96 +165,40 @@ question.post("/submitCode/:id", async (req, res) => {
       });
     }
     const testCases = questionData.test_cases;
-    const job = await judgeQueue.add("submit", {
-      code,
-      language_id,
-      testCases,
-    });
-    const response = Promise.all(
-      testCases.map(async (testCase) => {
-        try {
-          const res = await api.post(
-            `${process.env.JUDGE0_API}`,
-            {
-              source_code: code,
-              language_id: language_id,
-              stdin: testCase.input,
-              expected_output: testCase.output,
-            },
-            {
-              headers: {
-                "Content-Type": "application/json",
-                "X-RapidAPI-Host": JSON.parse(process.env[`USER_${randomInt}`])[
-                  "x-rapidapi-host"
-                ],
-                "X-RapidAPI-Key": JSON.parse(process.env[`USER_${randomInt}`])[
-                  "x-rapidapi-key"
-                ],
-              },
-            }
-          );
-          return res.data;
-        } catch (err) {
-          console.log(err);
-          return res.status(500).json({
-            message: "Submission Failed",
-          });
-        }
-      })
+    await redis.set(
+      `submission:${submissionId}`,
+      JSON.stringify({
+        status: "queued",
+        questionId: id,
+        code,
+        language_id,
+        testCases,
+        userId
+      }),
+      "EX",
+      1800
     );
 
-    const results = await response;
-
-    const resultSummary = results.map((result) => {
-      return result.status.description;
-    });
-
-    for (let status of resultSummary) {
-      if (status !== "Accepted") {
-        await prisma.$transaction(async (tx) => {
-          await tx.submissions.create({
-            data: {
-              userId: req.user.id,
-              questionId: id,
-              status: `rejected`,
-              languageId: language_id,
-              code: code,
-            },
-          });
-        });
-        return res.status(400).json({
-          message: "Some Test Cases Failed",
-          results: resultSummary,
-        });
-      }
-    }
-    await prisma.$transaction(async (tx) => {
-      await tx.user.update({
-        where: {
-          id: req.user.id,
-        },
-        data: {
-          solvedQuestions: {
-            create: {
-              questionId: id,
-              status: "accepted",
-              code: code,
-              languageId: language_id,
-            },
-          },
-        },
-      });
-    });
-    return res.status(200).json({
-      message: "All Test Cases Passed",
-      results: resultSummary,
-    });
+    await redis.lpush("queue:submissions", submissionId);
+    return res.status(200).json({ submissionId, status: "queued" });
   } catch (err) {
     console.log(err);
     return res.status(500).json({
       error: "Internal Server Error",
     });
   }
+});
+
+question.get("/submission/result/:submissionId", async (req, res) => {
+  const { submissionId } = req.params;
+
+  const data = await redis.get(`submission:${submissionId}`);
+
+  if (!data) {
+    return res.status(404).json({ status: "not_found" });
+  }
+
+  return res.status(200).json(JSON.parse(data));
 });
 
 question.get("/submissions/:id", async (req, res) => {

@@ -225,6 +225,7 @@ export default function Dashboard() {
       setSloader(true);
       setTestcaseStatus(testcaseStatus.map(() => "loading"));
 
+      // 1. Trigger submission
       const resp = await api.post(
         `/questions/submitCode/${questionData.id}`,
         {
@@ -234,52 +235,78 @@ export default function Dashboard() {
         }
       );
 
-      setSubmissionOutput(resp.data.results);
+      const submissionId = resp.data.submissionId;
 
-      setTestcaseStatus(
-        resp.data.results.map((r: string) =>
-          r === "Accepted" ? "accepted" : "failed"
-        )
-      );
+      // 2. Poll for results
+      const MAX_RETRIES = 40; // More retries for submission as it runs multiple test cases
+      let retries = 0;
 
-      toast.success("Code submitted successfully!");
+      const pollSubmission = async () => {
+        if (retries >= MAX_RETRIES) {
+          toast.error("Submission timed out");
+          setSloader(false);
+          setTestcaseStatus(testcaseStatus.map(() => "failed"));
+          return;
+        }
+
+        try {
+          const resultResp = await api.get(`/questions/submission/result/${submissionId}`);
+          const data = resultResp.data;
+
+          if (data.status === "processing" || data.status === "queued") {
+            retries++;
+            setTimeout(pollSubmission, 1000);
+          } else if (data.status === "completed") {
+            const result = data.result;
+            const report = result.report;
+
+
+            const newStatus = report.map((r: any) =>
+              r.verdict === "AC" ? "accepted" : "failed"
+            );
+
+            setTestcaseStatus(newStatus);
+
+            if (result.verdict === "accepted") {
+              toast.success("All Test Cases Passed!");
+            } else {
+              toast.error("Some Test Cases Failed");
+            }
+
+            setSloader(false);
+
+          } else if (data.status === "failed") {
+            toast.error("Submission failed to process");
+            setTestcaseStatus(testcaseStatus.map(() => "failed"));
+            setSloader(false);
+          } else {
+            retries++;
+            setTimeout(pollSubmission, 1000);
+          }
+        } catch (pollErr) {
+          console.error("Polling error:", pollErr);
+          toast.error("Failed to fetch submission results");
+          setSloader(false);
+        }
+      };
+
+      setTimeout(pollSubmission, 1000);
+
     } catch (err: unknown) {
       console.error(err);
+      setSloader(false);
+      setTestcaseStatus(testcaseStatus.map(() => "pending"));
 
       if (axios.isAxiosError(err)) {
         const data = err.response?.data;
-
-        if (data?.results) {
-          const results = data.results;
-          setSubmissionOutput(results);
-          setTestcaseStatus(
-            results.map((r: string) =>
-              r === "Accepted" ? "accepted" : "failed"
-            )
-          );
-        }
-
-        if (data?.error || data?.stderr || data?.compile_output) {
-          setOutput({
-            stdout: "",
-            stderr: data?.stderr || data?.error || "",
-            compile_output: data?.compile_output || "",
-            message: data?.message || "",
-            time: "",
-            memory: 0,
-            token: "",
-            status: { id: 1, description: "Submission Error" }
-          });
-        }
-
-        if (!data?.results && !data?.stderr && !data?.compile_output) {
+        if (data?.error) {
+          toast.error(data.error);
+        } else {
           toast.error("Submission failed!");
         }
       } else {
         toast.error("Submission failed!");
       }
-    } finally {
-      setSloader(false);
     }
   };
 
