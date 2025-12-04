@@ -18,6 +18,13 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { ArrowLeft, CheckCircle2, Play, Send, Terminal, AlertCircle } from "lucide-react";
 
+interface submissionReportItem {
+  verdict: string;
+  input: string;
+  output: string;
+  expected: string;
+}
+
 interface languageDetails {
   language: string;
   id: number;
@@ -220,95 +227,98 @@ export default function Dashboard() {
     }
   };
 
-  const handleSubmit = async () => {
-    try {
-      setSloader(true);
-      setTestcaseStatus(testcaseStatus.map(() => "loading"));
+const handleSubmit = async () => {
+  try {
+    setSloader(true);
 
-      // 1. Trigger submission
-      const resp = await api.post(
-        `/questions/submitCode/${questionData.id}`,
-        {
-          code,
-          questionId,
-          language_id: language.id,
-        }
-      );
+    setTestcaseStatus((prev) => (prev || []).map(() => "loading"));
 
-      const submissionId = resp.data.submissionId;
-
-      // 2. Poll for results
-      const MAX_RETRIES = 40; // More retries for submission as it runs multiple test cases
-      let retries = 0;
-
-      const pollSubmission = async () => {
-        if (retries >= MAX_RETRIES) {
-          toast.error("Submission timed out");
-          setSloader(false);
-          setTestcaseStatus(testcaseStatus.map(() => "failed"));
-          return;
-        }
-
-        try {
-          const resultResp = await api.get(`/questions/submission/result/${submissionId}`);
-          const data = resultResp.data;
-
-          if (data.status === "processing" || data.status === "queued") {
-            retries++;
-            setTimeout(pollSubmission, 1000);
-          } else if (data.status === "completed") {
-            const result = data.result;
-            const report = result.report;
-
-
-            const newStatus = report.map((r: any) =>
-              r.verdict === "AC" ? "accepted" : "failed"
-            );
-
-            setTestcaseStatus(newStatus);
-
-            if (result.verdict === "accepted") {
-              toast.success("All Test Cases Passed!");
-            } else {
-              toast.error("Some Test Cases Failed");
-            }
-
-            setSloader(false);
-
-          } else if (data.status === "failed") {
-            toast.error("Submission failed to process");
-            setTestcaseStatus(testcaseStatus.map(() => "failed"));
-            setSloader(false);
-          } else {
-            retries++;
-            setTimeout(pollSubmission, 1000);
-          }
-        } catch (pollErr) {
-          console.error("Polling error:", pollErr);
-          toast.error("Failed to fetch submission results");
-          setSloader(false);
-        }
-      };
-
-      setTimeout(pollSubmission, 1000);
-
-    } catch (err: unknown) {
-      console.error(err);
-      setSloader(false);
-      setTestcaseStatus(testcaseStatus.map(() => "pending"));
-
-      if (axios.isAxiosError(err)) {
-        const data = err.response?.data;
-        if (data?.error) {
-          toast.error(data.error);
-        } else {
-          toast.error("Submission failed!");
-        }
-      } else {
-        toast.error("Submission failed!");
+    const resp = await api.post(
+      `/questions/submitCode/${questionData.id}`,
+      {
+        code,
+        questionId,
+        language_id: language.id,
       }
+    );
+
+    const submissionId = resp.data.submissionId;
+
+    const MAX_RETRIES = 40;
+    let retries = 0;
+
+    const pollSubmission = async () => {
+      if (retries >= MAX_RETRIES) {
+        toast.error("Submission timed out");
+        setSloader(false);
+        setTestcaseStatus((prev) => (prev || []).map(() => "failed"));
+        return;
+      }
+
+      try {
+        const resultResp = await api.get(
+          `/questions/submission/result/${submissionId}`
+        );
+
+        const data = resultResp.data;
+
+        if (data.status === "processing" || data.status === "queued") {
+          retries++;
+          setTimeout(pollSubmission, 1000);
+        }
+        else if (data.status === "completed") {
+          const result = data.result;
+
+          const report =
+            Array.isArray(result?.report) ? result.report : [];
+
+          const newStatus = report.map((r : submissionReportItem) =>
+            r.verdict === "AC" ? "accepted" : "failed"
+          );
+
+          setTestcaseStatus(newStatus);
+
+          if (result?.verdict === "accepted") {
+            toast.success("All Test Cases Passed!");
+          } else {
+            toast.error("Some Test Cases Failed");
+          }
+
+          setSloader(false);
+        }
+        else if (data.status === "failed") {
+          toast.error("Submission failed to process");
+          setTestcaseStatus((prev) => (prev || []).map(() => "failed"));
+          setSloader(false);
+        }
+        else {
+          retries++;
+          setTimeout(pollSubmission, 1000);
+        }
+      }
+      catch (pollErr) {
+        console.error("Polling error:", pollErr);
+        toast.error("Failed to fetch submission results");
+        setSloader(false);
+      }
+    };
+
+    setTimeout(pollSubmission, 1000);
+  }
+  catch (err) {
+    console.error(err);
+    setSloader(false);
+
+    setTestcaseStatus((prev) => (prev || []).map(() => "pending"));
+
+    if (axios.isAxiosError(err)) {
+      const data = err.response?.data;
+      toast.error(data?.error || "Submission failed!");
+    } else {
+      toast.error("Submission failed!");
     }
-  };
+  }
+};
 
   const handleCodeChange: OnChange = (value) => {
     if (value !== undefined) {
