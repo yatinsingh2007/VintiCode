@@ -114,6 +114,9 @@ auth.post("/login", async (req, res) => {
 
 auth.get("/logout", checkUserAuthentication, (req, res) => {
   res.cookie("token" , null , {
+    httpOnly : true,
+    secure : true,
+    sameSite : "none",
     expires : new Date(Date.now())
   }).status(200).json({
     message: "Logout successful",
