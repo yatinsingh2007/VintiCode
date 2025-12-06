@@ -91,25 +91,31 @@ function SidebarDemoInner() {
                 : links.map((link, idx) => {
                   if (link.label === "Logout") {
                     return (
-                      <div
+                      <button
                         key={idx}
-                        onClick={async (e) => {
+                        type="button"
+                        className="w-full text-left"
+                        onClick={async () => {
                           try {
-                            const res = await api.get("/auth/logout");
-                            if (res.status == 200){
+                            const res = await api.get("/auth/logout", {
+                              withCredentials: true,
+                            });
+
+                            if (res.status === 200) {
                               toast.success("Logged out successfully");
+                              router.push("/auth");
                             }
-                          } catch (err: unknown) {
+                          } catch (err) {
+                            console.error(err);
                             toast.error("Logout failed");
-                          }finally{
-                            toast.dismiss();
                           }
                         }}
                       >
-                        <SidebarLink link={link} />
-                      </div>
+                        <SidebarLink link={{ ...link, href: "#" }} />
+                      </button>
                     );
                   }
+
                   return <SidebarLink key={idx} link={link} />;
                 })}
             </div>
