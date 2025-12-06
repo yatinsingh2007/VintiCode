@@ -67,7 +67,7 @@ function SidebarDemoInner() {
     },
     {
       label: "Logout",
-      href: "/auth",
+      href: "/",
       icon: <IconArrowLeft className="h-5 w-5 text-neutral-300" />,
     },
   ];
@@ -96,12 +96,13 @@ function SidebarDemoInner() {
                         onClick={async (e) => {
                           try {
                             const res = await api.get("/auth/logout");
-                            toast.success("Logged out successfully");
-                            if (res.status === 200) {
-                              router.push("/");
+                            if (res.status == 200){
+                              toast.success("Logged out successfully");
                             }
                           } catch (err: unknown) {
                             toast.error("Logout failed");
+                          }finally{
+                            toast.dismiss();
                           }
                         }}
                       >
@@ -255,7 +256,6 @@ const Dashboard: React.FC<DashboardProps> = ({
   return (
     <div className="flex-1 w-full bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950 overflow-y-auto">
 
-      {/* Header Section */}
       <div className="border-b border-neutral-800/50 bg-neutral-900/30 backdrop-blur-md px-6 py-6 space-y-4 sticky top-0 z-10">
         <div>
           <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
@@ -266,7 +266,6 @@ const Dashboard: React.FC<DashboardProps> = ({
           </p>
         </div>
 
-        {/* Search + Filters */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div className="relative w-full max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 h-4 w-4" />
@@ -307,7 +306,7 @@ const Dashboard: React.FC<DashboardProps> = ({
         )}
       </div>
 
-      {/* Questions Grid */}
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 p-6">
         {loading &&
           Array.from({ length: 9 }).map((_, idx) => <ShimmerCard key={idx} />)}
@@ -365,7 +364,7 @@ const Dashboard: React.FC<DashboardProps> = ({
         )}
       </div>
 
-      {/* Pagination */}
+
       <div className="border-t border-neutral-800/50 bg-neutral-900/30 backdrop-blur-md py-4 px-6 sticky bottom-0">
         <DashboardPagination
           totalPages={totalPages}

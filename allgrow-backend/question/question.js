@@ -2,7 +2,6 @@ require("dotenv").config();
 
 const express = require("express");
 const { prisma } = require("../prisma/prismaClient");
-const { runSubmission } = require("../controllers/runSubmission");
 const { api } = require("../utils");
 const { redis } = require("../redis/redis");
 
