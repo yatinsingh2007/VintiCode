@@ -67,7 +67,7 @@ function SidebarDemoInner() {
     },
     {
       label: "Logout",
-      href: "/",
+      href: "#",
       icon: <IconArrowLeft className="h-5 w-5 text-neutral-300" />,
     },
   ];
@@ -103,7 +103,7 @@ function SidebarDemoInner() {
 
                             if (res.status === 200) {
                               toast.success("Logged out successfully");
-                              router.push("/auth");
+                              router.push("/auth"); 
                             }
                           } catch (err) {
                             console.error(err);
