@@ -113,17 +113,11 @@ auth.post("/login", async (req, res) => {
 });
 
 auth.get("/logout", checkUserAuthentication, (req, res) => {
-  res
-    .clearCookie("token", {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-      path: "/",
-    })
-    .status(200)
-    .json({
-      message: "Logout successful",
-    });
+  res.cookie("token" , null , {
+    expires : new Date(Date.now())
+  }).status(200).json({
+    message: "Logout successful",
+  });
 });
 
 auth.get("/verify", async (req, res) => {
