@@ -303,13 +303,6 @@ const Dashboard: React.FC<DashboardProps> = ({
             </SelectContent>
           </Select>
         </div>
-
-        {!loading && (
-          <p className="text-xs text-neutral-500">
-            Showing {Math.min((page - 1) * itemsPerPage + 1, totalCount)}–
-            {Math.min(page * itemsPerPage, totalCount)} of {totalCount} questions
-          </p>
-        )}
       </div>
 
 
