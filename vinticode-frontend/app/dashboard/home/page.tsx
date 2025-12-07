@@ -103,7 +103,7 @@ function SidebarDemoInner() {
 
                             if (res.status === 200) {
                               toast.success("Logged out successfully");
-                              router.push("/auth"); 
+                              router.push("/auth");
                             }
                           } catch (err) {
                             console.error(err);
@@ -157,11 +157,11 @@ const ShimmerCard = () => (
 const getDifficultyBadge = (difficulty: string) => {
   switch (difficulty.toLowerCase()) {
     case "easy":
-      return "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-sm shadow-emerald-500/10";
+      return "bg-green-500/10 text-green-400 border border-green-500/20 shadow-sm shadow-green-500/10";
     case "medium":
-      return "bg-amber-500/10 text-amber-400 border border-amber-500/20 shadow-sm shadow-amber-500/10";
+      return "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 shadow-sm shadow-yellow-500/10";
     case "hard":
-      return "bg-rose-500/10 text-rose-400 border border-rose-500/20 shadow-sm shadow-rose-500/10";
+      return "bg-red-500/10 text-red-400 border border-red-500/20 shadow-sm shadow-red-500/10";
     default:
       return "bg-neutral-500/10 text-neutral-300 border border-neutral-500/20";
   }
@@ -180,16 +180,16 @@ const Dashboard: React.FC<DashboardProps> = ({
   setData,
   setLoading,
 }) => {
-  const [page, setPage] = useState(1);
-  const [difficultyFilter, setDifficultyFilter] = useState("all");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [ page, setPage ] = useState<number>(1);
+  const [ difficultyFilter, setDifficultyFilter ] = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
-  const [allQuestions, setAllQuestions] = useState<Question[]>([]);
-  const [filteredQuestions, setFilteredQuestions] = useState<Question[]>([]);
-  const [paginatedQuestions, setPaginatedQuestions] = useState<Question[]>([]);
+  const [ allQuestions, setAllQuestions ] = useState<Question[]>([]);
+  const [ filteredQuestions, setFilteredQuestions ] = useState<Question[]>([]);
+  const [ paginatedQuestions, setPaginatedQuestions ] = useState<Question[]>([]);
 
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalCount, setTotalCount] = useState(0);
+  const [ totalPages, setTotalPages ] = useState<number>(1);
+  const [ totalCount, setTotalCount ] = useState<number>(0);
 
   const router = useRouter();
   const itemsPerPage = 9;
