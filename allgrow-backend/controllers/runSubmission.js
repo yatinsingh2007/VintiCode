@@ -13,12 +13,12 @@ async function runSubmission(req, res) {
 
     console.log("Running submission:", submissionId);
 
-    const raw = await redis.get(`submissions:${submissionId}`);
-    if (!raw) {
+    const reddisSubmission = await redis.get(`submissions:${submissionId}`);
+    if (!reddisSubmission) {
       return res.status(404).json({ error: "Submission not found in Redis" });
     }
 
-    const submission = JSON.parse(raw);
+    const submission = JSON.parse(reddisSubmission);
     const {
       code,
       language_id,
@@ -163,8 +163,6 @@ async function runSubmission(req, res) {
         },
       });
     }
-
-    console.log("Submission Completed:", submissionId);
 
     return res.status(200).json({
       success: true,

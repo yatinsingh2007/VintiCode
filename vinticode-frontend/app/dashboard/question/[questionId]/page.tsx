@@ -189,7 +189,11 @@ export default function Dashboard() {
             retries++;
             setTimeout(pollResult, 1000);
           } else if (data.status === "completed") {
-            setOutput(data.result);
+            const result = data.result;
+            if (result.stdout.length > 3000){
+              result.stdout = result.stdout.slice(0, 3000) + "\n\n[Output truncated: too large]"; 
+            }
+            setOutput(result);
             setRloader(false);
           } else if (data.status === "failed") {
             setOutput(prev => ({
