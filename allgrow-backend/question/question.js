@@ -98,6 +98,9 @@ question.post("/runCode/:id", async (req, res) => {
       }
 
       result = pollRes.data;
+      if (result.stdout.length > 3000) {
+        result.stdout = result.stdout.slice(0, 3000) + "\n\n[Output truncated: too large]";
+      }
       break;
     }
 
