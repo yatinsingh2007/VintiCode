@@ -1,21 +1,9 @@
-const express = require("express");
-
 const validator = require("validator");
-
 const bcrypt = require("bcrypt");
-
 const jwt = require("jsonwebtoken");
-
 const { prisma } = require("../prisma/prismaClient");
-const { checkUserAuthentication } = require("../middleware/middleware");
 
-require("dotenv").config();
-
-const auth = express.Router();
-
-auth.use(express.json());
-
-auth.post("/register", async (req, res) => {
+const register = async (req, res) => {
   let { name, email, password } = req.body;
 
   if (!name || !email || !password) {
@@ -41,13 +29,13 @@ auth.post("/register", async (req, res) => {
     return res.status(400).json({ error: "Password is not strong enough" });
   }
 
-  password = await bcrypt.hash(password, 10);
   try {
+    const hashedPassword = await bcrypt.hash(password, 10);
     await prisma.user.create({
       data: {
         name,
         email,
-        password,
+        password: hashedPassword,
       },
     });
     return res.status(201).send("User registered successfully");
@@ -58,9 +46,9 @@ auth.post("/register", async (req, res) => {
     console.log(err);
     return res.status(500).json({ error: "Internal Server Error" });
   }
-});
+};
 
-auth.post("/login", async (req, res) => {
+const login = async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -91,7 +79,7 @@ auth.post("/login", async (req, res) => {
         id: ourUser.id,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "7d" }
+      { expiresIn: "7d" },
     );
 
     return res
@@ -110,20 +98,23 @@ auth.post("/login", async (req, res) => {
     console.log(err);
     return res.status(500).json({ error: "Internal Server Error" });
   }
-});
+};
 
-auth.get("/logout", checkUserAuthentication, (req, res) => {
-  res.cookie("token" , null , {
-    httpOnly : true,
-    secure : true,
-    sameSite : "none",
-    expires : new Date(Date.now())
-  }).status(200).json({
-    message: "Logout successful",
-  });
-});
+const logout = (req, res) => {
+  res
+    .cookie("token", null, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      expires: new Date(Date.now()),
+    })
+    .status(200)
+    .json({
+      message: "Logout successful",
+    });
+};
 
-auth.get("/verify", async (req, res) => {
+const verify = async (req, res) => {
   try {
     const { token } = req.cookies;
     if (!token) {
@@ -151,6 +142,6 @@ auth.get("/verify", async (req, res) => {
       error: "Internal Server Error",
     });
   }
-});
+};
 
-module.exports = { auth };
+module.exports = { register, login, logout, verify };

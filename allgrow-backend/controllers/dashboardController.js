@@ -1,10 +1,6 @@
-const express = require("express");
-
 const { prisma } = require("../prisma/prismaClient");
 
-const dashboard = express.Router();
-
-dashboard.get("/home", async (req, res) => {
+const getHome = async (req, res) => {
   try {
     const allQuestions = await prisma.questions.findMany();
     const completedQuestions = await prisma.questions.findMany({
@@ -26,15 +22,15 @@ dashboard.get("/home", async (req, res) => {
         } else {
           return { ...question, done: false };
         }
-      })
+      }),
     );
   } catch (err) {
     console.log(err);
     return res.status(500).json({ error: "Internal Server Error" });
   }
-});
+};
 
-dashboard.get("/question/:id", async (req, res) => {
+const getQuestionById = async (req, res) => {
   const { id } = req.params;
   if (!id) {
     return res.status(400).json({ error: "Bad Request" });
@@ -53,6 +49,6 @@ dashboard.get("/question/:id", async (req, res) => {
     console.log(err);
     return res.status(500).json({ error: "Internal Server Error" });
   }
-});
+};
 
-module.exports = { dashboard };
+module.exports = { getHome, getQuestionById };

@@ -1,19 +1,17 @@
-const express = require("express");
 const { prisma } = require("../prisma/prismaClient");
-const profile = express.Router();
 
-profile.get("/submissions", async (req, res) => {
+const getSubmissions = async (req, res) => {
   try {
     const rawSubmissionData = await prisma.submissions.findMany({
       where: {
         userId: req.user.id,
       },
-      include : {
-        question : true
+      include: {
+        question: true,
       },
       orderBy: {
         createdAt: "desc",
-      }
+      },
     });
     const refinedSubmissionData = rawSubmissionData.map((submission) => {
       return { ...submission, createdAt: submission.createdAt.toISOString() };
@@ -25,9 +23,9 @@ profile.get("/submissions", async (req, res) => {
       error: "Internal Server Error",
     });
   }
-});
+};
 
-profile.get("/count-of-submittedQuestions", async (req, res) => {
+const getCountOfSubmittedQuestions = async (req, res) => {
   try {
     const data = await prisma.submissions.findMany({
       where: {
@@ -67,29 +65,33 @@ profile.get("/count-of-submittedQuestions", async (req, res) => {
       error: "Internal Server Error",
     });
   }
-});
+};
 
-profile.get('/' , async (req , res) => {
-  try{
+const getUserProfile = async (req, res) => {
+  try {
     const data = await prisma.user.findUnique({
-      where : {
-        id : req.user.id 
-      }
-    })
+      where: {
+        id: req.user.id,
+      },
+    });
 
-    if (!data){
+    if (!data) {
       return res.status(404).json({
-        "error" : "user not found"
-      })
+        error: "user not found",
+      });
     }
 
     return res.status(200).json(data);
-  }catch(err){
+  } catch (err) {
     console.log(err);
     return res.status(500).json({
-      "error" : "Internal Server Error"
-    })
+      error: "Internal Server Error",
+    });
   }
-})
+};
 
-module.exports = { profile };
+module.exports = {
+  getSubmissions,
+  getCountOfSubmittedQuestions,
+  getUserProfile,
+};

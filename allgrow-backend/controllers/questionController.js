@@ -1,13 +1,8 @@
-require("dotenv").config();
-
-const express = require("express");
 const { prisma } = require("../prisma/prismaClient");
 const { api } = require("../utils");
 const { redis } = require("../redis/redis");
 
-const question = express.Router();
-
-question.post("/runCode/:id", async (req, res) => {
+const runCode = async (req, res) => {
   const randomInt = Math.floor(Math.random() * 5) + 1;
   const { v4: uuidv4 } = await import("uuid");
 
@@ -23,7 +18,7 @@ question.post("/runCode/:id", async (req, res) => {
         questionId,
       }),
       "EX",
-      300
+      300,
     );
 
     const submitRes = await api.post(
@@ -45,7 +40,7 @@ question.post("/runCode/:id", async (req, res) => {
             "x-rapidapi-key"
           ],
         },
-      }
+      },
     );
 
     const token = submitRes.data.token;
@@ -68,7 +63,7 @@ question.post("/runCode/:id", async (req, res) => {
               "x-rapidapi-key"
             ],
           },
-        }
+        },
       );
 
       const statusId = pollRes.data.status.id;
@@ -98,8 +93,9 @@ question.post("/runCode/:id", async (req, res) => {
       }
 
       result = pollRes.data;
-      if (result.stdout.length > 3000) {
-        result.stdout = result.stdout.slice(0, 3000) + "\n\n[Output truncated: too large]";
+      if (result.stdout && result.stdout.length > 3000) {
+        result.stdout =
+          result.stdout.slice(0, 3000) + "\n\n[Output truncated: too large]";
       }
       break;
     }
@@ -111,7 +107,7 @@ question.post("/runCode/:id", async (req, res) => {
         result,
       }),
       "EX",
-      600
+      600,
     );
 
     return res.status(200).json({ submissionId });
@@ -129,27 +125,23 @@ question.post("/runCode/:id", async (req, res) => {
         },
       }),
       "EX",
-      300
+      300,
     );
 
     return res.status(500).json({ error: "Internal Server Error" });
   }
-});
+};
 
-question.get("/runCode/result/:submissionId", async (req, res) => {
+const getRunResult = async (req, res) => {
   const { submissionId } = req.params;
-
   const data = await redis.get(`submission:${submissionId}`);
-
   if (!data) {
     return res.status(404).json({ status: "not_found" });
   }
-
   return res.status(200).json(JSON.parse(data));
-});
+};
 
-
-question.post("/submitCode/:id", async (req, res) => {
+const submitCode = async (req, res) => {
   const { v4: uuidv4 } = await import("uuid");
   const submissionId = uuidv4();
 
@@ -179,42 +171,36 @@ question.post("/submitCode/:id", async (req, res) => {
         userId,
       }),
       "EX",
-      1800
+      1800,
     );
 
-    fetch(
-      `${process.env.BACKEND_URL}/api/run-submission/${submissionId}`,
-      { method: "POST" }
-    ).catch(console.error);
+    fetch(`${process.env.BACKEND_URL}/api/run-submission/${submissionId}`, {
+      method: "POST",
+    }).catch(console.error);
 
     return res.status(200).json({
       submissionId,
       status: "queued",
     });
-
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: "Internal Server Error" });
   }
-});
+};
 
-question.get("/submission/result/:submissionId", async (req, res) => {
+const getSubmissionResult = async (req, res) => {
   const { submissionId } = req.params;
-
   const data = await redis.get(`submissions:${submissionId}`);
-
   if (!data) {
     return res.status(404).json({ status: "not_found" });
   }
-
   return res.status(200).json(JSON.parse(data));
-});
+};
 
-question.get("/submissions/:id", async (req, res) => {
+const getSubmissionsByQuestionId = async (req, res) => {
   try {
     const ourUser = req.user;
     const { id } = req.params;
-
     const data = await prisma.submissions.findMany({
       where: {
         userId: ourUser.id,
@@ -223,33 +209,29 @@ question.get("/submissions/:id", async (req, res) => {
       include: { question: true },
       orderBy: { createdAt: "asc" },
     });
-
     return res.status(200).json({ submissions: data });
   } catch (err) {
     console.log(err);
     return res.status(500).json({ error: "Internal Server Error" });
   }
-});
+};
 
-question.get("/submission/:id", async (req, res) => {
+const getSubmissionById = async (req, res) => {
   try {
     const { id } = req.params;
-
     const submissionData = await prisma.submissions.findUnique({
       where: { id },
     });
-
     return res.status(200).json(submissionData);
   } catch (err) {
     console.log(err);
     return res.status(500).json({ error: "Internal Server Error" });
   }
-});
+};
 
-question.get("/latestSubmission/:id", async (req, res) => {
+const getLatestSubmission = async (req, res) => {
   try {
     const { id } = req.params;
-
     const latestSubmission = await prisma.submissions.findFirst({
       where: {
         userId: req.user.id,
@@ -257,16 +239,22 @@ question.get("/latestSubmission/:id", async (req, res) => {
       },
       orderBy: { createdAt: "desc" },
     });
-
     if (!latestSubmission) {
       return res.status(404).json({ error: "Submission not Found" });
     }
-
     return res.status(200).json(latestSubmission);
   } catch (err) {
     console.log(err);
     return res.status(500).json({ error: "Internal Server Error" });
   }
-});
+};
 
-module.exports = { question };
+module.exports = {
+  runCode,
+  getRunResult,
+  submitCode,
+  getSubmissionResult,
+  getSubmissionsByQuestionId,
+  getSubmissionById,
+  getLatestSubmission,
+};
