@@ -342,342 +342,297 @@ export default function Dashboard() {
   ];
 
   return (
-    <PanelGroup direction="horizontal" className="fixed inset-0 h-dvh w-screen bg-neutral-950 text-white overflow-hidden z-50">
-      <Panel defaultSize={40} minSize={20}>
-        <div className="flex flex-col h-full border-r border-neutral-800/50">
-          <div className="flex-none flex items-center gap-3 border-b border-neutral-800/50 bg-neutral-900/50 backdrop-blur-md px-4 py-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="gap-2 text-neutral-400 hover:text-white hover:bg-neutral-800"
-              onClick={() => router.push("/dashboard/home")}
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
+    <PanelGroup direction="horizontal" className="fixed inset-0 h-dvh w-screen bg-neutral-950 text-neutral-200 overflow-hidden z-50 font-sans selection:bg-blue-500/20">
+      <Panel defaultSize={40} minSize={20} className="flex flex-col border-r border-white/5 bg-neutral-900/30">
+        <div className="flex-none flex items-center gap-4 px-5 py-3 border-b border-white/5 bg-neutral-900/50 backdrop-blur-sm">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 rounded-full hover:bg-white/10 text-neutral-400 hover:text-white transition-colors"
+            onClick={() => router.push("/dashboard/home")}
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
 
-            {questionData.title && (
-              <div className="flex items-center gap-3 overflow-hidden">
-                <h1 className="truncate text-sm font-semibold text-white md:text-base">
+          {questionData.title && (
+            <div className="flex flex-col gap-0.5 overflow-hidden">
+              <div className="flex items-center gap-3">
+                <h1 className="truncate text-sm font-medium text-white/90">
                   {questionData.title}
                 </h1>
                 {questionData.done && (
-                  <span className="flex-none inline-flex items-center gap-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 text-[10px] font-medium text-emerald-400">
-                    <CheckCircle2 className="h-3 w-3" /> Solved
-                  </span>
-                )}
-              </div>
-            )}
-          </div>
-
-          <div className="flex-1 overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-neutral-800 scrollbar-track-transparent">
-            {questionData.title ? (
-              <div className="space-y-6 max-w-3xl mx-auto">
-                <div>
-                  <span
-                    className={`${questionData.difficulty === "Easy"
-                      ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                      : questionData.difficulty === "Medium"
-                        ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
-                        : "bg-rose-500/10 text-rose-400 border-rose-500/20"
-                      } inline-flex rounded-full border px-2.5 py-1 text-xs font-medium`}
-                  >
-                    {questionData.difficulty}
-                  </span>
-                </div>
-
-                <div className="prose prose-invert prose-sm max-w-none">
-                  <p className="text-neutral-300 leading-relaxed text-sm">
-                    {questionData.description}
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
-                      Input Format
-                    </h3>
-                    <div className="rounded-lg border border-neutral-800 bg-neutral-900/50 p-3">
-                      <pre className="text-xs text-neutral-300 whitespace-pre-wrap font-mono">
-                        {questionData.input_format}
-                      </pre>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
-                      Output Format
-                    </h3>
-                    <div className="rounded-lg border border-neutral-800 bg-neutral-900/50 p-3">
-                      <pre className="text-xs text-neutral-300 whitespace-pre-wrap font-mono">
-                        {questionData.output_format}
-                      </pre>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
-                        Sample Input
-                      </h3>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-6 text-xs text-neutral-400 hover:text-white"
-                        onClick={() => {
-                          navigator.clipboard.writeText(questionData.sample_input || "");
-                          toast.success("Copied");
-                        }}
-                      >
-                        Copy
-                      </Button>
-                    </div>
-                    <div className="rounded-lg border border-neutral-800 bg-neutral-900/50 p-3">
-                      <pre className="text-xs text-neutral-300 font-mono">
-                        {questionData.sample_input}
-                      </pre>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
-                        Sample Output
-                      </h3>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-6 text-xs text-neutral-400 hover:text-white"
-                        onClick={() => {
-                          navigator.clipboard.writeText(questionData.sample_output || "");
-                          toast.success("Copied");
-                        }}
-                      >
-                        Copy
-                      </Button>
-                    </div>
-                    <div className="rounded-lg border border-neutral-800 bg-neutral-900/50 p-3">
-                      <pre className="text-xs text-neutral-300 font-mono">
-                        {questionData.sample_output}
-                      </pre>
-                    </div>
-                  </div>
-                </div>
-
-                {questionData.test_cases.length > 0 && (
-                  <div className="space-y-3 pt-4 border-t border-neutral-800/50">
-                    <h3 className="text-sm font-medium text-white">Test Cases</h3>
-                    <div className="grid grid-cols-1 gap-2">
-                      {questionData.test_cases.map((testCase, index) => {
-                        const status = testcaseStatus[index];
-                        return (
-                          <div
-                            key={index}
-                            className="flex items-center justify-between rounded-md border border-neutral-800 bg-neutral-900/30 px-3 py-2"
-                          >
-                            <span className="text-xs text-neutral-400">Case {index + 1}</span>
-                            {status === "pending" && (
-                              <span className="text-[10px] text-neutral-600">Pending</span>
-                            )}
-                            {status === "loading" && (
-                              <span className="h-3 w-3 animate-spin rounded-full border-2 border-neutral-600 border-t-transparent"></span>
-                            )}
-                            {status === "accepted" && (
-                              <span className="flex items-center gap-1 text-[10px] font-medium text-emerald-400">
-                                <CheckCircle2 className="h-3 w-3" /> Passed
-                              </span>
-                            )}
-                            {status === "failed" && (
-                              <span className="flex items-center gap-1 text-[10px] font-medium text-rose-400">
-                                <AlertCircle className="h-3 w-3" /> Failed
-                              </span>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
+                  <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-medium text-emerald-500">
+                    <CheckCircle2 className="h-3 w-3" />
+                    <span>Solved</span>
                   </div>
                 )}
               </div>
-            ) : (
-              <div className="space-y-4">
-                <Skeleton className="h-8 w-3/4 bg-neutral-800" />
-                <Skeleton className="h-4 w-1/4 bg-neutral-800" />
-                <Skeleton className="h-32 w-full bg-neutral-800" />
+            </div>
+          )}
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+          {questionData.title ? (
+            <div className="space-y-8 max-w-3xl mx-auto pb-10">
+              <div className="flex items-center gap-3">
+                <span
+                  className={`${questionData.difficulty === "Easy"
+                    ? "text-emerald-400 bg-emerald-400/10 ring-emerald-400/20"
+                    : questionData.difficulty === "Medium"
+                      ? "text-amber-400 bg-amber-400/10 ring-amber-400/20"
+                      : "text-rose-400 bg-rose-400/10 ring-rose-400/20"
+                    } inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ring-1 ring-inset`}
+                >
+                  {questionData.difficulty}
+                </span>
               </div>
-            )}
-          </div>
+
+              <div className="prose prose-invert prose-sm max-w-none prose-p:text-neutral-300 prose-headings:text-neutral-100 prose-pre:bg-white/5 prose-pre:border prose-pre:border-white/5 prose-pre:rounded-lg">
+                <p>{questionData.description}</p>
+              </div>
+
+              <div className="grid grid-cols-1 gap-6">
+                <div className="space-y-2">
+                  <h3 className="text-[10px] font-bold uppercase tracking-wider text-neutral-500">Input Format</h3>
+                  <div className="p-4 rounded-lg bg-white/5 text-sm text-neutral-300 font-mono leading-relaxed border border-white/5">
+                    {questionData.input_format}
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-[10px] font-bold uppercase tracking-wider text-neutral-500">Output Format</h3>
+                  <div className="p-4 rounded-lg bg-white/5 text-sm text-neutral-300 font-mono leading-relaxed border border-white/5">
+                    {questionData.output_format}
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-[10px] font-bold uppercase tracking-wider text-neutral-500">Sample Input</h3>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 text-xs hover:bg-white/10 text-neutral-400 hover:text-white"
+                      onClick={() => {
+                        navigator.clipboard.writeText(questionData.sample_input || "");
+                        toast.success("Copied");
+                      }}
+                    >
+                      Copy
+                    </Button>
+                  </div>
+                  <div className="p-4 rounded-lg bg-white/5 text-sm text-neutral-300 font-mono border border-white/5">
+                    <pre className="whitespace-pre-wrap">{questionData.sample_input}</pre>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-[10px] font-bold uppercase tracking-wider text-neutral-500">Sample Output</h3>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 text-xs hover:bg-white/10 text-neutral-400 hover:text-white"
+                      onClick={() => {
+                        navigator.clipboard.writeText(questionData.sample_output || "");
+                        toast.success("Copied");
+                      }}
+                    >
+                      Copy
+                    </Button>
+                  </div>
+                  <div className="p-4 rounded-lg bg-white/5 text-sm text-neutral-300 font-mono border border-white/5">
+                    <pre className="whitespace-pre-wrap">{questionData.sample_output}</pre>
+                  </div>
+                </div>
+              </div>
+
+              {questionData.test_cases.length > 0 && (
+                <div className="pt-6 border-t border-white/5">
+                  <h3 className="text-sm font-medium text-white mb-4">Test Cases</h3>
+                  <div className="grid grid-cols-2 gap-3">
+                    {questionData.test_cases.map((testCase, index) => {
+                      const status = testcaseStatus[index];
+                      return (
+                        <div
+                          key={index}
+                          className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/5 transition-colors"
+                        >
+                          <span className="text-xs font-medium text-neutral-400">Case {index + 1}</span>
+                          {status === "pending" && (
+                            <span className="text-[10px] text-neutral-600 font-medium tracking-wide">PENDING</span>
+                          )}
+                          {status === "loading" && (
+                            <span className="h-3 w-3 animate-spin rounded-full border-2 border-neutral-600 border-t-transparent"></span>
+                          )}
+                          {status === "accepted" && (
+                            <span className="flex items-center gap-1.5 text-[10px] font-bold text-emerald-500 uppercase tracking-wide">
+                              <CheckCircle2 className="h-3.5 w-3.5" /> PASS
+                            </span>
+                          )}
+                          {status === "failed" && (
+                            <span className="flex items-center gap-1.5 text-[10px] font-bold text-rose-500 uppercase tracking-wide">
+                              <AlertCircle className="h-3.5 w-3.5" /> FAIL
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-6 max-w-3xl mx-auto mt-8">
+              <Skeleton className="h-5 w-24 bg-white/5 rounded-full" />
+              <Skeleton className="h-8 w-3/4 bg-white/5 rounded-lg" />
+              <Skeleton className="h-40 w-full bg-white/5 rounded-lg" />
+            </div>
+          )}
         </div>
       </Panel>
 
-      <PanelResizeHandle className="w-1 bg-neutral-900 hover:bg-blue-500/50 transition-colors" />
+      <PanelResizeHandle className="w-px bg-white/5 hover:bg-blue-500/50 transition-colors" />
 
       <Panel defaultSize={60}>
         <PanelGroup direction="vertical">
-          <Panel defaultSize={70} minSize={30}>
-            <div className="flex flex-col h-full">
-              <div className="flex-none flex items-center justify-between border-b border-neutral-800/50 bg-neutral-900/50 px-4 py-2">
-                <div className="flex items-center gap-3">
-                  <Select
-                    onValueChange={(value) => {
-                      const selected = languages.find((lang) => lang.language === value);
-                      if (selected) setLanguage(selected);
-                    }}
-                    value={language.language}
-                  >
-                    <SelectTrigger className="h-8 w-[140px] border-neutral-700 bg-neutral-800 text-xs text-white focus:ring-0">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="border-neutral-800 bg-neutral-900 text-white">
-                      {languages.map((lang) => (
-                        <SelectItem key={lang.id} value={lang.language} className="text-xs">
-                          {lang.language.toUpperCase()}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-
-                  <Select
-                    onValueChange={(value) => setFontSize(parseInt(value))}
-                    value={fontSize.toString()}
-                  >
-                    <SelectTrigger className="h-8 w-[100px] border-neutral-700 bg-neutral-800 text-xs text-white focus:ring-0">
-                      <SelectValue placeholder="Size" />
-                    </SelectTrigger>
-                    <SelectContent className="border-neutral-800 bg-neutral-900 text-white">
-                      {[12, 14, 16, 18, 20, 22, 24].map((size) => (
-                        <SelectItem key={size} value={size.toString()} className="text-xs">
-                          {size}px
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <Button
-                    onClick={handleRun}
-                    disabled={rloader}
-                    size="sm"
-                    className="h-8 bg-blue-600/10 text-blue-400 hover:bg-blue-600/20 hover:text-blue-300 border border-blue-600/20"
-                  >
-                    {rloader ? (
-                      <span className="animate-spin mr-2">⟳</span>
-                    ) : (
-                      <Play className="mr-1.5 h-3.5 w-3.5" />
-                    )}
-                    Run
-                  </Button>
-
-                  <Button
-                    onClick={handleSubmit}
-                    disabled={sloader}
-                    size="sm"
-                    className="h-8 bg-emerald-600 text-white hover:bg-emerald-500 shadow-lg shadow-emerald-900/20"
-                  >
-                    {sloader ? (
-                      <span className="animate-spin mr-2">⟳</span>
-                    ) : (
-                      <Send className="mr-1.5 h-3.5 w-3.5" />
-                    )}
-                    Submit
-                  </Button>
-                </div>
-              </div>
-
-              <div className="flex-1 relative">
-                <Editor
-                  height="100%"
-                  language={language.language}
-                  theme="vs-dark"
-                  value={code}
-                  onChange={handleCodeChange}
-                  options={{
-                    fontSize,
-                    minimap: { enabled: false },
-                    scrollBeyondLastLine: false,
-                    padding: { top: 16, bottom: 16 },
-                    fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
+          <Panel defaultSize={70} minSize={30} className="flex flex-col bg-[#1e1e1e]">
+            <div className="flex-none h-12 flex items-center justify-between px-4 border-b border-[#2b2b2b] bg-[#1e1e1e]">
+              <div className="flex items-center gap-2">
+                <Select
+                  onValueChange={(value) => {
+                    const selected = languages.find((lang) => lang.language === value);
+                    if (selected) setLanguage(selected);
                   }}
-                />
+                  value={language.language}
+                >
+                  <SelectTrigger className="h-7 w-[130px] border-none bg-white/5 hover:bg-white/10 text-xs text-neutral-300 focus:ring-0 rounded-md transition-colors">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="border-[#2b2b2b] bg-[#1e1e1e] text-neutral-300">
+                    {languages.map((lang) => (
+                      <SelectItem key={lang.id} value={lang.language} className="text-xs hover:bg-white/5 cursor-pointer">
+                        {lang.language.toUpperCase()}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select
+                  onValueChange={(value) => setFontSize(parseInt(value))}
+                  value={fontSize.toString()}
+                >
+                  <SelectTrigger className="h-7 w-[70px] border-none bg-white/5 hover:bg-white/10 text-xs text-neutral-300 focus:ring-0 rounded-md transition-colors">
+                    <SelectValue placeholder="Size" />
+                  </SelectTrigger>
+                  <SelectContent className="border-[#2b2b2b] bg-[#1e1e1e] text-neutral-300">
+                    {[12, 14, 16, 18, 20, 22, 24].map((size) => (
+                      <SelectItem key={size} value={size.toString()} className="text-xs hover:bg-white/5 cursor-pointer">
+                        {size}px
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
+
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={handleRun}
+                  disabled={rloader}
+                  size="sm"
+                  className="h-7 px-3 text-xs bg-white/5 text-neutral-300 hover:text-white hover:bg-white/10 border-none transition-all rounded-md font-medium"
+                >
+                  {rloader ? (
+                    <span className="animate-spin mr-1.5">⟳</span>
+                  ) : (
+                    <Play className="mr-1.5 h-3 w-3" />
+                  )}
+                  Run
+                </Button>
+
+                <Button
+                  onClick={handleSubmit}
+                  disabled={sloader}
+                  size="sm"
+                  className="h-7 px-3 text-xs bg-emerald-500 text-white hover:bg-emerald-400 border-none transition-all rounded-md font-medium shadow-none hover:shadow-lg hover:shadow-emerald-500/20"
+                >
+                  {sloader ? (
+                    <span className="animate-spin mr-1.5">⟳</span>
+                  ) : (
+                    <Send className="mr-1.5 h-3 w-3" />
+                  )}
+                  Submit
+                </Button>
+              </div>
+            </div>
+
+            <div className="flex-1 relative">
+              <Editor
+                height="100%"
+                language={language.language}
+                theme="vs-dark"
+                value={code}
+                onChange={handleCodeChange}
+                options={{
+                  fontSize,
+                  minimap: { enabled: false },
+                  scrollBeyondLastLine: false,
+                  padding: { top: 20, bottom: 20 },
+                  fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
+                  cursorBlinking: "smooth",
+                  cursorSmoothCaretAnimation: "on",
+                }}
+              />
             </div>
           </Panel>
 
-          <PanelResizeHandle className="h-1 bg-neutral-900 hover:bg-blue-500/50 transition-colors" />
+          <PanelResizeHandle className="h-px bg-[#2b2b2b] hover:bg-blue-500/50 transition-colors" />
 
-          <Panel defaultSize={30} minSize={20}>
-            <div className="flex flex-col h-full bg-[#1e1e1e] border-t border-neutral-800">
-              <div className="flex-none flex items-center justify-between px-4 py-2 bg-neutral-900 border-b border-neutral-800">
-                <div className="flex items-center gap-2 text-neutral-400">
-                  <Terminal className="h-4 w-4" />
-                  <span className="text-xs font-medium uppercase tracking-wider">Console</span>
+          <Panel defaultSize={30} minSize={20} className="flex flex-col bg-[#1e1e1e]">
+            <div className="flex-none h-9 flex items-center justify-between px-4 border-b border-[#2b2b2b] bg-[#1e1e1e]">
+              <div className="flex items-center gap-2 text-neutral-500">
+                <Terminal className="h-3.5 w-3.5" />
+                <span className="text-[11px] font-medium uppercase tracking-wider">Console</span>
+              </div>
+              <span className={`text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded ${output?.status?.description === "Accepted" ? "text-emerald-500" :
+                output?.status?.id !== 3 && output?.status?.id !== 0 ? "text-rose-500" :
+                  "text-neutral-500"
+                }`}>
+                {output?.status?.description || "Ready"}
+              </span>
+            </div>
+
+            <div className="flex-1 p-0 overflow-hidden flex">
+              <div className="flex-1 flex flex-col min-w-0">
+                <div className="flex-none px-4 py-2 border-b border-[#2b2b2b]/50">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-600">Standard Output</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full border ${output?.status?.description === "Accepted" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" :
-                    output?.status?.id !== 3 && output?.status?.id !== 0 ? "bg-rose-500/10 text-rose-400 border-rose-500/20" :
-                      "bg-neutral-800 text-neutral-400 border-neutral-700"
-                    }`}>
-                    {output?.status?.description || "Ready"}
-                  </span>
+                <div className="flex-1 overflow-auto p-4 pt-2">
+                  <pre className="text-xs font-mono text-neutral-300 whitespace-pre-wrap break-all leading-relaxed">
+                    {output.stderr ? (
+                      <span className="text-rose-400">{output.stderr}</span>
+                    ) : output.compile_output ? (
+                      <span className="text-amber-400">{output.compile_output}</span>
+                    ) : output.stdout ? (
+                      output.stdout
+                    ) : (
+                      <span className="text-neutral-700 italic opacity-50">Run code to see output...</span>
+                    )}
+                  </pre>
                 </div>
               </div>
 
-              <div className="flex-1 p-4 overflow-auto font-mono text-sm">
-                <div className="grid grid-cols-1 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-xs text-neutral-500 font-medium">Input</label>
-                    <textarea
-                      value={customInput}
-                      onChange={(e) => setCustomInput(e.target.value)}
-                      className="w-full h-20 bg-neutral-900/50 border border-neutral-800 rounded p-2 text-neutral-300 focus:outline-none focus:border-blue-500/50 text-xs resize-none"
-                      placeholder="Enter custom input..."
-                      spellCheck={false}
-                    />
-                  </div>
-
-                  {(output.stdout || (!output.stderr && !output.compile_output && !output.message)) && (
-                    <div className="space-y-2">
-                      <label className="text-xs text-neutral-500 font-medium">Output</label>
-                      <div className="bg-neutral-900/50 border border-neutral-800 rounded p-3 min-h-[3rem]">
-                        <pre className="text-neutral-300 whitespace-pre-wrap break-all">
-                          {output.stdout || <span className="text-neutral-600 italic">Run code to see output...</span>}
-                        </pre>
-                      </div>
-                    </div>
-                  )}
-
-                  {output.stderr && (
-                    <div className="space-y-2">
-                      <label className="text-xs text-rose-500 font-medium flex items-center gap-1">
-                        <AlertCircle className="h-3 w-3" /> Standard Error
-                      </label>
-                      <div className="bg-rose-950/10 border border-rose-900/20 rounded p-3">
-                        <pre className="text-rose-400 whitespace-pre-wrap break-all">{output.stderr}</pre>
-                      </div>
-                    </div>
-                  )}
-
-                  {output.compile_output && (
-                    <div className="space-y-2">
-                      <label className="text-xs text-amber-500 font-medium flex items-center gap-1">
-                        <AlertCircle className="h-3 w-3" /> Compilation Error
-                      </label>
-                      <div className="bg-amber-950/10 border border-amber-900/20 rounded p-3">
-                        <pre className="text-amber-400 whitespace-pre-wrap break-all">{output.compile_output}</pre>
-                      </div>
-                    </div>
-                  )}
-
-                  {output.message && (
-                    <div className="space-y-2">
-                      <label className="text-xs text-blue-500 font-medium">System Message</label>
-                      <div className="bg-blue-950/10 border border-blue-900/20 rounded p-3">
-                        <pre className="text-blue-400 whitespace-pre-wrap break-all">{output.message}</pre>
-                      </div>
-                    </div>
-                  )}
+              <div className="w-1/3 flex flex-col border-l border-[#2b2b2b] min-w-[200px]">
+                <div className="flex-none px-4 py-2 border-b border-[#2b2b2b]/50">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-600">Input</span>
                 </div>
+                <textarea
+                  value={customInput}
+                  onChange={(e) => setCustomInput(e.target.value)}
+                  className="flex-1 w-full bg-transparent p-4 pt-2 text-xs font-mono text-neutral-400 resize-none focus:outline-none placeholder:text-neutral-700/50"
+                  placeholder="Enter custom input..."
+                  spellCheck={false}
+                />
               </div>
             </div>
           </Panel>
