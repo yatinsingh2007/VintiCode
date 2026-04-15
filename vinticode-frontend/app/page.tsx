@@ -13,26 +13,25 @@ export default function BackgroundLinesDemo() {
   const router = useRouter();
   
   useEffect(() => {
-    (async() => {
-      try{
-        toast.loading("Loading");
-        setTimeout(async () => {
-          const response = await api.get("/");
-          if (response.status === 200) {
-          router.push("/dashboard/home");
-          return;
-        }
-        return;
-        }, 2000);
-        toast.success("Welcome Back!");
-        toast.dismiss();
-        return;
-      }catch(err : unknown){
-        console.error("Error fetching data from backend: ", err);
-        return;
+  const checkAuth = async () => {
+    try {
+      toast.loading("Loading");
+
+      const response = await api.get("/");
+
+      if (response.status === 200) {
+        router.push("/dashboard/home");
       }
-    })();
-  } , []);
+
+    } catch (err) {
+      console.log("Not authenticated");
+    } finally {
+      toast.dismiss();
+    }
+  };
+
+  checkAuth();
+}, []);
 
   return (
     <>
