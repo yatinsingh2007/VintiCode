@@ -1,10 +1,12 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
 import { Logo, LogoIcon } from "@/components/Logo";
-import { Search, X, CheckCircle2 } from "lucide-react";
+import { Search, X, CheckCircle2, Sun, Moon } from "lucide-react";
+import { ThemeContext } from "@/context/ThemeContext";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import { Button } from "@/components/ui/button";
 import {
   IconArrowLeft,
   IconBrandTabler,
@@ -58,24 +60,24 @@ function SidebarDemoInner() {
     {
       label: "Dashboard",
       href: "/dashboard/home",
-      icon: <IconBrandTabler className="h-5 w-5 text-neutral-300" />,
+      icon: <IconBrandTabler className="h-5 w-5 text-muted-foreground" />,
     },
     {
       label: "Profile",
       href: "/dashboard/profile",
-      icon: <IconUserBolt className="h-5 w-5 text-neutral-300" />,
+      icon: <IconUserBolt className="h-5 w-5 text-muted-foreground" />,
     },
     {
       label: "Logout",
       href: "#",
-      icon: <IconArrowLeft className="h-5 w-5 text-neutral-300" />,
+      icon: <IconArrowLeft className="h-5 w-5 text-muted-foreground" />,
     },
   ];
 
   return (
     <div
       className={cn(
-        "mx-auto flex w-full h-screen flex-1 flex-col md:flex-row bg-neutral-950 border border-neutral-900"
+        "mx-auto flex w-full h-screen flex-1 flex-col md:flex-row bg-background border border-border"
       )}
     >
       <Sidebar open={open} setOpen={setOpen}>
@@ -135,21 +137,21 @@ function SidebarDemoInner() {
 
 const SidebarShimmer = () => (
   <div className="flex items-center space-x-2 px-2 py-2">
-    <Skeleton className="h-5 w-5 bg-neutral-800 rounded" />
-    <Skeleton className="h-4 w-20 bg-neutral-800 rounded" />
+    <Skeleton className="h-5 w-5 bg-muted rounded" />
+    <Skeleton className="h-4 w-20 bg-muted rounded" />
   </div>
 );
 
 const ShimmerCard = () => (
-  <div className="h-40 rounded-xl border border-neutral-800/50 bg-gradient-to-br from-neutral-900/50 to-neutral-900/30 backdrop-blur-sm p-5 animate-pulse flex flex-col justify-between shadow-lg">
+  <div className="h-40 rounded-xl border border-border bg-card/50 backdrop-blur-sm p-5 animate-pulse flex flex-col justify-between shadow-lg">
     <div className="space-y-3">
-      <div className="h-6 w-3/4 bg-neutral-800/60 rounded-lg" />
-      <div className="h-4 w-full bg-neutral-800/40 rounded-md" />
-      <div className="h-4 w-5/6 bg-neutral-800/40 rounded-md" />
+      <div className="h-6 w-3/4 bg-muted rounded-lg" />
+      <div className="h-4 w-full bg-muted rounded-md" />
+      <div className="h-4 w-5/6 bg-muted rounded-md" />
     </div>
     <div className="flex justify-between items-center">
-      <div className="h-6 w-20 bg-neutral-800/60 rounded-full" />
-      <div className="h-4 w-16 bg-neutral-800/40 rounded" />
+      <div className="h-6 w-20 bg-muted rounded-full" />
+      <div className="h-4 w-16 bg-muted rounded" />
     </div>
   </div>
 );
@@ -163,7 +165,7 @@ const getDifficultyBadge = (difficulty: string) => {
     case "hard":
       return "bg-red-500/10 text-red-400 border border-red-500/20 shadow-sm shadow-red-500/10";
     default:
-      return "bg-neutral-500/10 text-neutral-300 border border-neutral-500/20";
+      return "bg-muted text-muted-foreground border border-border";
   }
 };
 
@@ -192,6 +194,7 @@ const Dashboard: React.FC<DashboardProps> = ({
   const [ totalCount, setTotalCount ] = useState<number>(0);
 
   const router = useRouter();
+  const { theme, toggleTheme } = useContext(ThemeContext);
   const itemsPerPage = 9;
 
   useEffect(() => {
@@ -260,30 +263,40 @@ const Dashboard: React.FC<DashboardProps> = ({
   }, [filteredQuestions, page]);
 
   return (
-    <div className="flex-1 w-full bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950 overflow-y-auto">
+    <div className="flex-1 w-full bg-background overflow-y-auto">
 
-      <div className="border-b border-neutral-800/50 bg-neutral-900/30 backdrop-blur-md px-6 py-6 space-y-4 sticky top-0 z-10">
-        <div>
-          <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-            Practice Questions
-          </h2>
-          <p className="text-sm text-neutral-400 mt-1">
-            Search, filter, and track your coding journey.
-          </p>
+      <div className="border-b border-border bg-muted/30 backdrop-blur-md px-6 py-6 space-y-4 sticky top-0 z-10 transition-colors duration-300">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">
+              Practice Questions
+            </h2>
+            <p className="text-sm text-muted-foreground mt-1">
+              Search, filter, and track your coding journey.
+            </p>
+          </div>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={toggleTheme}
+            className="h-10 w-10 rounded-xl border-border bg-card hover:bg-muted text-foreground transition-all duration-300"
+          >
+            {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          </Button>
         </div>
 
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div className="relative w-full max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 h-4 w-4" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <Input
               placeholder="Search questions..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-10 bg-neutral-900/50 border-neutral-700/50 text-white placeholder:text-neutral-500 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all rounded-lg"
+              className="pl-10 pr-10 bg-card border-border text-foreground placeholder:text-muted-foreground focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all rounded-lg"
             />
             {searchQuery && (
               <button
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-white transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 onClick={() => setSearchQuery("")}
               >
                 <X className="h-4 w-4" />
@@ -292,10 +305,10 @@ const Dashboard: React.FC<DashboardProps> = ({
           </div>
 
           <Select value={difficultyFilter} onValueChange={setDifficultyFilter}>
-            <SelectTrigger className="bg-neutral-900/50 border-neutral-700/50 text-white min-w-[140px] focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all rounded-lg">
+            <SelectTrigger className="bg-card border-border text-foreground min-w-[140px] focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all rounded-lg">
               <SelectValue placeholder="Difficulty" />
             </SelectTrigger>
-            <SelectContent className="bg-neutral-900 border-neutral-800 text-white rounded-lg">
+            <SelectContent className="bg-popover border-border text-popover-foreground rounded-lg">
               <SelectItem value="all">All Levels</SelectItem>
               <SelectItem value="easy">Easy</SelectItem>
               <SelectItem value="medium">Medium</SelectItem>
@@ -315,11 +328,11 @@ const Dashboard: React.FC<DashboardProps> = ({
             <div
               key={q.id}
               onClick={() => router.push(`/dashboard/question/${q.id}`)}
-              className="group cursor-pointer rounded-xl border border-neutral-800/50 bg-gradient-to-br from-neutral-900/60 to-neutral-900/40 backdrop-blur-sm p-5 hover:border-blue-500/30 hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300 hover:-translate-y-1"
+              className="group cursor-pointer rounded-xl border border-border bg-card/50 backdrop-blur-sm p-5 hover:border-blue-500/30 hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300 hover:-translate-y-1"
             >
               <div className="space-y-3">
                 <div className="flex items-start justify-between gap-2">
-                  <h4 className="text-lg font-semibold text-white line-clamp-1 group-hover:text-blue-400 transition-colors">
+                  <h4 className="text-lg font-semibold text-foreground line-clamp-1 group-hover:text-blue-500 transition-colors">
                     {q.title}
                   </h4>
 
@@ -331,12 +344,12 @@ const Dashboard: React.FC<DashboardProps> = ({
                   )}
                 </div>
 
-                <p className="text-sm text-neutral-400 line-clamp-2 leading-relaxed">
+                <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
                   {q.description}
                 </p>
               </div>
 
-              <div className="mt-4 pt-4 border-t border-neutral-800/50 flex items-center justify-between">
+              <div className="mt-4 pt-4 border-t border-border flex items-center justify-between">
                 <span
                   className={`text-xs px-3 py-1.5 rounded-full font-medium ${getDifficultyBadge(
                     q.difficulty
@@ -345,7 +358,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                   {q.difficulty}
                 </span>
 
-                <span className="text-xs text-neutral-500 group-hover:text-blue-400 flex items-center gap-1 transition-colors">
+                <span className="text-xs text-muted-foreground group-hover:text-blue-500 flex items-center gap-1 transition-colors">
                   View
                   <span className="group-hover:translate-x-1 transition-transform inline-block">→</span>
                 </span>
@@ -354,17 +367,17 @@ const Dashboard: React.FC<DashboardProps> = ({
           ))}
 
         {!loading && paginatedQuestions.length === 0 && (
-          <div className="col-span-full text-center py-16 text-neutral-400 border border-neutral-800/50 rounded-xl bg-neutral-900/30 backdrop-blur-sm">
+          <div className="col-span-full text-center py-16 text-muted-foreground border border-border rounded-xl bg-muted/20 backdrop-blur-sm">
             <div className="space-y-2">
-              <p className="text-lg font-medium">No matching questions found</p>
-              <p className="text-sm text-neutral-500">Try adjusting your search or filters</p>
+              <p className="text-lg font-medium text-foreground">No matching questions found</p>
+              <p className="text-sm text-muted-foreground">Try adjusting your search or filters</p>
             </div>
           </div>
         )}
       </div>
 
 
-      <div className="border-t border-neutral-800/50 bg-neutral-900/30 backdrop-blur-md py-4 px-6 sticky bottom-0">
+      <div className="border-t border-border bg-muted/30 backdrop-blur-md py-4 px-6 sticky bottom-0">
         <DashboardPagination
           totalPages={totalPages}
           currentPage={page}

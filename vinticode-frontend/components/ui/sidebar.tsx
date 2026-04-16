@@ -89,7 +89,7 @@ export const DesktopSidebar = ({
       role="navigation"
       aria-expanded={open}
       className={cn(
-        "h-full px-4 py-4 hidden md:flex md:flex-col bg-neutral-950 text-neutral-200 w-[300px] shrink-0 border-r border-neutral-800",
+        "h-full px-4 py-4 hidden md:flex md:flex-col bg-background text-foreground w-[300px] shrink-0 border-r border-border",
         className
       )}
       animate={{
@@ -113,13 +113,13 @@ export const MobileSidebar = ({
   return (
     <div
       className={cn(
-        "h-10 px-4 py-4 flex flex-row md:hidden items-center justify-between bg-neutral-950 text-neutral-200 w-full border-b border-neutral-800"
+        "h-10 px-4 py-4 flex flex-row md:hidden items-center justify-between bg-background text-foreground w-full border-b border-border"
       )}
       {...props}
     >
       <div className="flex justify-end z-20 w-full">
         <IconMenu2
-          className="text-neutral-200"
+          className="text-foreground"
           onClick={() => setOpen(!open)}
         />
       </div>
@@ -134,12 +134,12 @@ export const MobileSidebar = ({
               ease: "easeInOut",
             }}
             className={cn(
-              "fixed h-full w-full inset-0 bg-neutral-950 text-neutral-200 p-10 z-[100] flex flex-col justify-between",
+              "fixed h-full w-full inset-0 bg-background text-foreground p-10 z-[100] flex flex-col justify-between",
               className
             )}
           >
             <div
-              className="absolute right-10 top-10 z-50 text-neutral-200"
+              className="absolute right-10 top-10 z-50 text-foreground"
               onClick={() => setOpen(!open)}
             >
               <IconX />
@@ -165,7 +165,7 @@ export const SidebarLink = ({
     <a
       href={link.href}
       className={cn(
-        "flex items-center justify-start gap-2 group/sidebar py-2 text-neutral-300 hover:text-white hover:bg-neutral-900 rounded-md px-2 transition",
+        "flex items-center justify-start gap-2 group/sidebar py-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-md px-2 transition",
         className
       )}
       {...props}
