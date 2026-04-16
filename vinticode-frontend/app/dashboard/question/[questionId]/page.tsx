@@ -16,7 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { ArrowLeft, CheckCircle2, Play, Send, Terminal, AlertCircle } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Play, Send, Terminal, AlertCircle, Sun, Moon } from "lucide-react";
 
 interface submissionReportItem {
   verdict: string;
@@ -141,6 +141,17 @@ export default function Dashboard() {
   const [code, setCode] = useState<string>("");
   const [rloader, setRloader] = useState<boolean>(false);
   const [sloader, setSloader] = useState<boolean>(false);
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
+
+  useEffect(() => {
+    const root = window.document.documentElement;
+    root.classList.remove("light", "dark");
+    root.classList.add(theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === "dark" ? "light" : "dark");
+  };
 
   const handleRun = async () => {
     try {
@@ -355,9 +366,9 @@ export default function Dashboard() {
   };
 
   return (
-    <PanelGroup direction="horizontal" className="fixed inset-0 h-dvh w-screen bg-neutral-950 text-neutral-200 overflow-hidden z-50 font-sans selection:bg-indigo-500/30">
-      <Panel defaultSize={40} minSize={25} className="flex flex-col border-r border-white/5 bg-neutral-950/50 backdrop-blur-xl">
-        <div className="flex-none h-14 flex items-center gap-4 px-6 border-b border-white/5 bg-neutral-900/20 backdrop-blur-md">
+    <PanelGroup direction="horizontal" className="fixed inset-0 h-dvh w-screen bg-background text-foreground overflow-hidden z-50 font-sans selection:bg-indigo-500/30">
+      <Panel defaultSize={40} minSize={25} className="flex flex-col border-r border-border bg-background/50 backdrop-blur-xl">
+        <div className="flex-none h-14 flex items-center gap-4 px-6 border-b border-border bg-muted/20 backdrop-blur-md">
           <Button
             variant="ghost"
             size="icon"
@@ -369,7 +380,7 @@ export default function Dashboard() {
 
           <div className="flex flex-col gap-0.5 overflow-hidden">
             <div className="flex items-center gap-3">
-              <h1 className="truncate text-sm font-semibold tracking-tight text-white/90">
+              <h1 className="truncate text-sm font-semibold tracking-tight text-foreground/90">
                 {questionData.title || "Loading Question..."}
               </h1>
               {questionData.done && (
@@ -382,7 +393,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-8 scrollbar-thin scrollbar-thumb-white/5 scrollbar-track-transparent">
+        <div className="flex-1 overflow-y-auto p-8 scrollbar-thin scrollbar-thumb-muted-foreground/10 scrollbar-track-transparent">
           {questionData.title ? (
             <div className="space-y-10 max-w-3xl mx-auto pb-12">
               <div className="flex items-center gap-4">
@@ -402,22 +413,22 @@ export default function Dashboard() {
               </div>
 
               <div className="space-y-4">
-                <h2 className="text-xl font-bold tracking-tight text-white">Problem Statement</h2>
-                <div className="prose prose-invert prose-sm max-w-none prose-p:text-neutral-400 prose-p:leading-relaxed prose-headings:text-neutral-100 prose-pre:bg-white/5 prose-pre:border prose-pre:border-white/5 prose-pre:rounded-xl">
+                <h2 className="text-xl font-bold tracking-tight text-foreground">Problem Statement</h2>
+                <div className="prose dark:prose-invert prose-sm max-w-none prose-p:text-muted-foreground prose-p:leading-relaxed prose-headings:text-foreground prose-pre:bg-muted/50 prose-pre:border prose-pre:border-border prose-pre:rounded-xl">
                   <p className="text-[15px] leading-relaxed">{questionData.description}</p>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 gap-8">
                 <div className="space-y-3">
-                  <h3 className="text-[11px] font-bold uppercase tracking-widest text-indigo-400/70">Input Format</h3>
-                  <div className="p-5 rounded-xl bg-white/[0.02] text-[13px] text-neutral-300 font-mono leading-relaxed border border-white/5 hover:border-white/10 transition-colors">
+                  <h3 className="text-[11px] font-bold uppercase tracking-widest text-indigo-500/70">Input Format</h3>
+                  <div className="p-5 rounded-xl bg-muted/30 text-[13px] text-foreground/80 font-mono leading-relaxed border border-border hover:border-indigo-500/30 transition-colors">
                     {questionData.input_format}
                   </div>
                 </div>
                 <div className="space-y-3">
-                  <h3 className="text-[11px] font-bold uppercase tracking-widest text-indigo-400/70">Output Format</h3>
-                  <div className="p-5 rounded-xl bg-white/[0.02] text-[13px] text-neutral-300 font-mono leading-relaxed border border-white/5 hover:border-white/10 transition-colors">
+                  <h3 className="text-[11px] font-bold uppercase tracking-widest text-indigo-500/70">Output Format</h3>
+                  <div className="p-5 rounded-xl bg-muted/30 text-[13px] text-foreground/80 font-mono leading-relaxed border border-border hover:border-indigo-500/30 transition-colors">
                     {questionData.output_format}
                   </div>
                 </div>
@@ -430,7 +441,7 @@ export default function Dashboard() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-7 px-3 text-[10px] uppercase font-bold tracking-widest hover:bg-white/5 text-neutral-500 hover:text-white transition-all"
+                      className="h-7 px-3 text-[10px] uppercase font-bold tracking-widest hover:bg-muted text-muted-foreground hover:text-foreground transition-all"
                       onClick={() => {
                         navigator.clipboard.writeText(questionData.sample_input || "");
                         toast.success("Copied Input");
@@ -439,17 +450,17 @@ export default function Dashboard() {
                       Copy
                     </Button>
                   </div>
-                  <div className="p-5 rounded-xl bg-white/[0.03] text-sm text-neutral-300 font-mono border border-white/5 shadow-inner">
+                  <div className="p-5 rounded-xl bg-muted/20 text-sm text-foreground/80 font-mono border border-border shadow-inner">
                     <pre className="whitespace-pre-wrap leading-relaxed">{questionData.sample_input}</pre>
                   </div>
                 </div>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-[11px] font-bold uppercase tracking-widest text-indigo-400/70">Sample Output</h3>
+                    <h3 className="text-[11px] font-bold uppercase tracking-widest text-indigo-500/70">Sample Output</h3>
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-7 px-3 text-[10px] uppercase font-bold tracking-widest hover:bg-white/5 text-neutral-500 hover:text-white transition-all"
+                      className="h-7 px-3 text-[10px] uppercase font-bold tracking-widest hover:bg-muted text-muted-foreground hover:text-foreground transition-all"
                       onClick={() => {
                         navigator.clipboard.writeText(questionData.sample_output || "");
                         toast.success("Copied Output");
@@ -458,26 +469,26 @@ export default function Dashboard() {
                       Copy
                     </Button>
                   </div>
-                  <div className="p-5 rounded-xl bg-white/[0.03] text-sm text-neutral-300 font-mono border border-white/5 shadow-inner">
+                  <div className="p-5 rounded-xl bg-muted/20 text-sm text-foreground/80 font-mono border border-border shadow-inner">
                     <pre className="whitespace-pre-wrap leading-relaxed">{questionData.sample_output}</pre>
                   </div>
                 </div>
               </div>
 
               {questionData.test_cases.length > 0 && (
-                <div className="pt-10 border-t border-white/5">
-                  <h3 className="text-sm font-semibold text-white/90 uppercase tracking-widest mb-6 px-1">Verification Status</h3>
+                <div className="pt-10 border-t border-border">
+                  <h3 className="text-sm font-semibold text-foreground/90 uppercase tracking-widest mb-6 px-1">Verification Status</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {questionData.test_cases.map((testCase, index) => {
                       const status = testcaseStatus[index];
                       return (
                         <div
                           key={index}
-                          className="flex items-center justify-between p-4 rounded-xl bg-white/[0.02] border border-white/5 hover:border-white/10 hover:bg-white/[0.04] transition-all duration-300 group"
+                          className="flex items-center justify-between p-4 rounded-xl bg-muted/20 border border-border hover:border-indigo-500/20 hover:bg-muted/30 transition-all duration-300 group"
                         >
                           <div className="flex flex-col gap-1">
-                            <span className="text-[10px] font-bold text-neutral-500 group-hover:text-neutral-400 uppercase tracking-widest transition-colors">Test Case</span>
-                            <span className="text-sm font-semibold text-neutral-300">Case #0{index + 1}</span>
+                            <span className="text-[10px] font-bold text-muted-foreground group-hover:text-foreground/60 uppercase tracking-widest transition-colors">Test Case</span>
+                            <span className="text-sm font-semibold text-foreground/80">Case #0{index + 1}</span>
                           </div>
                           <div className="flex items-center">
                             {status === "pending" && (
@@ -524,16 +535,16 @@ export default function Dashboard() {
         </div>
       </Panel>
 
-      <PanelResizeHandle className="w-1.5 flex items-center justify-center group bg-black/40 hover:bg-indigo-500/50 transition-all duration-300 relative z-50">
-        <div className="h-8 w-1 rounded-full bg-white/10 group-hover:bg-white/40 transition-colors" />
+      <PanelResizeHandle className="w-1.5 flex items-center justify-center group bg-border/20 hover:bg-indigo-500/50 transition-all duration-300 relative z-50">
+        <div className="h-8 w-1 rounded-full bg-border group-hover:bg-white/40 transition-colors" />
       </PanelResizeHandle>
 
       <Panel defaultSize={60}>
         <PanelGroup direction="vertical">
-          <Panel defaultSize={65} minSize={30} className="flex flex-col bg-[#0d0d0d]">
-            <div className="flex-none h-14 flex items-center justify-between px-6 border-b border-white/5 bg-neutral-900/40 backdrop-blur-md">
+          <Panel defaultSize={65} minSize={30} className="flex flex-col bg-background">
+            <div className="flex-none h-14 flex items-center justify-between px-6 border-b border-border bg-muted/20 backdrop-blur-md">
               <div className="flex items-center gap-4">
-                <div className="flex items-center gap-1.5 bg-white/5 p-1 rounded-xl border border-white/5">
+                <div className="flex items-center gap-1.5 bg-muted/40 p-1 rounded-xl border border-border">
                   <Select
                     onValueChange={(value) => {
                       const selected = languages.find((lang) => lang.language === value);
@@ -541,30 +552,30 @@ export default function Dashboard() {
                     }}
                     value={language.language}
                   >
-                    <SelectTrigger className="h-8 w-[140px] border-none bg-transparent hover:bg-white/5 text-[11px] font-bold uppercase tracking-widest text-neutral-300 focus:ring-0 rounded-lg transition-all">
+                    <SelectTrigger className="h-8 w-[140px] border-none bg-transparent hover:bg-muted text-[11px] font-bold uppercase tracking-widest text-foreground/70 focus:ring-0 rounded-lg transition-all">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="border-white/5 bg-neutral-900 text-neutral-300 backdrop-blur-xl">
+                    <SelectContent className="border-border bg-popover text-popover-foreground backdrop-blur-xl">
                       {languages.map((lang) => (
-                        <SelectItem key={lang.id} value={lang.language} className="text-[11px] font-bold uppercase tracking-widest hover:bg-indigo-500/10 focus:bg-indigo-500/20 cursor-pointer">
+                        <SelectItem key={lang.id} value={lang.language} className="text-[11px] font-bold uppercase tracking-widest hover:bg-primary/10 focus:bg-primary/20 cursor-pointer">
                           {lang.language}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
 
-                  <div className="w-[1px] h-4 bg-white/10 mx-1" />
+                  <div className="w-[1px] h-4 bg-border mx-1" />
 
                   <Select
                     onValueChange={(value) => setFontSize(parseInt(value))}
                     value={fontSize.toString()}
                   >
-                    <SelectTrigger className="h-8 w-[80px] border-none bg-transparent hover:bg-white/5 text-[11px] font-bold uppercase tracking-widest text-neutral-300 focus:ring-0 rounded-lg transition-all">
+                    <SelectTrigger className="h-8 w-[80px] border-none bg-transparent hover:bg-muted text-[11px] font-bold uppercase tracking-widest text-foreground/70 focus:ring-0 rounded-lg transition-all">
                       <SelectValue placeholder="Size" />
                     </SelectTrigger>
-                    <SelectContent className="border-white/5 bg-neutral-900 text-neutral-300 backdrop-blur-xl">
+                    <SelectContent className="border-border bg-popover text-popover-foreground backdrop-blur-xl">
                       {[12, 14, 16, 18, 20, 22, 24].map((size) => (
-                        <SelectItem key={size} value={size.toString()} className="text-[11px] font-bold tracking-widest hover:bg-indigo-500/10 focus:bg-indigo-500/20 cursor-pointer">
+                        <SelectItem key={size} value={size.toString()} className="text-[11px] font-bold tracking-widest hover:bg-primary/10 focus:bg-primary/20 cursor-pointer">
                           {size}px
                         </SelectItem>
                       ))}
@@ -575,10 +586,19 @@ export default function Dashboard() {
 
               <div className="flex items-center gap-3">
                 <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleTheme}
+                  className="h-9 w-9 rounded-xl hover:bg-muted text-muted-foreground hover:text-foreground transition-all duration-300"
+                >
+                  {theme === "dark" ? <Sun className="h-4.5 w-4.5" /> : <Moon className="h-4.5 w-4.5" />}
+                </Button>
+
+                <Button
                   onClick={handleRun}
                   disabled={rloader}
                   size="sm"
-                  className="h-9 px-5 text-[11px] font-bold uppercase tracking-widest bg-white/5 text-neutral-400 hover:text-white hover:bg-white/10 border border-white/5 transition-all rounded-xl active:scale-95"
+                  className="h-9 px-5 text-[11px] font-bold uppercase tracking-widest bg-blue-600 text-white hover:bg-blue-500 border-none shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] transition-all rounded-xl active:scale-95"
                 >
                   {rloader ? (
                     <div className="flex items-center gap-2">
@@ -597,7 +617,7 @@ export default function Dashboard() {
                   onClick={handleSubmit}
                   disabled={sloader}
                   size="sm"
-                  className="h-9 px-6 text-[11px] font-bold uppercase tracking-widest bg-indigo-600 text-white hover:bg-indigo-500 border-none transition-all rounded-xl shadow-[0_0_20px_rgba(79,70,229,0.2)] hover:shadow-[0_0_25px_rgba(79,70,229,0.4)] active:scale-95"
+                  className="h-9 px-6 text-[11px] font-bold uppercase tracking-widest bg-emerald-600 text-white hover:bg-emerald-500 border-none transition-all rounded-xl shadow-[0_4px_14px_0_rgba(16,185,129,0.39)] active:scale-95"
                 >
                   {sloader ? (
                     <div className="flex items-center gap-2">
@@ -614,11 +634,11 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <div className="flex-1 relative bg-[#121212]">
+            <div className="flex-1 relative bg-background border-t border-border">
               <Editor
                 height="100%"
                 language={language.language}
-                theme="vs-dark"
+                theme={theme === "dark" ? "vs-dark" : "light"}
                 value={code}
                 onChange={handleCodeChange}
                 options={{
@@ -643,26 +663,26 @@ export default function Dashboard() {
             </div>
           </Panel>
 
-          <PanelResizeHandle className="h-1.5 flex items-center justify-center group bg-black/40 hover:bg-indigo-500/50 transition-all duration-300 relative z-50">
-            <div className="w-8 h-1 rounded-full bg-white/10 group-hover:bg-white/40 transition-colors" />
+          <PanelResizeHandle className="h-1.5 flex items-center justify-center group bg-border/20 hover:bg-indigo-500/50 transition-all duration-300 relative z-50">
+            <div className="w-8 h-1 rounded-full bg-border group-hover:bg-white/40 transition-colors" />
           </PanelResizeHandle>
 
-          <Panel defaultSize={35} minSize={20} className="flex flex-col bg-[#0a0a0a]">
-            <div className="flex-none h-12 flex items-center justify-between px-6 border-b border-white/5 bg-neutral-900/40 backdrop-blur-md">
+          <Panel defaultSize={35} minSize={20} className="flex flex-col bg-background">
+            <div className="flex-none h-12 flex items-center justify-between px-6 border-b border-border bg-muted/20 backdrop-blur-md">
               <div className="flex items-center gap-6">
-                <div className="flex items-center gap-2 text-indigo-400">
+                <div className="flex items-center gap-2 text-indigo-500">
                   <Terminal className="h-4 w-4" />
                   <span className="text-[11px] font-bold uppercase tracking-widest">Execution Console</span>
                 </div>
 
                 {output?.status?.id !== 0 && (
-                  <div className="flex items-center gap-4 border-l border-white/10 pl-6 animate-in fade-in slide-in-from-left-4 duration-500">
+                  <div className="flex items-center gap-4 border-l border-border pl-6 animate-in fade-in slide-in-from-left-4 duration-500">
                     <div className="flex flex-col">
-                      <span className="text-[8px] font-bold text-neutral-600 uppercase tracking-tighter">Status</span>
+                      <span className="text-[8px] font-bold text-muted-foreground uppercase tracking-tighter">Status</span>
                       <span className={`text-[10px] font-bold uppercase tracking-wider ${output?.status?.id === 3 ? "text-emerald-500" :
                         output?.status?.id === 4 ? "text-rose-500" :
                           output?.status?.id === 5 ? "text-amber-500" :
-                            "text-indigo-400"
+                            "text-indigo-500"
                         }`}>
                         {output?.status?.description}
                       </span>
@@ -670,15 +690,15 @@ export default function Dashboard() {
 
                     {output.time && (
                       <div className="flex flex-col">
-                        <span className="text-[8px] font-bold text-neutral-600 uppercase tracking-tighter">Time</span>
-                        <span className="text-[10px] font-bold text-neutral-400 tabular-nums lowercase tracking-wider">{output.time}s</span>
+                        <span className="text-[8px] font-bold text-muted-foreground uppercase tracking-tighter">Time</span>
+                        <span className="text-[10px] font-bold text-muted-foreground/80 tabular-nums lowercase tracking-wider">{output.time}s</span>
                       </div>
                     )}
 
                     {output.memory && (
                       <div className="flex flex-col">
-                        <span className="text-[8px] font-bold text-neutral-600 uppercase tracking-tighter">Memory</span>
-                        <span className="text-[10px] font-bold text-neutral-400 tabular-nums lowercase tracking-wider">{(output.memory / 1024).toFixed(1)}MB</span>
+                        <span className="text-[8px] font-bold text-muted-foreground uppercase tracking-tighter">Memory</span>
+                        <span className="text-[10px] font-bold text-muted-foreground/80 tabular-nums lowercase tracking-wider">{(output.memory / 1024).toFixed(1)}MB</span>
                       </div>
                     )}
                   </div>
@@ -690,16 +710,16 @@ export default function Dashboard() {
                   variant="ghost"
                   size="sm"
                   onClick={handleClearOutput}
-                  className="h-7 px-3 text-[10px] font-bold uppercase tracking-widest text-neutral-600 hover:text-white hover:bg-white/5 transition-all"
+                  className="h-7 px-3 text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground hover:bg-muted transition-all"
                 >
                   Clear
                 </Button>
               </div>
             </div>
 
-            <div className="flex-1 p-0 overflow-hidden flex bg-[#0d0d0d]">
+            <div className="flex-1 p-0 overflow-hidden flex bg-background">
               <div className="flex-1 flex flex-col min-w-0">
-                <div className="flex-1 overflow-auto p-6 scrollbar-thin scrollbar-thumb-white/5 scrollbar-track-transparent">
+                <div className="flex-1 overflow-auto p-6 scrollbar-thin scrollbar-thumb-muted-foreground/10 scrollbar-track-transparent">
                   <div className="max-w-4xl">
                     {output.stderr ? (
                       <div className="space-y-4">
@@ -707,7 +727,7 @@ export default function Dashboard() {
                           <AlertCircle className="h-3.5 w-3.5" />
                           <span className="text-[10px] font-bold uppercase tracking-widest">Runtime Error</span>
                         </div>
-                        <pre className="text-[13px] font-mono text-rose-400/90 whitespace-pre-wrap break-all leading-relaxed p-4 rounded-xl bg-rose-500/5 border border-rose-500/10">
+                        <pre className="text-[13px] font-mono text-rose-500/90 whitespace-pre-wrap break-all leading-relaxed p-4 rounded-xl bg-rose-500/10 border border-rose-500/20">
                           {output.stderr}
                         </pre>
                       </div>
@@ -717,22 +737,22 @@ export default function Dashboard() {
                           <AlertCircle className="h-3.5 w-3.5" />
                           <span className="text-[10px] font-bold uppercase tracking-widest">Compilation Error</span>
                         </div>
-                        <pre className="text-[13px] font-mono text-amber-400/90 whitespace-pre-wrap break-all leading-relaxed p-4 rounded-xl bg-amber-500/5 border border-amber-500/10">
+                        <pre className="text-[13px] font-mono text-amber-500/90 whitespace-pre-wrap break-all leading-relaxed p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
                           {output.compile_output}
                         </pre>
                       </div>
                     ) : (
                       <div className="space-y-4">
                         <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-600">Standard Output</span>
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Standard Output</span>
                         </div>
                         {output.stdout ? (
-                          <pre className="text-[14px] font-mono text-neutral-300 whitespace-pre-wrap break-all leading-relaxed selection:bg-indigo-500/30">
+                          <pre className="text-[14px] font-mono text-foreground/90 whitespace-pre-wrap break-all leading-relaxed selection:bg-indigo-500/30">
                             {output.stdout}
                           </pre>
                         ) : (
-                          <div className="flex flex-col items-center justify-center py-12 opacity-20 pointer-events-none">
-                            <Terminal className="h-10 w-10 mb-3 text-neutral-400" />
+                          <div className="flex flex-col items-center justify-center py-12 opacity-30 pointer-events-none">
+                            <Terminal className="h-10 w-10 mb-3 text-muted-foreground" />
                             <p className="text-xs font-medium tracking-widest uppercase">Console Ready</p>
                           </div>
                         )}
@@ -742,19 +762,19 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div className="w-[320px] flex flex-col border-l border-white/5 bg-black/20 backdrop-blur-sm">
-                <div className="flex-none h-10 flex items-center px-5 border-b border-white/5 bg-white/[0.02]">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">Test Input</span>
+              <div className="w-[320px] flex flex-col border-l border-border bg-muted/10 backdrop-blur-sm">
+                <div className="flex-none h-10 flex items-center px-5 border-b border-border bg-muted/20">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Test Input</span>
                 </div>
                 <div className="flex-1 relative group">
                   <textarea
                     value={customInput}
                     onChange={(e) => setCustomInput(e.target.value)}
-                    className="absolute inset-0 w-full h-full bg-transparent p-6 text-[13px] font-mono text-neutral-400 resize-none focus:outline-none placeholder:text-neutral-700/50 scrollbar-thin scrollbar-thumb-white/5 transition-all focus:bg-white/[0.01]"
+                    className="absolute inset-0 w-full h-full bg-transparent p-6 text-[13px] font-mono text-foreground/80 resize-none focus:outline-none placeholder:text-muted-foreground/40 scrollbar-thin scrollbar-thumb-muted-foreground/10 transition-all focus:bg-muted/10"
                     placeholder="Enter process input..."
                     spellCheck={false}
                   />
-                  <div className="absolute bottom-4 right-4 text-[9px] font-bold text-neutral-700 group-focus-within:text-indigo-500 transition-colors uppercase tracking-tighter">
+                  <div className="absolute bottom-4 right-4 text-[9px] font-bold text-muted-foreground group-focus-within:text-indigo-500 transition-colors uppercase tracking-tighter">
                     Editable Stdin
                   </div>
                 </div>

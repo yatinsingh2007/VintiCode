@@ -75,14 +75,21 @@ const runCode = async (req, res) => {
           if (timeoutResult.stdout && timeoutResult.stdout.length > 3000) {
             timeoutResult.stdout = timeoutResult.stdout.slice(0, 3000) + "\n\n[Output truncated: too large]";
           }
-          return res.status(200).json({
-            result: {
-              ...timeoutResult,
-              status: "TLE",
-              stdout: timeoutResult.stdout || "",
-              stderr: timeoutResult.stderr || "Time Limit Exceeded",
-            },
-          });
+          await redis.set(
+            `submission:${submissionId}`,
+            JSON.stringify({
+              status: "completed",
+              result: {
+                ...timeoutResult,
+                status: "TLE",
+                stdout: timeoutResult.stdout || "",
+                stderr: timeoutResult.stderr || "Time Limit Exceeded",
+              },
+            }),
+            "EX",
+            600
+          );
+          return res.status(200).json({ submissionId });
         }
         continue;
       }
@@ -92,14 +99,21 @@ const runCode = async (req, res) => {
         if (tleResult.stdout && tleResult.stdout.length > 3000) {
           tleResult.stdout = tleResult.stdout.slice(0, 3000) + "\n\n[Output truncated: too large]";
         }
-        return res.status(200).json({
-          result: {
-            ...tleResult,
-            status: "TLE",
-            stdout: tleResult.stdout || "",
-            stderr: tleResult.stderr || "Time Limit Exceeded",
-          },
-        });
+        await redis.set(
+          `submission:${submissionId}`,
+          JSON.stringify({
+            status: "completed",
+            result: {
+              ...tleResult,
+              status: "TLE",
+              stdout: tleResult.stdout || "",
+              stderr: tleResult.stderr || "Time Limit Exceeded",
+            },
+          }),
+          "EX",
+          600
+        );
+        return res.status(200).json({ submissionId });
       }
 
       result = pollRes.data;
