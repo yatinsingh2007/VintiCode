@@ -88,7 +88,7 @@ async function runSubmission(req, res) {
         if (statusId <= 2) {
           polls++;
           if (polls >= MAX_POLLS) {
-            result = { status: "TLE" };
+            result = pollRes.data || { status: "TLE" };
             finalVerdict = "TLE";
             break;
           }
@@ -96,7 +96,7 @@ async function runSubmission(req, res) {
         }
 
         if (statusId === 5) {
-          result = { status: "TLE" };
+          result = pollRes.data || { status: "TLE" };
           finalVerdict = "TLE";
           break;
         }

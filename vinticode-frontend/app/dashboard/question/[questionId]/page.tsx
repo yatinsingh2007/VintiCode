@@ -341,140 +341,167 @@ export default function Dashboard() {
     { language: "javascript", id: 63 },
   ];
 
+  const handleClearOutput = () => {
+    setOutput({
+      stdout: "",
+      stderr: "",
+      compile_output: "",
+      message: "",
+      time: "",
+      memory: 0,
+      token: "",
+      status: { id: 0, description: "" },
+    });
+  };
+
   return (
-    <PanelGroup direction="horizontal" className="fixed inset-0 h-dvh w-screen bg-neutral-950 text-neutral-200 overflow-hidden z-50 font-sans selection:bg-blue-500/20">
-      <Panel defaultSize={40} minSize={20} className="flex flex-col border-r border-white/5 bg-neutral-900/30">
-        <div className="flex-none flex items-center gap-4 px-5 py-3 border-b border-white/5 bg-neutral-900/50 backdrop-blur-sm">
+    <PanelGroup direction="horizontal" className="fixed inset-0 h-dvh w-screen bg-neutral-950 text-neutral-200 overflow-hidden z-50 font-sans selection:bg-indigo-500/30">
+      <Panel defaultSize={40} minSize={25} className="flex flex-col border-r border-white/5 bg-neutral-950/50 backdrop-blur-xl">
+        <div className="flex-none h-14 flex items-center gap-4 px-6 border-b border-white/5 bg-neutral-900/20 backdrop-blur-md">
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 rounded-full hover:bg-white/10 text-neutral-400 hover:text-white transition-colors"
+            className="h-9 w-9 rounded-xl hover:bg-white/5 text-neutral-400 hover:text-white transition-all duration-300 active:scale-95"
             onClick={() => router.push("/dashboard/home")}
           >
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="h-4.5 w-4.5" />
           </Button>
 
-          {questionData.title && (
-            <div className="flex flex-col gap-0.5 overflow-hidden">
-              <div className="flex items-center gap-3">
-                <h1 className="truncate text-sm font-medium text-white/90">
-                  {questionData.title}
-                </h1>
-                {questionData.done && (
-                  <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-medium text-emerald-500">
-                    <CheckCircle2 className="h-3 w-3" />
-                    <span>Solved</span>
-                  </div>
-                )}
-              </div>
+          <div className="flex flex-col gap-0.5 overflow-hidden">
+            <div className="flex items-center gap-3">
+              <h1 className="truncate text-sm font-semibold tracking-tight text-white/90">
+                {questionData.title || "Loading Question..."}
+              </h1>
+              {questionData.done && (
+                <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-bold text-emerald-400 uppercase tracking-wider">
+                  <CheckCircle2 className="h-3 w-3" />
+                  <span>Solved</span>
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+        <div className="flex-1 overflow-y-auto p-8 scrollbar-thin scrollbar-thumb-white/5 scrollbar-track-transparent">
           {questionData.title ? (
-            <div className="space-y-8 max-w-3xl mx-auto pb-10">
-              <div className="flex items-center gap-3">
+            <div className="space-y-10 max-w-3xl mx-auto pb-12">
+              <div className="flex items-center gap-4">
                 <span
                   className={`${questionData.difficulty === "Easy"
-                    ? "text-emerald-400 bg-emerald-400/10 ring-emerald-400/20"
+                    ? "text-emerald-400 bg-emerald-400/5 ring-emerald-400/20"
                     : questionData.difficulty === "Medium"
-                      ? "text-amber-400 bg-amber-400/10 ring-amber-400/20"
-                      : "text-rose-400 bg-rose-400/10 ring-rose-400/20"
-                    } inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ring-1 ring-inset`}
+                      ? "text-amber-400 bg-amber-400/5 ring-amber-400/20"
+                      : "text-rose-400 bg-rose-400/5 ring-rose-400/20"
+                    } inline-flex items-center px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider ring-1 ring-inset`}
                 >
                   {questionData.difficulty}
                 </span>
+                <span className="text-[11px] text-neutral-500 font-medium uppercase tracking-widest">
+                  Memory Limit: 256MB
+                </span>
               </div>
 
-              <div className="prose prose-invert prose-sm max-w-none prose-p:text-neutral-300 prose-headings:text-neutral-100 prose-pre:bg-white/5 prose-pre:border prose-pre:border-white/5 prose-pre:rounded-lg">
-                <p>{questionData.description}</p>
+              <div className="space-y-4">
+                <h2 className="text-xl font-bold tracking-tight text-white">Problem Statement</h2>
+                <div className="prose prose-invert prose-sm max-w-none prose-p:text-neutral-400 prose-p:leading-relaxed prose-headings:text-neutral-100 prose-pre:bg-white/5 prose-pre:border prose-pre:border-white/5 prose-pre:rounded-xl">
+                  <p className="text-[15px] leading-relaxed">{questionData.description}</p>
+                </div>
               </div>
 
-              <div className="grid grid-cols-1 gap-6">
-                <div className="space-y-2">
-                  <h3 className="text-[10px] font-bold uppercase tracking-wider text-neutral-500">Input Format</h3>
-                  <div className="p-4 rounded-lg bg-white/5 text-sm text-neutral-300 font-mono leading-relaxed border border-white/5">
+              <div className="grid grid-cols-1 gap-8">
+                <div className="space-y-3">
+                  <h3 className="text-[11px] font-bold uppercase tracking-widest text-indigo-400/70">Input Format</h3>
+                  <div className="p-5 rounded-xl bg-white/[0.02] text-[13px] text-neutral-300 font-mono leading-relaxed border border-white/5 hover:border-white/10 transition-colors">
                     {questionData.input_format}
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <h3 className="text-[10px] font-bold uppercase tracking-wider text-neutral-500">Output Format</h3>
-                  <div className="p-4 rounded-lg bg-white/5 text-sm text-neutral-300 font-mono leading-relaxed border border-white/5">
+                <div className="space-y-3">
+                  <h3 className="text-[11px] font-bold uppercase tracking-widest text-indigo-400/70">Output Format</h3>
+                  <div className="p-5 rounded-xl bg-white/[0.02] text-[13px] text-neutral-300 font-mono leading-relaxed border border-white/5 hover:border-white/10 transition-colors">
                     {questionData.output_format}
                   </div>
                 </div>
               </div>
 
-              <div className="space-y-6">
-                <div className="space-y-2">
+              <div className="space-y-8">
+                <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-[10px] font-bold uppercase tracking-wider text-neutral-500">Sample Input</h3>
+                    <h3 className="text-[11px] font-bold uppercase tracking-widest text-indigo-400/70">Sample Input</h3>
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-6 text-xs hover:bg-white/10 text-neutral-400 hover:text-white"
+                      className="h-7 px-3 text-[10px] uppercase font-bold tracking-widest hover:bg-white/5 text-neutral-500 hover:text-white transition-all"
                       onClick={() => {
                         navigator.clipboard.writeText(questionData.sample_input || "");
-                        toast.success("Copied");
+                        toast.success("Copied Input");
                       }}
                     >
                       Copy
                     </Button>
                   </div>
-                  <div className="p-4 rounded-lg bg-white/5 text-sm text-neutral-300 font-mono border border-white/5">
-                    <pre className="whitespace-pre-wrap">{questionData.sample_input}</pre>
+                  <div className="p-5 rounded-xl bg-white/[0.03] text-sm text-neutral-300 font-mono border border-white/5 shadow-inner">
+                    <pre className="whitespace-pre-wrap leading-relaxed">{questionData.sample_input}</pre>
                   </div>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-[10px] font-bold uppercase tracking-wider text-neutral-500">Sample Output</h3>
+                    <h3 className="text-[11px] font-bold uppercase tracking-widest text-indigo-400/70">Sample Output</h3>
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-6 text-xs hover:bg-white/10 text-neutral-400 hover:text-white"
+                      className="h-7 px-3 text-[10px] uppercase font-bold tracking-widest hover:bg-white/5 text-neutral-500 hover:text-white transition-all"
                       onClick={() => {
                         navigator.clipboard.writeText(questionData.sample_output || "");
-                        toast.success("Copied");
+                        toast.success("Copied Output");
                       }}
                     >
                       Copy
                     </Button>
                   </div>
-                  <div className="p-4 rounded-lg bg-white/5 text-sm text-neutral-300 font-mono border border-white/5">
-                    <pre className="whitespace-pre-wrap">{questionData.sample_output}</pre>
+                  <div className="p-5 rounded-xl bg-white/[0.03] text-sm text-neutral-300 font-mono border border-white/5 shadow-inner">
+                    <pre className="whitespace-pre-wrap leading-relaxed">{questionData.sample_output}</pre>
                   </div>
                 </div>
               </div>
 
               {questionData.test_cases.length > 0 && (
-                <div className="pt-6 border-t border-white/5">
-                  <h3 className="text-sm font-medium text-white mb-4">Test Cases</h3>
-                  <div className="grid grid-cols-2 gap-3">
+                <div className="pt-10 border-t border-white/5">
+                  <h3 className="text-sm font-semibold text-white/90 uppercase tracking-widest mb-6 px-1">Verification Status</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {questionData.test_cases.map((testCase, index) => {
                       const status = testcaseStatus[index];
                       return (
                         <div
                           key={index}
-                          className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/5 transition-colors"
+                          className="flex items-center justify-between p-4 rounded-xl bg-white/[0.02] border border-white/5 hover:border-white/10 hover:bg-white/[0.04] transition-all duration-300 group"
                         >
-                          <span className="text-xs font-medium text-neutral-400">Case {index + 1}</span>
-                          {status === "pending" && (
-                            <span className="text-[10px] text-neutral-600 font-medium tracking-wide">PENDING</span>
-                          )}
-                          {status === "loading" && (
-                            <span className="h-3 w-3 animate-spin rounded-full border-2 border-neutral-600 border-t-transparent"></span>
-                          )}
-                          {status === "accepted" && (
-                            <span className="flex items-center gap-1.5 text-[10px] font-bold text-emerald-500 uppercase tracking-wide">
-                              <CheckCircle2 className="h-3.5 w-3.5" /> PASS
-                            </span>
-                          )}
-                          {status === "failed" && (
-                            <span className="flex items-center gap-1.5 text-[10px] font-bold text-rose-500 uppercase tracking-wide">
-                              <AlertCircle className="h-3.5 w-3.5" /> FAIL
-                            </span>
-                          )}
+                          <div className="flex flex-col gap-1">
+                            <span className="text-[10px] font-bold text-neutral-500 group-hover:text-neutral-400 uppercase tracking-widest transition-colors">Test Case</span>
+                            <span className="text-sm font-semibold text-neutral-300">Case #0{index + 1}</span>
+                          </div>
+                          <div className="flex items-center">
+                            {status === "pending" && (
+                              <span className="text-[10px] text-neutral-600 font-bold tracking-widest uppercase">Idle</span>
+                            )}
+                            {status === "loading" && (
+                              <div className="flex items-center gap-2 text-indigo-400">
+                                <span className="text-[10px] font-bold uppercase tracking-widest animate-pulse">Running</span>
+                                <span className="h-3 w-3 animate-spin rounded-full border border-indigo-400 border-t-transparent"></span>
+                              </div>
+                            )}
+                            {status === "accepted" && (
+                              <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                                <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Passed</span>
+                                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
+                              </div>
+                            )}
+                            {status === "failed" && (
+                              <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-rose-500/10 border border-rose-500/20">
+                                <span className="text-[10px] font-bold text-rose-500 uppercase tracking-widest">Failed</span>
+                                <AlertCircle className="h-3.5 w-3.5 text-rose-500" />
+                              </div>
+                            )}
+                          </div>
                         </div>
                       );
                     })}
@@ -483,90 +510,111 @@ export default function Dashboard() {
               )}
             </div>
           ) : (
-            <div className="space-y-6 max-w-3xl mx-auto mt-8">
-              <Skeleton className="h-5 w-24 bg-white/5 rounded-full" />
-              <Skeleton className="h-8 w-3/4 bg-white/5 rounded-lg" />
-              <Skeleton className="h-40 w-full bg-white/5 rounded-lg" />
+            <div className="space-y-8 max-w-3xl mx-auto mt-10">
+              <Skeleton className="h-6 w-20 bg-white/5 rounded-full" />
+              <Skeleton className="h-10 w-3/4 bg-white/5 rounded-xl" />
+              <div className="space-y-4 pt-6">
+                <Skeleton className="h-4 w-full bg-white/5 rounded-md" />
+                <Skeleton className="h-4 w-full bg-white/5 rounded-md" />
+                <Skeleton className="h-4 w-2/3 bg-white/5 rounded-md" />
+              </div>
+              <Skeleton className="h-48 w-full bg-white/5 rounded-2xl" />
             </div>
           )}
         </div>
       </Panel>
 
-      <PanelResizeHandle className="w-px bg-white/5 hover:bg-blue-500/50 transition-colors" />
+      <PanelResizeHandle className="w-1.5 flex items-center justify-center group bg-black/40 hover:bg-indigo-500/50 transition-all duration-300 relative z-50">
+        <div className="h-8 w-1 rounded-full bg-white/10 group-hover:bg-white/40 transition-colors" />
+      </PanelResizeHandle>
 
       <Panel defaultSize={60}>
         <PanelGroup direction="vertical">
-          <Panel defaultSize={70} minSize={30} className="flex flex-col bg-[#1e1e1e]">
-            <div className="flex-none h-12 flex items-center justify-between px-4 border-b border-[#2b2b2b] bg-[#1e1e1e]">
-              <div className="flex items-center gap-2">
-                <Select
-                  onValueChange={(value) => {
-                    const selected = languages.find((lang) => lang.language === value);
-                    if (selected) setLanguage(selected);
-                  }}
-                  value={language.language}
-                >
-                  <SelectTrigger className="h-7 w-[130px] border-none bg-white/5 hover:bg-white/10 text-xs text-neutral-300 focus:ring-0 rounded-md transition-colors">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="border-[#2b2b2b] bg-[#1e1e1e] text-neutral-300">
-                    {languages.map((lang) => (
-                      <SelectItem key={lang.id} value={lang.language} className="text-xs hover:bg-white/5 cursor-pointer">
-                        {lang.language.toUpperCase()}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+          <Panel defaultSize={65} minSize={30} className="flex flex-col bg-[#0d0d0d]">
+            <div className="flex-none h-14 flex items-center justify-between px-6 border-b border-white/5 bg-neutral-900/40 backdrop-blur-md">
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-1.5 bg-white/5 p-1 rounded-xl border border-white/5">
+                  <Select
+                    onValueChange={(value) => {
+                      const selected = languages.find((lang) => lang.language === value);
+                      if (selected) setLanguage(selected);
+                    }}
+                    value={language.language}
+                  >
+                    <SelectTrigger className="h-8 w-[140px] border-none bg-transparent hover:bg-white/5 text-[11px] font-bold uppercase tracking-widest text-neutral-300 focus:ring-0 rounded-lg transition-all">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="border-white/5 bg-neutral-900 text-neutral-300 backdrop-blur-xl">
+                      {languages.map((lang) => (
+                        <SelectItem key={lang.id} value={lang.language} className="text-[11px] font-bold uppercase tracking-widest hover:bg-indigo-500/10 focus:bg-indigo-500/20 cursor-pointer">
+                          {lang.language}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
 
-                <Select
-                  onValueChange={(value) => setFontSize(parseInt(value))}
-                  value={fontSize.toString()}
-                >
-                  <SelectTrigger className="h-7 w-[70px] border-none bg-white/5 hover:bg-white/10 text-xs text-neutral-300 focus:ring-0 rounded-md transition-colors">
-                    <SelectValue placeholder="Size" />
-                  </SelectTrigger>
-                  <SelectContent className="border-[#2b2b2b] bg-[#1e1e1e] text-neutral-300">
-                    {[12, 14, 16, 18, 20, 22, 24].map((size) => (
-                      <SelectItem key={size} value={size.toString()} className="text-xs hover:bg-white/5 cursor-pointer">
-                        {size}px
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  <div className="w-[1px] h-4 bg-white/10 mx-1" />
+
+                  <Select
+                    onValueChange={(value) => setFontSize(parseInt(value))}
+                    value={fontSize.toString()}
+                  >
+                    <SelectTrigger className="h-8 w-[80px] border-none bg-transparent hover:bg-white/5 text-[11px] font-bold uppercase tracking-widest text-neutral-300 focus:ring-0 rounded-lg transition-all">
+                      <SelectValue placeholder="Size" />
+                    </SelectTrigger>
+                    <SelectContent className="border-white/5 bg-neutral-900 text-neutral-300 backdrop-blur-xl">
+                      {[12, 14, 16, 18, 20, 22, 24].map((size) => (
+                        <SelectItem key={size} value={size.toString()} className="text-[11px] font-bold tracking-widest hover:bg-indigo-500/10 focus:bg-indigo-500/20 cursor-pointer">
+                          {size}px
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 <Button
                   onClick={handleRun}
                   disabled={rloader}
                   size="sm"
-                  className="h-7 px-3 text-xs bg-white/5 text-neutral-300 hover:text-white hover:bg-white/10 border-none transition-all rounded-md font-medium"
+                  className="h-9 px-5 text-[11px] font-bold uppercase tracking-widest bg-white/5 text-neutral-400 hover:text-white hover:bg-white/10 border border-white/5 transition-all rounded-xl active:scale-95"
                 >
                   {rloader ? (
-                    <span className="animate-spin mr-1.5">⟳</span>
+                    <div className="flex items-center gap-2">
+                      <span className="h-3 w-3 animate-spin rounded-full border border-white/40 border-t-transparent" />
+                      <span>Running</span>
+                    </div>
                   ) : (
-                    <Play className="mr-1.5 h-3 w-3" />
+                    <div className="flex items-center gap-2">
+                      <Play className="h-3.5 w-3.5" />
+                      <span>Run</span>
+                    </div>
                   )}
-                  Run
                 </Button>
 
                 <Button
                   onClick={handleSubmit}
                   disabled={sloader}
                   size="sm"
-                  className="h-7 px-3 text-xs bg-emerald-500 text-white hover:bg-emerald-400 border-none transition-all rounded-md font-medium shadow-none hover:shadow-lg hover:shadow-emerald-500/20"
+                  className="h-9 px-6 text-[11px] font-bold uppercase tracking-widest bg-indigo-600 text-white hover:bg-indigo-500 border-none transition-all rounded-xl shadow-[0_0_20px_rgba(79,70,229,0.2)] hover:shadow-[0_0_25px_rgba(79,70,229,0.4)] active:scale-95"
                 >
                   {sloader ? (
-                    <span className="animate-spin mr-1.5">⟳</span>
+                    <div className="flex items-center gap-2">
+                      <span className="h-3 w-3 animate-spin rounded-full border border-white/40 border-t-transparent" />
+                      <span>Submitting</span>
+                    </div>
                   ) : (
-                    <Send className="mr-1.5 h-3 w-3" />
+                    <div className="flex items-center gap-2">
+                      <Send className="h-3.5 w-3.5" />
+                      <span>Submit</span>
+                    </div>
                   )}
-                  Submit
                 </Button>
               </div>
             </div>
 
-            <div className="flex-1 relative">
+            <div className="flex-1 relative bg-[#121212]">
               <Editor
                 height="100%"
                 language={language.language}
@@ -577,62 +625,139 @@ export default function Dashboard() {
                   fontSize,
                   minimap: { enabled: false },
                   scrollBeyondLastLine: false,
-                  padding: { top: 20, bottom: 20 },
+                  padding: { top: 24, bottom: 24 },
                   fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
                   cursorBlinking: "smooth",
                   cursorSmoothCaretAnimation: "on",
+                  lineNumbers: "on",
+                  renderLineHighlight: "all",
+                  scrollbar: {
+                    vertical: "visible",
+                    horizontal: "visible",
+                    useShadows: false,
+                    verticalScrollbarSize: 10,
+                    horizontalScrollbarSize: 10,
+                  },
                 }}
               />
             </div>
           </Panel>
 
-          <PanelResizeHandle className="h-px bg-[#2b2b2b] hover:bg-blue-500/50 transition-colors" />
+          <PanelResizeHandle className="h-1.5 flex items-center justify-center group bg-black/40 hover:bg-indigo-500/50 transition-all duration-300 relative z-50">
+            <div className="w-8 h-1 rounded-full bg-white/10 group-hover:bg-white/40 transition-colors" />
+          </PanelResizeHandle>
 
-          <Panel defaultSize={30} minSize={20} className="flex flex-col bg-[#1e1e1e]">
-            <div className="flex-none h-9 flex items-center justify-between px-4 border-b border-[#2b2b2b] bg-[#1e1e1e]">
-              <div className="flex items-center gap-2 text-neutral-500">
-                <Terminal className="h-3.5 w-3.5" />
-                <span className="text-[11px] font-medium uppercase tracking-wider">Console</span>
+          <Panel defaultSize={35} minSize={20} className="flex flex-col bg-[#0a0a0a]">
+            <div className="flex-none h-12 flex items-center justify-between px-6 border-b border-white/5 bg-neutral-900/40 backdrop-blur-md">
+              <div className="flex items-center gap-6">
+                <div className="flex items-center gap-2 text-indigo-400">
+                  <Terminal className="h-4 w-4" />
+                  <span className="text-[11px] font-bold uppercase tracking-widest">Execution Console</span>
+                </div>
+
+                {output?.status?.id !== 0 && (
+                  <div className="flex items-center gap-4 border-l border-white/10 pl-6 animate-in fade-in slide-in-from-left-4 duration-500">
+                    <div className="flex flex-col">
+                      <span className="text-[8px] font-bold text-neutral-600 uppercase tracking-tighter">Status</span>
+                      <span className={`text-[10px] font-bold uppercase tracking-wider ${output?.status?.id === 3 ? "text-emerald-500" :
+                        output?.status?.id === 4 ? "text-rose-500" :
+                          output?.status?.id === 5 ? "text-amber-500" :
+                            "text-indigo-400"
+                        }`}>
+                        {output?.status?.description}
+                      </span>
+                    </div>
+
+                    {output.time && (
+                      <div className="flex flex-col">
+                        <span className="text-[8px] font-bold text-neutral-600 uppercase tracking-tighter">Time</span>
+                        <span className="text-[10px] font-bold text-neutral-400 tabular-nums lowercase tracking-wider">{output.time}s</span>
+                      </div>
+                    )}
+
+                    {output.memory && (
+                      <div className="flex flex-col">
+                        <span className="text-[8px] font-bold text-neutral-600 uppercase tracking-tighter">Memory</span>
+                        <span className="text-[10px] font-bold text-neutral-400 tabular-nums lowercase tracking-wider">{(output.memory / 1024).toFixed(1)}MB</span>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
-              <span className={`text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded ${output?.status?.description === "Accepted" ? "text-emerald-500" :
-                output?.status?.id !== 3 && output?.status?.id !== 0 ? "text-rose-500" :
-                  "text-neutral-500"
-                }`}>
-                {output?.status?.description || "Ready"}
-              </span>
+
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleClearOutput}
+                  className="h-7 px-3 text-[10px] font-bold uppercase tracking-widest text-neutral-600 hover:text-white hover:bg-white/5 transition-all"
+                >
+                  Clear
+                </Button>
+              </div>
             </div>
 
-            <div className="flex-1 p-0 overflow-hidden flex">
+            <div className="flex-1 p-0 overflow-hidden flex bg-[#0d0d0d]">
               <div className="flex-1 flex flex-col min-w-0">
-                <div className="flex-none px-4 py-2 border-b border-[#2b2b2b]/50">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-600">Standard Output</span>
-                </div>
-                <div className="flex-1 overflow-auto p-4 pt-2">
-                  <pre className="text-xs font-mono text-neutral-300 whitespace-pre-wrap break-all leading-relaxed">
+                <div className="flex-1 overflow-auto p-6 scrollbar-thin scrollbar-thumb-white/5 scrollbar-track-transparent">
+                  <div className="max-w-4xl">
                     {output.stderr ? (
-                      <span className="text-rose-400">{output.stderr}</span>
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-2 text-rose-500/80">
+                          <AlertCircle className="h-3.5 w-3.5" />
+                          <span className="text-[10px] font-bold uppercase tracking-widest">Runtime Error</span>
+                        </div>
+                        <pre className="text-[13px] font-mono text-rose-400/90 whitespace-pre-wrap break-all leading-relaxed p-4 rounded-xl bg-rose-500/5 border border-rose-500/10">
+                          {output.stderr}
+                        </pre>
+                      </div>
                     ) : output.compile_output ? (
-                      <span className="text-amber-400">{output.compile_output}</span>
-                    ) : output.stdout ? (
-                      output.stdout
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-2 text-amber-500/80">
+                          <AlertCircle className="h-3.5 w-3.5" />
+                          <span className="text-[10px] font-bold uppercase tracking-widest">Compilation Error</span>
+                        </div>
+                        <pre className="text-[13px] font-mono text-amber-400/90 whitespace-pre-wrap break-all leading-relaxed p-4 rounded-xl bg-amber-500/5 border border-amber-500/10">
+                          {output.compile_output}
+                        </pre>
+                      </div>
                     ) : (
-                      <span className="text-neutral-700 italic opacity-50">Run code to see output...</span>
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-600">Standard Output</span>
+                        </div>
+                        {output.stdout ? (
+                          <pre className="text-[14px] font-mono text-neutral-300 whitespace-pre-wrap break-all leading-relaxed selection:bg-indigo-500/30">
+                            {output.stdout}
+                          </pre>
+                        ) : (
+                          <div className="flex flex-col items-center justify-center py-12 opacity-20 pointer-events-none">
+                            <Terminal className="h-10 w-10 mb-3 text-neutral-400" />
+                            <p className="text-xs font-medium tracking-widest uppercase">Console Ready</p>
+                          </div>
+                        )}
+                      </div>
                     )}
-                  </pre>
+                  </div>
                 </div>
               </div>
 
-              <div className="w-1/3 flex flex-col border-l border-[#2b2b2b] min-w-[200px]">
-                <div className="flex-none px-4 py-2 border-b border-[#2b2b2b]/50">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-600">Input</span>
+              <div className="w-[320px] flex flex-col border-l border-white/5 bg-black/20 backdrop-blur-sm">
+                <div className="flex-none h-10 flex items-center px-5 border-b border-white/5 bg-white/[0.02]">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">Test Input</span>
                 </div>
-                <textarea
-                  value={customInput}
-                  onChange={(e) => setCustomInput(e.target.value)}
-                  className="flex-1 w-full bg-transparent p-4 pt-2 text-xs font-mono text-neutral-400 resize-none focus:outline-none placeholder:text-neutral-700/50"
-                  placeholder="Enter custom input..."
-                  spellCheck={false}
-                />
+                <div className="flex-1 relative group">
+                  <textarea
+                    value={customInput}
+                    onChange={(e) => setCustomInput(e.target.value)}
+                    className="absolute inset-0 w-full h-full bg-transparent p-6 text-[13px] font-mono text-neutral-400 resize-none focus:outline-none placeholder:text-neutral-700/50 scrollbar-thin scrollbar-thumb-white/5 transition-all focus:bg-white/[0.01]"
+                    placeholder="Enter process input..."
+                    spellCheck={false}
+                  />
+                  <div className="absolute bottom-4 right-4 text-[9px] font-bold text-neutral-700 group-focus-within:text-indigo-500 transition-colors uppercase tracking-tighter">
+                    Editable Stdin
+                  </div>
+                </div>
               </div>
             </div>
           </Panel>

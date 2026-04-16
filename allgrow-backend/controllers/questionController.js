@@ -71,11 +71,16 @@ const runCode = async (req, res) => {
       if (statusId <= 2) {
         polls++;
         if (polls >= MAX_POLLS) {
+          let timeoutResult = pollRes.data || {};
+          if (timeoutResult.stdout && timeoutResult.stdout.length > 3000) {
+            timeoutResult.stdout = timeoutResult.stdout.slice(0, 3000) + "\n\n[Output truncated: too large]";
+          }
           return res.status(200).json({
             result: {
+              ...timeoutResult,
               status: "TLE",
-              stdout: "",
-              stderr: "Time Limit Exceeded",
+              stdout: timeoutResult.stdout || "",
+              stderr: timeoutResult.stderr || "Time Limit Exceeded",
             },
           });
         }
@@ -83,11 +88,16 @@ const runCode = async (req, res) => {
       }
 
       if (statusId === 5) {
-        return res.status(400).json({
+        let tleResult = pollRes.data || {};
+        if (tleResult.stdout && tleResult.stdout.length > 3000) {
+          tleResult.stdout = tleResult.stdout.slice(0, 3000) + "\n\n[Output truncated: too large]";
+        }
+        return res.status(200).json({
           result: {
+            ...tleResult,
             status: "TLE",
-            stdout: "",
-            stderr: "Time Limit Exceeded",
+            stdout: tleResult.stdout || "",
+            stderr: tleResult.stderr || "Time Limit Exceeded",
           },
         });
       }
