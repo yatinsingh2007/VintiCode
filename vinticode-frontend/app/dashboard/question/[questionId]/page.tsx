@@ -437,7 +437,7 @@ export default function Dashboard() {
               <div className="space-y-8">
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-[11px] font-bold uppercase tracking-widest text-indigo-400/70">Sample Input</h3>
+                    <h3 className="text-[11px] font-bold uppercase tracking-widest text-blue-500">Sample Input</h3>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -456,7 +456,7 @@ export default function Dashboard() {
                 </div>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-[11px] font-bold uppercase tracking-widest text-indigo-500/70">Sample Output</h3>
+                    <h3 className="text-[11px] font-bold uppercase tracking-widest text-yellow-400">Sample Output</h3>
                     <Button
                       variant="ghost"
                       size="sm"
