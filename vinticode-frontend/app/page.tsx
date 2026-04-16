@@ -17,7 +17,7 @@ export default function BackgroundLinesDemo() {
     try {
       toast.loading("Loading");
 
-      const response = await api.get("/");
+      const response = await api.get("/?t=" + Date.now());
 
       if (response.status === 200) {
         router.push("/dashboard/home");

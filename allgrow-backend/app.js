@@ -32,6 +32,7 @@ app.use("/api/questions", checkUserAuthentication, questionsRouter);
 app.use("/api/userprofile", checkUserAuthentication, profileRouter);
 
 app.get("/api", checkUserAuthentication, (req, res) => {
+  res.setHeader("Cache-Control", "no-store");
   return res.status(200).json({ message: "Welcome back to VintiCode API." });
 });
 

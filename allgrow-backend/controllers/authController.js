@@ -101,12 +101,14 @@ const login = async (req, res) => {
 };
 
 const logout = (req, res) => {
+  res.setHeader("Cache-Control", "no-store");
   res
-    .clearCookie("token", {
+    .cookie("token", "", {
       httpOnly: true,
       secure: true,
       sameSite: "none",
       path: "/",
+      expires: new Date(0),
     })
     .status(200)
     .json({
