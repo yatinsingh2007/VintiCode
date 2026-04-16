@@ -3,7 +3,8 @@
 import Editor, { OnChange } from "@monaco-editor/react";
 import { useParams, useRouter } from "next/navigation";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import { ThemeContext } from "@/context/ThemeContext";
 import { Skeleton } from "@/components/ui/skeleton";
 import api from "@/lib/axios";
 import {
@@ -141,17 +142,7 @@ export default function Dashboard() {
   const [code, setCode] = useState<string>("");
   const [rloader, setRloader] = useState<boolean>(false);
   const [sloader, setSloader] = useState<boolean>(false);
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
-
-  useEffect(() => {
-    const root = window.document.documentElement;
-    root.classList.remove("light", "dark");
-    root.classList.add(theme);
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme(prev => prev === "dark" ? "light" : "dark");
-  };
+  const { theme, toggleTheme } = useContext(ThemeContext);
 
   const handleRun = async () => {
     try {
