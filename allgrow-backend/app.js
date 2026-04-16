@@ -31,11 +31,7 @@ app.use("/api/dashboard", checkUserAuthentication, dashboardRouter);
 app.use("/api/questions", checkUserAuthentication, questionsRouter);
 app.use("/api/userprofile", checkUserAuthentication, profileRouter);
 
-app.get("/api", (req, res) => {
-  const { token } = req.cookies;
-  if (!token) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
+app.get("/api", checkUserAuthentication, (req, res) => {
   return res.status(200).json({ message: "Welcome back to VintiCode API." });
 });
 

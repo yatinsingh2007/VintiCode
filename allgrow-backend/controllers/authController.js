@@ -102,11 +102,11 @@ const login = async (req, res) => {
 
 const logout = (req, res) => {
   res
-    .cookie("token", null, {
+    .clearCookie("token", {
       httpOnly: true,
       secure: true,
       sameSite: "none",
-      expires: new Date(Date.now()),
+      path: "/",
     })
     .status(200)
     .json({
