@@ -421,13 +421,13 @@ export default function Dashboard() {
 
               <div className="grid grid-cols-1 gap-8">
                 <div className="space-y-3">
-                  <h3 className="text-[11px] font-bold uppercase tracking-widest text-indigo-500/70">Input Format</h3>
+                  <h3 className="text-[11px] font-bold uppercase tracking-widest text-blue-500">Input Format</h3>
                   <div className="p-5 rounded-xl bg-muted/30 text-[13px] text-foreground/80 font-mono leading-relaxed border border-border hover:border-indigo-500/30 transition-colors">
                     {questionData.input_format}
                   </div>
                 </div>
                 <div className="space-y-3">
-                  <h3 className="text-[11px] font-bold uppercase tracking-widest text-indigo-500/70">Output Format</h3>
+                  <h3 className="text-[11px] font-bold uppercase tracking-widest text-green-500">Output Format</h3>
                   <div className="p-5 rounded-xl bg-muted/30 text-[13px] text-foreground/80 font-mono leading-relaxed border border-border hover:border-indigo-500/30 transition-colors">
                     {questionData.output_format}
                   </div>
