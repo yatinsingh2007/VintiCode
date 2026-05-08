@@ -13,20 +13,20 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "@prisma/client": "^6.16.2",
-    "axios": "^1.12.2",
+    "@prisma/client": "^7.8.0",
+    "axios": "^1.15.2",
     "bcrypt": "^6.0.0",
-    "bullmq": "^5.65.1",
+    "bullmq": "^5.76.2",
     "cookie-parser": "^1.4.7",
-    "cors": "^2.8.5",
-    "dotenv": "^17.2.2",
-    "express": "^5.1.0",
-    "googleapis": "^166.0.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "googleapis": "^171.4.0",
     "ioredis": "^5.8.2",
-    "jsonwebtoken": "^9.0.2",
-    "nodemon": "^3.1.10",
-    "prisma": "^6.16.2",
-    "uuid": "^13.0.0",
-    "validator": "^13.15.15"
+    "jsonwebtoken": "^9.0.3",
+    "nodemon": "^3.1.14",
+    "prisma": "^7.8.0",
+    "uuid": "^14.0.0",
+    "validator": "^13.15.35"
   }
 }
