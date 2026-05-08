@@ -9,6 +9,7 @@ const authRouter = require("./routes/auth");
 const dashboardRouter = require("./routes/dashboard");
 const questionsRouter = require("./routes/questions");
 const profileRouter = require("./routes/profile");
+const adminRouter = require("./routes/admin");
 const { runSubmission } = require("./controllers/runSubmission");
 
 const app = express();
@@ -30,6 +31,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/dashboard", checkUserAuthentication, dashboardRouter);
 app.use("/api/questions", checkUserAuthentication, questionsRouter);
 app.use("/api/userprofile", checkUserAuthentication, profileRouter);
+app.use("/api/admin", adminRouter);
 
 app.get("/api", checkUserAuthentication, (req, res) => {
   res.setHeader("Cache-Control", "no-store");
