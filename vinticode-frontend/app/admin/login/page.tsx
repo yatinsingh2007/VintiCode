@@ -126,11 +126,11 @@ function AdminInput({
           placeholder={placeholder}
           autoComplete={autoComplete}
           disabled={disabled}
-          className="
+          className={`
             flex-1 bg-transparent text-white placeholder-gray-600
             pl-10 pr-4 py-3 text-sm outline-none
             disabled:opacity-50 disabled:cursor-not-allowed
-          "
+          `}
         />
         {rightElement && (
           <div className="absolute right-3">{rightElement}</div>
@@ -443,7 +443,7 @@ export default function AdminLoginPage() {
                   id="admin-login-submit"
                   type="submit"
                   disabled={loading}
-                  className="
+                  className={`
                     relative w-full group overflow-hidden
                     bg-gradient-to-r from-violet-600 to-indigo-600
                     hover:from-violet-500 hover:to-indigo-500
@@ -453,7 +453,7 @@ export default function AdminLoginPage() {
                     flex items-center justify-center gap-2
                     shadow-lg shadow-violet-500/25
                     focus:outline-none focus:ring-2 focus:ring-violet-500/50
-                  "
+                  `}
                 >
                   {/* Shimmer effect on hover */}
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700" />
