@@ -15,6 +15,9 @@ import {
   Loader2,
 } from "lucide-react";
 
+import TableSkeleton from "@/components/admin/TableSkeleton";
+import { toast } from "react-hot-toast";
+
 interface Question {
   id: string;
   title: string;
@@ -39,7 +42,7 @@ function difficultyBadge(diff: string) {
   const cls =
     difficultyColors[diff] ?? "text-gray-400 bg-gray-500/10 border-gray-500/20";
   return (
-    <span className={`px-2 py-0.5 rounded text-xs font-medium border ${cls}`}>
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider border ${cls}`}>
       {diff}
     </span>
   );
@@ -86,11 +89,13 @@ export default function AdminQuestionsPage() {
     )
       return;
     setDeletingId(id);
+    const toastId = toast.loading("Deleting question...");
     try {
       await adminApi.delete(`/questions/${id}`);
+      toast.success("Question deleted successfully", { id: toastId });
       fetchQuestions(page, search);
     } catch {
-      alert("Failed to delete question.");
+      toast.error("Failed to delete question", { id: toastId });
     } finally {
       setDeletingId(null);
     }
@@ -99,16 +104,16 @@ export default function AdminQuestionsPage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-        <div className="flex-1">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
           <h1 className="text-2xl font-bold text-white">Questions</h1>
           <p className="text-gray-400 text-sm mt-1">
-            Manage all coding problems
+            Manage your problem set and test cases
           </p>
         </div>
         <Link
           href="/admin/questions/new"
-          className="flex items-center gap-2 px-4 py-2.5 bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium rounded-lg transition-colors duration-200 shadow-lg"
+          className="flex items-center gap-2 px-5 py-2.5 bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-violet-500/10 active:scale-95"
         >
           <Plus className="w-4 h-4" />
           New Question
@@ -118,13 +123,13 @@ export default function AdminQuestionsPage() {
       {/* Search */}
       <form
         onSubmit={handleSearch}
-        className="flex gap-3 bg-[#161b22] border border-white/8 rounded-xl p-3"
+        className="flex gap-3 bg-[#161b22] border border-white/8 rounded-xl p-3 shadow-sm"
       >
         <div className="flex-1 flex items-center gap-2">
           <Search className="w-4 h-4 text-gray-500 shrink-0" />
           <input
             type="text"
-            placeholder="Search by title or difficulty…"
+            placeholder="Search questions by title or difficulty…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="flex-1 bg-transparent text-white text-sm placeholder-gray-600 outline-none"
@@ -132,122 +137,117 @@ export default function AdminQuestionsPage() {
         </div>
         <button
           type="submit"
-          className="px-4 py-1.5 bg-violet-600 hover:bg-violet-500 text-white text-sm rounded-lg transition-colors"
+          className="px-6 py-1.5 bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium rounded-lg transition-colors"
         >
           Search
         </button>
       </form>
 
-      {/* Table */}
-      <div className="bg-[#161b22] border border-white/8 rounded-xl overflow-hidden">
+      {/* Table Section */}
+      <div className="bg-[#161b22] border border-white/8 rounded-xl overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-white/8 text-left">
-                <th className="px-5 py-3 text-gray-400 font-medium">#</th>
-                <th className="px-5 py-3 text-gray-400 font-medium">Title</th>
-                <th className="px-5 py-3 text-gray-400 font-medium">
-                  Difficulty
-                </th>
-                <th className="px-5 py-3 text-gray-400 font-medium">
-                  Solves
-                </th>
-                <th className="px-5 py-3 text-gray-400 font-medium">
-                  Created
-                </th>
-                <th className="px-5 py-3 text-gray-400 font-medium text-right">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <tr>
-                  <td colSpan={6} className="py-16 text-center">
-                    <Loader2 className="w-6 h-6 animate-spin text-violet-500 mx-auto" />
-                  </td>
+          {loading ? (
+            <div className="p-1">
+              <TableSkeleton rows={10} cols={6} />
+            </div>
+          ) : questions.length === 0 ? (
+            <div className="py-20 text-center">
+              <div className="flex flex-col items-center gap-2 text-gray-500">
+                <BookOpen className="w-10 h-10 mb-2 opacity-20" />
+                <p className="text-lg font-medium text-gray-400">No questions found</p>
+                <p className="text-sm">Try creating a new one or adjusting search</p>
+              </div>
+            </div>
+          ) : (
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-white/8 text-left bg-white/[0.02]">
+                  <th className="px-5 py-4 text-gray-400 font-medium">#</th>
+                  <th className="px-5 py-4 text-gray-400 font-medium">Title</th>
+                  <th className="px-5 py-4 text-gray-400 font-medium">Difficulty</th>
+                  <th className="px-5 py-4 text-gray-400 font-medium text-center">Solves</th>
+                  <th className="px-5 py-4 text-gray-400 font-medium">Created</th>
+                  <th className="px-5 py-4 text-gray-400 font-medium text-right">Actions</th>
                 </tr>
-              ) : questions.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="py-16 text-center">
-                    <div className="flex flex-col items-center gap-2 text-gray-500">
-                      <BookOpen className="w-8 h-8" />
-                      <p>No questions found.</p>
-                    </div>
-                  </td>
-                </tr>
-              ) : (
-                questions.map((q, i) => (
+              </thead>
+              <tbody className="divide-y divide-white/5">
+                {questions.map((q, i) => (
                   <tr
                     key={q.id}
-                    className="border-b border-white/5 hover:bg-white/3 transition-colors"
+                    className="group transition-colors hover:bg-white/[0.02]"
                   >
-                    <td className="px-5 py-3 text-gray-500">
+                    <td className="px-5 py-4 text-gray-500 font-mono text-xs">
                       {(pagination ? (pagination.page - 1) * 20 : 0) + i + 1}
                     </td>
-                    <td className="px-5 py-3 text-white font-medium max-w-xs truncate">
+                    <td className="px-5 py-4 text-white font-medium max-w-xs truncate group-hover:text-violet-400 transition-colors">
                       {q.title}
                     </td>
-                    <td className="px-5 py-3">{difficultyBadge(q.difficulty)}</td>
-                    <td className="px-5 py-3 text-gray-400">
-                      {q._count.solvedQuestions}
+                    <td className="px-5 py-4">{difficultyBadge(q.difficulty)}</td>
+                    <td className="px-5 py-4 text-center">
+                      <span className="px-2 py-0.5 bg-white/5 rounded text-xs text-gray-400">
+                        {q._count.solvedQuestions}
+                      </span>
                     </td>
-                    <td className="px-5 py-3 text-gray-500">
-                      {new Date(q.createdAt).toLocaleDateString()}
+                    <td className="px-5 py-4 text-gray-500 text-xs">
+                      {new Date(q.createdAt).toLocaleDateString(undefined, {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                      })}
                     </td>
-                    <td className="px-5 py-3 text-right">
-                      <div className="flex items-center justify-end gap-2">
+                    <td className="px-5 py-4 text-right">
+                      <div className="flex items-center justify-end gap-1.5">
                         <button
                           onClick={() =>
                             router.push(`/admin/questions/${q.id}/edit`)
                           }
-                          className="p-1.5 rounded-lg text-gray-400 hover:text-violet-400 hover:bg-violet-500/10 transition-colors"
+                          className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-all"
                           title="Edit"
                         >
-                          <Pencil className="w-4 h-4" />
+                          <Pencil className="w-3.5 h-3.5" />
                         </button>
                         <button
                           onClick={() => handleDelete(q.id, q.title)}
                           disabled={deletingId === q.id}
-                          className="p-1.5 rounded-lg text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-40"
+                          className="p-2 rounded-lg text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-all disabled:opacity-30"
                           title="Delete"
                         >
                           {deletingId === q.id ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
                           ) : (
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-3.5 h-3.5" />
                           )}
                         </button>
                       </div>
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
 
         {/* Pagination */}
         {pagination && pagination.totalPages > 1 && (
-          <div className="flex items-center justify-between px-5 py-3 border-t border-white/8">
-            <p className="text-gray-500 text-xs">
-              {pagination.total} total questions
+          <div className="flex items-center justify-between px-5 py-4 border-t border-white/8 bg-white/[0.01]">
+            <p className="text-gray-500 text-xs font-medium">
+              Showing <span className="text-white">{questions.length}</span> of <span className="text-white">{pagination.total}</span> questions
             </p>
             <div className="flex items-center gap-2">
               <button
                 disabled={page === 1}
                 onClick={() => setPage((p) => p - 1)}
-                className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/8 disabled:opacity-30 transition-colors"
+                className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 disabled:opacity-30 transition-all"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
-              <span className="text-gray-400 text-sm">
-                {page} / {pagination.totalPages}
+              <span className="text-gray-400 text-xs font-medium px-2">
+                Page {page} of {pagination.totalPages}
               </span>
               <button
                 disabled={page === pagination.totalPages}
                 onClick={() => setPage((p) => p + 1)}
-                className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/8 disabled:opacity-30 transition-colors"
+                className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 disabled:opacity-30 transition-all"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
@@ -258,3 +258,4 @@ export default function AdminQuestionsPage() {
     </div>
   );
 }
+
