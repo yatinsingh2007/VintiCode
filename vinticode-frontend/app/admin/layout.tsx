@@ -303,7 +303,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             {/* Mobile: just avatar */}
             <div className="sm:hidden w-8 h-8 rounded-full bg-white flex items-center justify-center">
               <span className="text-black text-xs font-bold">
-                {adminEmail ? adminEmail.charAt(0).toUpperCase() : "A"}
+                {admin?.email ? admin.email.charAt(0).toUpperCase() : "A"}
               </span>
             </div>
           </div>
