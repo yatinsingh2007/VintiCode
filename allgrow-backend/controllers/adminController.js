@@ -47,11 +47,12 @@ const adminLogin = (req, res) => {
  * POST /api/admin/logout
  */
 const adminLogout = (req, res) => {
+  res.setHeader("Cache-Control", "no-store");
   return res
     .cookie("admin_token", "", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      sameSite: "none",
       expires: new Date(0),
       path: "/",
     })
