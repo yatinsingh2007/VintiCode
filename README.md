@@ -10,24 +10,37 @@
 
 _A 1-minute summary of why this project matters._
 
-**VintiCode** demonstrates the transition from a simple "LeetCode clone" to a professional full-stack application by solving complex problems like **secure, non-blocking code execution at scale**.
+**VintiCode** demonstrates the transition from a simple "LeetCode clone" to a professional full-stack application by solving complex problems like **secure, non-blocking code execution at scale** and **enterprise-grade administrative control**.
 
 ### Core Competencies Demonstrated:
 
 - **Asynchronous System Design:** Implemented task queues using **BullMQ** and **Redis** to ensure compute-heavy tasks never block the user interface.
+- **Full-Stack Admin Suite:** Built a comprehensive, secure administrative panel for real-time platform management and analytics.
 - **Architectural Excellence:** Refactored from a feature-based structure to a modular **Controller/Router pattern** for enterprise-grade maintainability.
-- **Security-First Approach:** Abstracted code execution to a secure **Judge0** sandbox, effectively mitigating Remote Code Execution (RCE) risks.
-- **Premium UX/UI:** Integrated **Monaco Editor** and high-fidelity animations (**GSAP/Framer Motion**) to deliver a world-class developer experience.
+- **Security-First Approach:** Abstracted code execution to a secure **Judge0** sandbox and implemented multi-tier JWT authentication (User & Admin).
+- **Premium UX/UI:** Delivered a world-class developer experience using **Monaco Editor**, **Framer Motion**, and a professional **Monochrome Admin Aesthetic**.
+
+---
+
+## 🛠️ The Admin Powerhouse
+
+VintiCode includes a production-grade **Admin Dashboard** designed for platform operators to manage the ecosystem with ease.
+
+- **Monochrome Design System:** A sleek, high-contrast black-and-white interface built for focus and clarity.
+- **Platform Analytics:** Real-time metrics on user growth, submission volume, and platform performance.
+- **Question & Test Case Management:** Complete CRUD operations for coding challenges, including a secure system for handling hidden test cases.
+- **User & Submission Oversight:** Detailed views of user profiles, performance tracking, and granular submission history.
+- **Secure Admin Auth:** Dedicated JWT-based authentication layer protecting administrative routes.
 
 ---
 
 ## ✨ Key Features
 
-- **Interactive Code Editor:** Monaco Editor integration with multi-language support.
+- **Interactive Code Editor:** Monaco Editor integration with multi-language support and custom themes.
 - **Real-time Submission System:** Powered by BullMQ and Redis for efficient, asynchronous task processing.
-- **Performance Tracking:** Comprehensive dashboard with difficulty-wise problem tracking and submission history.
-- **Premium UI/UX:** Built with Next.js 15, HeroUI, and Framer Motion for a fluid, glassmorphic design.
-- **Scalable Backend:** Express.js architecture with organized Controller/Route patterns and Prisma ORM.
+- **Comprehensive Dashboards:** Tailored experiences for both users (practice tracking) and admins (platform control).
+- **Premium UI/UX:** Built with Next.js 15, HeroUI, and Framer Motion for a fluid, glassmorphic user design and a professional admin aesthetic.
+- **Scalable Backend:** Express.js architecture with organized Controller/Route patterns and Prisma ORM for PostgreSQL.
 
 ---
 
@@ -44,38 +57,31 @@ graph TD
     C -->|Callback/Polling| B
     B -->|Persistence| E[(PostgreSQL / Prisma)]
     B -->|Real-time Update| A
+    F[Admin Panel] -->|Secure Admin API| B
 ```
-
-### Technical Deep-Dive:
-
-1. **The Submission Lifecycle:** When a user submits code, it is immediately persisted in **PostgreSQL** with a `queued` status. A job is then pushed to **Redis**.
-2. **Background Processing:** A dedicated worker picks up the job, orchestrates communication with the **Judge0 API**, and updates the status once judging is complete.
-3. **Frontend Reactivity:** The client-side application polls the backend, which retrieves the near-instant state from Redis, providing a smooth user experience.
 
 ---
 
 ## 🛠️ Tech Stack
 
 ### Frontend & UI
-
 - **Core:** Next.js 15+ (App Router), TypeScript, React 19
-- **Design:** HeroUI, Radix UI, Tailwind CSS
+- **Design:** HeroUI, Tailwind CSS, Lucide Icons
 - **Animations:** Framer Motion, GSAP
 - **Editor:** @monaco-editor/react
 
 ### Backend & Infrastructure
-
 - **Core:** Node.js, Express.js (Controller/Router Pattern)
 - **Database:** PostgreSQL with Prisma ORM
 - **Concurrency:** Redis & BullMQ
 - **Sandbox:** Judge0 integration via RapidAPI
+- **Auth:** Multi-tier JWT (User & Admin)
 
 ---
 
 ## 🚀 Getting Started
 
 ### Prerequisites
-
 - Node.js (v18+)
 - PostgreSQL & Redis
 - RapidAPI Key (for Judge0)
@@ -83,18 +89,16 @@ graph TD
 ### Installation & Setup
 
 1. **Clone the repository:**
-
    ```bash
    git clone https://github.com/yatinsingh2007/VintiCode.git
    cd VintiCode
    ```
 
 2. **Backend Setup:**
-
    ```bash
    cd allgrow-backend
    npm install
-   # Configure your .env (DATABASE_URL, REDIS_URL, JWT_SECRET, USER_1...USER_5)
+   # Configure your .env (DATABASE_URL, REDIS_URL, JWT_SECRET, ADMIN_JWT_SECRET)
    npx prisma generate && npx prisma migrate dev
    npm run dev
    ```
@@ -114,14 +118,16 @@ graph TD
 ```text
 VintiCode/
 ├── allgrow-backend/       # Express.js API
-│   ├── controllers/      # Business Logic (Auth, Dashboard, Submissions)
+│   ├── controllers/      # Business Logic (Auth, Admin, Dashboard, Submissions)
 │   ├── routes/           # Route Definitions (Clean separation)
 │   ├── prisma/           # Database Schema & Client
-│   └── middleware/       # JWT Auth & Security
+│   └── middleware/       # JWT Auth (User & Admin tiers)
 └── vinticode-frontend/    # Next.js Application
-    ├── app/               # Next.js App Router (Pages & Layouts)
-    ├── components/        # Reusable UI Components (CodeEditor, Orbit, etc.)
-    └── section/           # High-level UI sections
+    ├── app/               # Next.js App Router
+    │   ├── (user)/       # User-facing platform pages
+    │   └── admin/        # Monochrome Admin Suite
+    ├── components/        # Reusable UI Components
+    └── lib/               # API utilities and Auth hooks
 ```
 
 ---
