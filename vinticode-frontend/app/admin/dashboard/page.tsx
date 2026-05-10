@@ -101,7 +101,7 @@ export default function AdminDashboardPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -126,37 +126,37 @@ export default function AdminDashboardPage() {
           label="Total Users"
           value={stats?.totalUsers ?? 0}
           icon={Users}
-          accent="bg-blue-500/20"
+          accent="bg-white/5"
         />
         <StatCard
           label="Total Questions"
           value={stats?.totalQuestions ?? 0}
           icon={BookOpen}
-          accent="bg-violet-500/20"
+          accent="bg-white/10"
         />
         <StatCard
           label="Total Submissions"
           value={stats?.totalSubmissions ?? 0}
           icon={FileCode2}
-          accent="bg-indigo-500/20"
+          accent="bg-white/15"
         />
         <StatCard
           label="Accepted"
           value={stats?.acceptedSubmissions ?? 0}
           icon={CheckCircle2}
-          accent="bg-emerald-500/20"
+          accent="bg-emerald-500/10"
         />
         <StatCard
           label="Rejected"
           value={stats?.rejectedSubmissions ?? 0}
           icon={XCircle}
-          accent="bg-red-500/20"
+          accent="bg-red-500/10"
         />
         <StatCard
           label="Acceptance Rate"
           value={`${acceptanceRate}%`}
           icon={TrendingUp}
-          accent="bg-amber-500/20"
+          accent="bg-white/20"
         />
       </div>
 
@@ -164,7 +164,7 @@ export default function AdminDashboardPage() {
         {/* Recent Submissions */}
         <div className="xl:col-span-2 bg-[#161b22] border border-white/8 rounded-xl overflow-hidden">
           <div className="flex items-center gap-2 px-5 py-4 border-b border-white/8">
-            <Clock className="w-4 h-4 text-violet-400" />
+            <Clock className="w-4 h-4 text-gray-400" />
             <h2 className="text-white font-semibold text-sm">
               Recent Submissions
             </h2>
@@ -203,7 +203,7 @@ export default function AdminDashboardPage() {
         {/* Recent Users */}
         <div className="bg-[#161b22] border border-white/8 rounded-xl overflow-hidden">
           <div className="flex items-center gap-2 px-5 py-4 border-b border-white/8">
-            <Users className="w-4 h-4 text-blue-400" />
+            <Users className="w-4 h-4 text-gray-400" />
             <h2 className="text-white font-semibold text-sm">Recent Users</h2>
           </div>
           <div className="divide-y divide-white/5">
@@ -217,8 +217,8 @@ export default function AdminDashboardPage() {
                   key={u.id}
                   className="flex items-center gap-3 px-5 py-3 hover:bg-white/3 transition-colors"
                 >
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shrink-0">
-                    <span className="text-white text-xs font-bold">
+                  <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shrink-0">
+                    <span className="text-black text-xs font-bold">
                       {u.name.charAt(0).toUpperCase()}
                     </span>
                   </div>

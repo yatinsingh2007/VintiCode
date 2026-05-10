@@ -66,14 +66,14 @@ function AdminSidebar({
       >
         {/* Logo */}
         <div className="flex items-center gap-3 px-5 py-5 border-b border-white/[0.06]">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/20 shrink-0">
-            <Shield className="w-4.5 h-4.5 text-white" />
+          <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center shadow-lg shadow-white/5 shrink-0">
+            <Shield className="w-4.5 h-4.5 text-black" />
           </div>
           <div className="min-w-0">
             <p className="text-white font-bold text-sm leading-none">
               VintiCode
             </p>
-            <p className="text-violet-400 text-xs mt-0.5">Admin Console</p>
+            <p className="text-gray-400 text-xs mt-0.5">Admin Console</p>
           </div>
           <button
             className="ml-auto lg:hidden text-gray-500 hover:text-white transition-colors"
@@ -102,24 +102,24 @@ function AdminSidebar({
                   transition-all duration-200 group relative
                   ${
                     active
-                      ? "bg-violet-500/15 text-violet-300 border border-violet-500/25"
+                      ? "bg-white/10 text-white border border-white/20"
                       : "text-gray-500 hover:bg-white/[0.04] hover:text-gray-200 border border-transparent"
                   }
                 `}
               >
                 {active && (
-                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-violet-500 rounded-r" />
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-white rounded-r" />
                 )}
                 <Icon
                   className={`w-4 h-4 shrink-0 transition-colors duration-200 ${
                     active
-                      ? "text-violet-400"
+                      ? "text-white"
                       : "text-gray-600 group-hover:text-gray-400"
                   }`}
                 />
                 <span className="flex-1">{label}</span>
                 {active && (
-                  <ChevronRight className="w-3 h-3 text-violet-400/60" />
+                  <ChevronRight className="w-3 h-3 text-white/60" />
                 )}
               </Link>
             );
@@ -130,8 +130,8 @@ function AdminSidebar({
         <div className="px-3 pb-4 border-t border-white/[0.06] pt-4 space-y-2">
           {/* Admin identity */}
           <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-white/[0.03] border border-white/[0.05]">
-            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shrink-0">
-              <span className="text-white text-xs font-bold">
+            <div className="w-7 h-7 rounded-full bg-white flex items-center justify-center shrink-0">
+              <span className="text-black text-xs font-bold">
                 {adminEmail ? adminEmail.charAt(0).toUpperCase() : "A"}
               </span>
             </div>
@@ -285,7 +285,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
           {/* Mobile: just the shield icon + page name */}
           <div className="flex items-center gap-2 lg:hidden">
-            <Shield className="w-4 h-4 text-violet-400" />
+            <Shield className="w-4 h-4 text-white" />
             <span className="text-white font-semibold text-sm">
               {currentPage}
             </span>
@@ -301,9 +301,9 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             </div>
 
             {/* Mobile: just avatar */}
-            <div className="sm:hidden w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center">
-              <span className="text-white text-xs font-bold">
-                {admin?.email ? admin.email.charAt(0).toUpperCase() : "A"}
+            <div className="sm:hidden w-8 h-8 rounded-full bg-white flex items-center justify-center">
+              <span className="text-black text-xs font-bold">
+                {adminEmail ? adminEmail.charAt(0).toUpperCase() : "A"}
               </span>
             </div>
           </div>

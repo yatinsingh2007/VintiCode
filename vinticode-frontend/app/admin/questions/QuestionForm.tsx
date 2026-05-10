@@ -47,10 +47,10 @@ function FieldHint({ children }: { children: React.ReactNode }) {
 }
 
 const textareaClass =
-  "w-full bg-[#0d1117] border border-white/10 text-white placeholder-gray-600 rounded-lg px-4 py-3 text-sm font-mono outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500/50 transition-all duration-200 resize-y";
+  "w-full bg-[#0d1117] border border-white/10 text-white placeholder-gray-600 rounded-lg px-4 py-3 text-sm font-mono outline-none focus:border-white focus:ring-1 focus:ring-white/30 transition-all duration-200 resize-y";
 
 const inputClass =
-  "w-full bg-[#0d1117] border border-white/10 text-white placeholder-gray-600 rounded-lg px-4 py-3 text-sm outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500/50 transition-all duration-200";
+  "w-full bg-[#0d1117] border border-white/10 text-white placeholder-gray-600 rounded-lg px-4 py-3 text-sm outline-none focus:border-white focus:ring-1 focus:ring-white/30 transition-all duration-200";
 
 // ─── Main Component ─────────────────────────────────────────────────────
 
@@ -311,7 +311,7 @@ export default function QuestionForm({
           <button
             type="button"
             onClick={addTestCase}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-violet-600/20 hover:bg-violet-600/30 text-violet-400 text-xs font-medium rounded-lg border border-violet-500/30 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white text-xs font-medium rounded-lg border border-white/20 transition-colors"
           >
             <Plus className="w-3.5 h-3.5" />
             Add Test Case
@@ -441,8 +441,8 @@ export default function QuestionForm({
           type="submit"
           id="q-form-submit"
           disabled={loading}
-          className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500
-                     text-white font-semibold rounded-lg text-sm transition-all duration-200
+          className="flex items-center gap-2 px-6 py-3 bg-white hover:bg-gray-200
+                     text-black font-semibold rounded-lg text-sm transition-all duration-200
                      disabled:opacity-60 disabled:cursor-not-allowed shadow-lg"
         >
           {loading && (

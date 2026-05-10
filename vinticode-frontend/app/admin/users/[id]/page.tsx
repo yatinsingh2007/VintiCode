@@ -56,7 +56,7 @@ export default function UserDetailPage() {
   if (loading)
     return (
       <div className="flex items-center justify-center py-24">
-        <Loader2 className="w-8 h-8 animate-spin text-violet-500" />
+        <Loader2 className="w-8 h-8 animate-spin text-white" />
       </div>
     );
 
@@ -84,8 +84,8 @@ export default function UserDetailPage() {
 
       {/* Profile card */}
       <div className="bg-[#161b22] border border-white/8 rounded-xl p-6 flex items-center gap-5">
-        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shrink-0">
-          <span className="text-white text-xl font-bold">
+        <div className="w-14 h-14 rounded-2xl bg-white flex items-center justify-center shrink-0">
+          <span className="text-black text-xl font-bold">
             {user.name.charAt(0).toUpperCase()}
           </span>
         </div>

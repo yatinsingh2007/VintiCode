@@ -150,7 +150,7 @@ export default function AdminSubmissionsPage() {
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="bg-[#0d1117] border border-white/10 text-gray-300 text-sm rounded-lg px-3 py-1.5 outline-none focus:border-violet-500 transition-colors"
+            className="bg-[#0d1117] border border-white/10 text-gray-300 text-sm rounded-lg px-3 py-1.5 outline-none focus:border-white transition-colors"
           >
             <option value="">All Statuses</option>
             <option value="accepted">Accepted</option>
@@ -159,7 +159,7 @@ export default function AdminSubmissionsPage() {
         </div>
         <button
           type="submit"
-          className="px-6 py-1.5 bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium rounded-lg transition-colors"
+          className="px-6 py-1.5 bg-white hover:bg-gray-200 text-black text-sm font-medium rounded-lg transition-colors"
         >
           Apply
         </button>
@@ -199,7 +199,7 @@ export default function AdminSubmissionsPage() {
                     className="group transition-colors hover:bg-white/[0.02]"
                   >
                     <td className="px-5 py-4">
-                      <p className="text-white font-medium group-hover:text-violet-400 transition-colors">
+                      <p className="text-white font-medium group-hover:text-white transition-colors">
                         {s.user?.name ?? "—"}
                       </p>
                       <p className="text-gray-500 text-xs">
@@ -284,8 +284,8 @@ export default function AdminSubmissionsPage() {
           >
             <div className="flex items-center justify-between px-6 py-5 border-b border-white/8 bg-white/[0.02]">
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-violet-500/20 border border-violet-500/30 flex items-center justify-center shrink-0">
-                  <FileCode2 className="w-5 h-5 text-violet-400" />
+                <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center shrink-0">
+                  <FileCode2 className="w-5 h-5 text-white" />
                 </div>
                 <div>
                   <h3 className="text-white font-bold text-lg leading-tight">
@@ -296,7 +296,7 @@ export default function AdminSubmissionsPage() {
                       {selected.user?.name}
                     </span>
                     <span className="w-1 h-1 rounded-full bg-gray-700" />
-                    <span className="text-violet-400 text-xs font-mono font-bold uppercase">
+                    <span className="text-white text-xs font-mono font-bold uppercase">
                       {getLang(selected.languageId)}
                     </span>
                     <span className="w-1 h-1 rounded-full bg-gray-700" />
@@ -326,7 +326,7 @@ export default function AdminSubmissionsPage() {
                 {copied ? "Copied!" : "Copy Code"}
               </button>
               
-              <div className="h-full overflow-auto p-6 bg-[#090c10] font-mono text-sm leading-relaxed text-blue-100/90 selection:bg-violet-500/30 selection:text-white">
+              <div className="h-full overflow-auto p-6 bg-[#090c10] font-mono text-sm leading-relaxed text-blue-100/90 selection:bg-white/30 selection:text-white">
                 <pre className="whitespace-pre-wrap break-all">
                   {selected.code || "// No code stored."}
                 </pre>

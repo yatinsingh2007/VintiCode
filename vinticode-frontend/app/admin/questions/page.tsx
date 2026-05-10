@@ -113,7 +113,7 @@ export default function AdminQuestionsPage() {
         </div>
         <Link
           href="/admin/questions/new"
-          className="flex items-center gap-2 px-5 py-2.5 bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-violet-500/10 active:scale-95"
+          className="flex items-center gap-2 px-5 py-2.5 bg-white hover:bg-gray-200 text-black text-sm font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-white/5 active:scale-95"
         >
           <Plus className="w-4 h-4" />
           New Question
@@ -137,7 +137,7 @@ export default function AdminQuestionsPage() {
         </div>
         <button
           type="submit"
-          className="px-6 py-1.5 bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium rounded-lg transition-colors"
+          className="px-6 py-1.5 bg-white hover:bg-gray-200 text-black text-sm font-medium rounded-lg transition-colors"
         >
           Search
         </button>
@@ -179,7 +179,7 @@ export default function AdminQuestionsPage() {
                     <td className="px-5 py-4 text-gray-500 font-mono text-xs">
                       {(pagination ? (pagination.page - 1) * 20 : 0) + i + 1}
                     </td>
-                    <td className="px-5 py-4 text-white font-medium max-w-xs truncate group-hover:text-violet-400 transition-colors">
+                    <td className="px-5 py-4 text-white font-medium max-w-xs truncate group-hover:text-gray-300 transition-colors">
                       {q.title}
                     </td>
                     <td className="px-5 py-4">{difficultyBadge(q.difficulty)}</td>

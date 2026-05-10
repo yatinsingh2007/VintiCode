@@ -2,15 +2,7 @@ const { prisma } = require("../prisma/prismaClient");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
-// ─────────────────────────────────────────────
-//  ADMIN AUTH
-// ─────────────────────────────────────────────
 
-/**
- * POST /api/admin/login
- * Validates ADMIN_EMAIL and ADMIN_PASSWORD from env.
- * Issues a short-lived (8h) admin-scoped JWT cookie.
- */
 const adminLogin = (req, res) => {
   const { email, password } = req.body;
 
@@ -60,23 +52,12 @@ const adminLogout = (req, res) => {
     .json({ message: "Admin logout successful." });
 };
 
-/**
- * GET /api/admin/verify
- * Returns { authenticated: true } if the admin cookie is valid.
- */
+
 const adminVerify = (req, res) => {
-  // If we reach here the checkAdminAuthentication middleware passed
   return res.status(200).json({ authenticated: true, email: req.admin.email });
 };
 
-// ─────────────────────────────────────────────
-//  DASHBOARD STATS
-// ─────────────────────────────────────────────
 
-/**
- * GET /api/admin/dashboard
- * Returns platform-wide counts and recent activity.
- */
 const getDashboardStats = async (req, res) => {
   try {
     const [
@@ -125,14 +106,6 @@ const getDashboardStats = async (req, res) => {
   }
 };
 
-// ─────────────────────────────────────────────
-//  QUESTION MANAGEMENT
-// ─────────────────────────────────────────────
-
-/**
- * GET /api/admin/questions
- * Lists all questions with pagination and optional search.
- */
 const getAllQuestions = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -177,10 +150,6 @@ const getAllQuestions = async (req, res) => {
   }
 };
 
-/**
- * GET /api/admin/questions/:id
- * Returns a single question with full test_cases included.
- */
 const getQuestionById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -195,14 +164,6 @@ const getQuestionById = async (req, res) => {
   }
 };
 
-/**
- * POST /api/admin/questions
- * Creates a new question. Maps directly to the Questions prisma model.
- *
- * Body fields (matching schema.prisma Questions model):
- *   title, description, input_format, output_format,
- *   sample_input, sample_output, difficulty, test_cases (JSON array)
- */
 const createQuestion = async (req, res) => {
   try {
     const {
@@ -216,7 +177,7 @@ const createQuestion = async (req, res) => {
       test_cases,
     } = req.body;
 
-    // Required field validation
+
     const required = {
       title,
       description,
@@ -242,7 +203,7 @@ const createQuestion = async (req, res) => {
         .json({ error: "At least one test case is required." });
     }
 
-    // Validate each test case has minimum required fields
+
     for (let i = 0; i < test_cases.length; i++) {
       const tc = test_cases[i];
       if (!tc.input || !tc.output) {
@@ -277,10 +238,7 @@ const createQuestion = async (req, res) => {
   }
 };
 
-/**
- * PUT /api/admin/questions/:id
- * Fully updates a question.
- */
+
 const updateQuestion = async (req, res) => {
   try {
     const { id } = req.params;
@@ -337,10 +295,6 @@ const updateQuestion = async (req, res) => {
   }
 };
 
-/**
- * DELETE /api/admin/questions/:id
- * Deletes a question and cascades submission deletions.
- */
 const deleteQuestion = async (req, res) => {
   try {
     const { id } = req.params;
@@ -349,7 +303,7 @@ const deleteQuestion = async (req, res) => {
       return res.status(404).json({ error: "Question not found." });
     }
 
-    // Delete linked submissions first to avoid FK constraint errors
+
     await prisma.submissions.deleteMany({ where: { questionId: id } });
     await prisma.questions.delete({ where: { id } });
 
@@ -360,14 +314,7 @@ const deleteQuestion = async (req, res) => {
   }
 };
 
-// ─────────────────────────────────────────────
-//  USER MANAGEMENT
-// ─────────────────────────────────────────────
 
-/**
- * GET /api/admin/users
- * Lists all users with pagination and optional search.
- */
 const getAllUsers = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -411,10 +358,7 @@ const getAllUsers = async (req, res) => {
   }
 };
 
-/**
- * GET /api/admin/users/:id
- * Returns a single user with their submission history.
- */
+
 const getUserById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -445,14 +389,6 @@ const getUserById = async (req, res) => {
   }
 };
 
-// ─────────────────────────────────────────────
-//  SUBMISSION MANAGEMENT
-// ─────────────────────────────────────────────
-
-/**
- * GET /api/admin/submissions
- * Lists all submissions with pagination, language/status filters.
- */
 const getAllSubmissions = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -495,10 +431,6 @@ const getAllSubmissions = async (req, res) => {
   }
 };
 
-/**
- * GET /api/admin/submissions/:id
- * Returns a single submission with full code.
- */
 const getSubmissionById = async (req, res) => {
   try {
     const { id } = req.params;

@@ -166,7 +166,7 @@ function DonutChart({
             cy="60"
             r="54"
             fill="none"
-            stroke="#8b5cf6"
+            stroke="#ffffff"
             strokeWidth="12"
             strokeDasharray={`${acceptedDash} ${circumference}`}
             strokeLinecap="round"
@@ -181,7 +181,7 @@ function DonutChart({
 
       <div className="flex gap-4 text-xs">
         <div className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-violet-500" />
+          <span className="w-2 h-2 rounded-full bg-white" />
           <span className="text-gray-400">Accepted ({accepted})</span>
         </div>
         <div className="flex items-center gap-1.5">
@@ -304,21 +304,21 @@ export default function AdminAnalyticsPage() {
           label="Total Users"
           value={stats?.totalUsers ?? 0}
           icon={Users}
-          accent="bg-blue-500/20"
+          accent="bg-white/10"
           sublabel="Registered accounts"
         />
         <AnalyticCard
           label="Total Questions"
           value={stats?.totalQuestions ?? 0}
           icon={BookOpen}
-          accent="bg-violet-500/20"
+          accent="bg-white/10"
           sublabel="Available problems"
         />
         <AnalyticCard
           label="Total Submissions"
           value={stats?.totalSubmissions ?? 0}
           icon={FileCode2}
-          accent="bg-indigo-500/20"
+          accent="bg-white/10"
           sublabel="Code submissions"
         />
         <AnalyticCard
@@ -346,7 +346,7 @@ export default function AdminAnalyticsPage() {
         {/* Submission breakdown */}
         <div className="lg:col-span-2 bg-[#161b22] border border-white/[0.06] rounded-xl p-6 space-y-6">
           <div className="flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-violet-400" />
+            <TrendingUp className="w-4 h-4 text-white" />
             <h2 className="text-white font-semibold text-sm">
               Submission Breakdown
             </h2>
@@ -357,7 +357,7 @@ export default function AdminAnalyticsPage() {
               label="Accepted Submissions"
               value={stats?.acceptedSubmissions ?? 0}
               total={stats?.totalSubmissions ?? 0}
-              color="bg-violet-500"
+              color="bg-white"
               icon={CheckCircle2}
             />
             <ProgressBar
@@ -385,12 +385,12 @@ export default function AdminAnalyticsPage() {
               {
                 label: "Questions",
                 value: stats?.totalQuestions ?? 0,
-                color: "text-violet-400",
+                color: "text-white",
               },
               {
                 label: "Users",
                 value: stats?.totalUsers ?? 0,
-                color: "text-blue-400",
+                color: "text-gray-400",
               },
             ].map(({ label, value, color }) => (
               <div key={label} className="text-center">
@@ -406,7 +406,7 @@ export default function AdminAnalyticsPage() {
         {/* Donut chart */}
         <div className="bg-[#161b22] border border-white/[0.06] rounded-xl p-6 flex flex-col items-center justify-center gap-6">
           <div className="flex items-center gap-2 w-full">
-            <BarChart3 className="w-4 h-4 text-violet-400" />
+            <BarChart3 className="w-4 h-4 text-white" />
             <h2 className="text-white font-semibold text-sm">
               Outcome Distribution
             </h2>
@@ -427,7 +427,7 @@ export default function AdminAnalyticsPage() {
         {/* Key ratios */}
         <div className="lg:col-span-2 bg-[#161b22] border border-white/[0.06] rounded-xl p-6">
           <div className="flex items-center gap-2 mb-5">
-            <Activity className="w-4 h-4 text-violet-400" />
+            <Activity className="w-4 h-4 text-white" />
             <h2 className="text-white font-semibold text-sm">
               Platform Ratios
             </h2>
@@ -444,8 +444,8 @@ export default function AdminAnalyticsPage() {
                       ).toFixed(1)
                     : "0",
                 description: "Avg submissions per registered user",
-                accent: "border-violet-500/20 bg-violet-500/5",
-                textColor: "text-violet-400",
+                accent: "border-white/10 bg-white/5",
+                textColor: "text-white",
               },
               {
                 label: "Solved Rate",
@@ -463,8 +463,8 @@ export default function AdminAnalyticsPage() {
                       ).toFixed(2)
                     : "0",
                 description: "Available questions per registered user",
-                accent: "border-blue-500/20 bg-blue-500/5",
-                textColor: "text-blue-400",
+                accent: "border-white/10 bg-white/5",
+                textColor: "text-white",
               },
             ].map(({ label, value, description, accent, textColor }) => (
               <div

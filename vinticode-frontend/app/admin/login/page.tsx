@@ -22,9 +22,9 @@ function GridBackground() {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none select-none">
       {/* Radial glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] bg-violet-600/10 rounded-full blur-[120px]" />
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-600/8 rounded-full blur-[100px]" />
-      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-blue-600/6 rounded-full blur-[100px]" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] bg-white/5 rounded-full blur-[120px]" />
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gray-600/5 rounded-full blur-[100px]" />
+      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-white/3 rounded-full blur-[100px]" />
 
       {/* Grid lines */}
       <svg
@@ -51,15 +51,15 @@ function GridBackground() {
 
       {/* Floating orbs */}
       <div
-        className="absolute top-[15%] left-[10%] w-2 h-2 rounded-full bg-violet-400/40"
+        className="absolute top-[15%] left-[10%] w-2 h-2 rounded-full bg-white/20"
         style={{ animation: "float1 6s ease-in-out infinite" }}
       />
       <div
-        className="absolute top-[60%] left-[85%] w-1.5 h-1.5 rounded-full bg-indigo-400/40"
+        className="absolute top-[60%] left-[85%] w-1.5 h-1.5 rounded-full bg-gray-400/20"
         style={{ animation: "float2 8s ease-in-out infinite" }}
       />
       <div
-        className="absolute top-[80%] left-[20%] w-1 h-1 rounded-full bg-blue-400/40"
+        className="absolute top-[80%] left-[20%] w-1 h-1 rounded-full bg-white/10"
         style={{ animation: "float1 10s ease-in-out infinite 2s" }}
       />
     </div>
@@ -106,14 +106,14 @@ function AdminInput({
         className={`
           relative flex items-center rounded-xl border transition-all duration-200
           ${focused
-            ? "border-violet-500 ring-2 ring-violet-500/20 bg-[#0d1117]"
+            ? "border-white ring-2 ring-white/20 bg-[#0d1117]"
             : "border-white/10 bg-[#0d1117] hover:border-white/20"
           }
         `}
       >
         <Icon
           className={`absolute left-3.5 w-4 h-4 transition-colors duration-200 ${
-            focused ? "text-violet-400" : "text-gray-600"
+            focused ? "text-white" : "text-gray-600"
           }`}
         />
         <input
@@ -146,7 +146,7 @@ function AdminInput({
 function FeaturePill({ text }: { text: string }) {
   return (
     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-white/5 text-gray-400 border border-white/8">
-      <span className="w-1.5 h-1.5 rounded-full bg-violet-400 shrink-0" />
+      <span className="w-1.5 h-1.5 rounded-full bg-white shrink-0" />
       {text}
     </span>
   );
@@ -224,9 +224,9 @@ export default function AdminLoginPage() {
         style: {
           background: "#161b22",
           color: "#fff",
-          border: "1px solid rgba(139,92,246,0.3)",
+          border: "1px solid rgba(255,255,255,0.2)",
         },
-        iconTheme: { primary: "#8b5cf6", secondary: "#fff" },
+        iconTheme: { primary: "#fff", secondary: "#000" },
       });
       router.push("/admin/dashboard");
     } catch (err: unknown) {
@@ -255,11 +255,11 @@ export default function AdminLoginPage() {
     return (
       <div className="min-h-screen bg-[#0d1117] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center">
-            <Shield className="w-6 h-6 text-white" />
+          <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center">
+            <Shield className="w-6 h-6 text-black" />
           </div>
           <div className="flex items-center gap-2">
-            <Loader2 className="w-4 h-4 animate-spin text-violet-400" />
+            <Loader2 className="w-4 h-4 animate-spin text-white" />
             <span className="text-gray-400 text-sm">
               Checking session…
             </span>
@@ -304,30 +304,30 @@ export default function AdminLoginPage() {
         <div className="hidden lg:flex flex-col justify-between w-[45%] px-14 py-12 relative z-10">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/20">
-              <Shield className="w-5 h-5 text-white" />
+            <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-lg shadow-white/10">
+              <Shield className="w-5 h-5 text-black" />
             </div>
             <div>
               <p className="text-white font-bold text-base leading-none">
                 VintiCode
               </p>
-              <p className="text-violet-400 text-xs mt-0.5">Admin Console</p>
+              <p className="text-gray-400 text-xs mt-0.5">Admin Console</p>
             </div>
           </div>
 
           {/* Hero copy */}
           <div className="space-y-6">
             <div className="space-y-4">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20">
-                <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
-                <span className="text-violet-300 text-xs font-medium">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
+                <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                <span className="text-gray-300 text-xs font-medium">
                   Secure Admin Access
                 </span>
               </div>
               <h1 className="text-4xl font-bold text-white leading-tight">
                 Control your
                 <br />
-                <span className="bg-gradient-to-r from-violet-400 to-indigo-400 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
                   platform with
                 </span>
                 <br />
@@ -348,7 +348,7 @@ export default function AdminLoginPage() {
           </div>
 
           {/* Bottom quote */}
-          <div className="border-l-2 border-violet-500/30 pl-4">
+          <div className="border-l-2 border-white/20 pl-4">
             <p className="text-gray-400 text-sm italic">
               &quot;Access is a privilege. Manage responsibly.&quot;
             </p>
@@ -363,8 +363,8 @@ export default function AdminLoginPage() {
           >
             {/* Mobile logo */}
             <div className="flex flex-col items-center mb-8 lg:hidden">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/25 mb-4">
-                <Shield className="w-7 h-7 text-white" />
+              <div className="w-14 h-14 rounded-2xl bg-white flex items-center justify-center shadow-lg shadow-white/10 mb-4">
+                <Shield className="w-7 h-7 text-black" />
               </div>
               <h1 className="text-white text-xl font-bold">VintiCode Admin</h1>
               <p className="text-gray-500 text-sm mt-1">Control Panel</p>
@@ -445,14 +445,13 @@ export default function AdminLoginPage() {
                   disabled={loading}
                   className={`
                     relative w-full group overflow-hidden
-                    bg-gradient-to-r from-violet-600 to-indigo-600
-                    hover:from-violet-500 hover:to-indigo-500
-                    text-white font-semibold py-3 rounded-xl text-sm
+                    bg-white hover:bg-gray-100
+                    text-black font-semibold py-3 rounded-xl text-sm
                     transition-all duration-300
                     disabled:opacity-60 disabled:cursor-not-allowed
                     flex items-center justify-center gap-2
-                    shadow-lg shadow-violet-500/25
-                    focus:outline-none focus:ring-2 focus:ring-violet-500/50
+                    shadow-lg shadow-white/5
+                    focus:outline-none focus:ring-2 focus:ring-white/50
                   `}
                 >
                   {/* Shimmer effect on hover */}

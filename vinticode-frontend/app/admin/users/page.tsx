@@ -93,7 +93,7 @@ export default function AdminUsersPage() {
         </div>
         <div className="bg-[#161b22] border border-white/8 rounded-xl p-4">
           <p className="text-gray-400 text-xs font-medium uppercase tracking-wider">Active Today</p>
-          <p className="text-2xl font-bold text-violet-400 mt-1">
+          <p className="text-2xl font-bold text-white mt-1">
             {loading ? "…" : Math.floor((pagination?.total ?? 0) * 0.15).toLocaleString()} 
           </p>
           <p className="text-[10px] text-gray-500 mt-1">Estimated active sessions</p>
@@ -124,7 +124,7 @@ export default function AdminUsersPage() {
         </div>
         <button
           type="submit"
-          className="px-4 py-1.5 bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium rounded-lg transition-colors"
+          className="px-4 py-1.5 bg-white hover:bg-gray-200 text-black text-sm font-medium rounded-lg transition-colors"
         >
           Search
         </button>
@@ -170,12 +170,12 @@ export default function AdminUsersPage() {
                     </td>
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500/20 to-indigo-600/20 border border-violet-500/30 flex items-center justify-center shrink-0">
-                          <span className="text-violet-400 text-sm font-bold">
+                        <div className="w-9 h-9 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center shrink-0">
+                          <span className="text-white text-sm font-bold">
                             {u.name.charAt(0).toUpperCase()}
                           </span>
                         </div>
-                        <span className="text-white font-medium group-hover:text-violet-400 transition-colors">
+                        <span className="text-white font-medium group-hover:text-white transition-colors">
                           {u.name}
                         </span>
                       </div>
