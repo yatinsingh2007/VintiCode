@@ -14,7 +14,7 @@
   "type": "commonjs",
   "dependencies": {
     "@prisma/client": "^6.16.2",
-    "axios": "^1.12.2",
+    "axios": "^1.16.0",
     "bcrypt": "^6.0.0",
     "bullmq": "^5.65.1",
     "cookie-parser": "^1.4.7",
