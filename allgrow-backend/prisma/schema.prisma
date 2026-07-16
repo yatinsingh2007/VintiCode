@@ -7,7 +7,6 @@ generator client {
   provider = "prisma-client-js"
 }
 
-
 model User {
   id              String        @id @default(uuid())
   name            String
@@ -16,6 +15,7 @@ model User {
   solvedQuestions Submissions[] @relation("UserSolved")
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
+  scratchPads     ScratchPad[]  @relation("UserScratchPad")
 }
 
 model Questions {
@@ -31,19 +31,37 @@ model Questions {
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
   solvedQuestions Submissions[] @relation("QuestionSolved")
+  scratchpad      ScratchPad[]  @relation("QuestionScratchPad")
 }
 
 model Submissions {
-  id         String    @id @default(uuid())
-  userId     String
-  questionId String
-  languageId Int
-  code       String
-  status     Status
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  user       User      @relation("UserSolved", fields: [userId], references: [id])
-  question   Questions @relation("QuestionSolved", fields: [questionId], references: [id])
+  id           String   @id @default(uuid())
+  userId       String
+  questionId   String
+  languageId   Int
+  scratchpadId String?
+  code         String
+  status       Status
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user       User        @relation("UserSolved", fields: [userId], references: [id])
+  question   Questions   @relation("QuestionSolved", fields: [questionId], references: [id])
+  scratchPad ScratchPad? @relation(fields: [scratchpadId], references: [id])
+}
+
+model ScratchPad {
+  id          String   @id @default(uuid())
+  userId      String
+  questionId  String
+  status      Status
+  explanation String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User          @relation("UserScratchPad", fields: [userId], references: [id])
+  question    Questions     @relation("QuestionScratchPad", fields: [questionId], references: [id])
+  submissions Submissions[]
 }
 
 enum Status {
