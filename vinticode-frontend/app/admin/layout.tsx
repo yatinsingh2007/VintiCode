@@ -3,7 +3,7 @@
 import { useEffect, useState, ReactNode } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import { useAdminAuth } from "@/lib/useAdminAuth";
+import { AdminAuthProvider, useAdminAuth } from "@/lib/useAdminAuth";
 import toast from "react-hot-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -52,6 +52,15 @@ function AdminSidebar({
         }`}
       />
 
+      {/*
+        `h-full` is correct while the drawer is `fixed` (its containing block
+        is the viewport), but wrong once it becomes `lg:static`: height:100%
+        against a parent that only sets `min-h-screen` has no definite height
+        to resolve against, so it collapsed to content height and the sidebar
+        surface stopped under "Sign Out". `lg:h-auto` hands sizing back to the
+        flex row's default `align-items: stretch`, which fills the container
+        whether the page is viewport-height or taller.
+      */}
       <aside
         aria-label="Admin sidebar"
         className={`
@@ -59,7 +68,7 @@ function AdminSidebar({
           bg-sidebar border-r border-sidebar-border
           transition-transform duration-300 ease-out
           ${open ? "translate-x-0" : "-translate-x-full"}
-          lg:translate-x-0 lg:static lg:z-auto
+          lg:translate-x-0 lg:static lg:z-auto lg:h-auto
         `}
       >
         {/* Brand — height matches the top bar so the two rules align */}
@@ -203,7 +212,21 @@ function AdminSkeleton() {
   );
 }
 
+/*
+  The provider must sit ABOVE every consumer, and the login page is rendered
+  as `children` of this layout — so the state it writes on sign-in is the same
+  state this layout's redirect guard reads. That shared instance is what stops
+  the two from fighting each other over the route.
+*/
 export default function AdminLayout({ children }: { children: ReactNode }) {
+  return (
+    <AdminAuthProvider>
+      <AdminLayoutInner>{children}</AdminLayoutInner>
+    </AdminAuthProvider>
+  );
+}
+
+function AdminLayoutInner({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const { admin, checking, logout } = useAdminAuth();
@@ -261,7 +284,13 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     )?.label ?? "Admin";
 
   return (
-    <div className="flex min-h-screen bg-background">
+    /*
+      h-screen (not min-h-screen) so <main>'s `overflow-auto` has a definite
+      height to scroll inside. With min-h-screen the whole document scrolled
+      instead, dragging the sidebar and its nav up out of view on long pages.
+      Now the rail stays put and only the content pane scrolls.
+    */
+    <div className="flex h-screen overflow-hidden bg-background">
       <AdminSidebar
         open={sidebarOpen}
         onClose={() => setSidebarOpen(false)}

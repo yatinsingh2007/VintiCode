@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, FormEvent, useEffect, useRef } from "react";
+import { useState, FormEvent, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import adminApi from "@/lib/adminApi";
+import { useAdminAuth } from "@/lib/useAdminAuth";
 import toast from "react-hot-toast";
 import {
   Shield,
@@ -162,17 +162,20 @@ export default function AdminLoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [checkingSession, setCheckingSession] = useState(true);
-  const emailRef = useRef<HTMLInputElement | null>(null);
 
-  // Redirect if already logged in
+  /*
+    Session state comes from the shared context instead of this page firing
+    its own /verify. Two independent checks were the whole problem: this one
+    said "authenticated → go to dashboard" while the layout's said "not
+    authenticated → go to login", and they bounced the router between them.
+  */
+  const { admin, checking: checkingSession, login } = useAdminAuth();
+
   useEffect(() => {
-    adminApi
-      .get("/verify")
-      .then(() => router.replace("/admin/dashboard"))
-      .catch(() => {})
-      .finally(() => setCheckingSession(false));
-  }, [router]);
+    if (!checkingSession && admin) {
+      router.replace("/admin/dashboard");
+    }
+  }, [admin, checkingSession, router]);
 
   // Focus email on mount
   useEffect(() => {
@@ -208,42 +211,23 @@ export default function AdminLoginPage() {
     if (!validate()) return;
 
     setLoading(true);
-    const toastId = toast.loading("Authenticating…", {
-      style: {
-        background: "#161b22",
-        color: "#fff",
-        border: "1px solid rgba(255,255,255,0.08)",
-      },
-    });
+    // Toast theming lives in layout.tsx now; the inline #161b22 styles here
+    // pinned every toast to dark regardless of the active theme.
+    const toastId = toast.loading("Authenticating…");
 
     try {
-      await adminApi.post("/login", { email: email.trim(), password });
-      toast.success("Welcome back, Admin!", {
-        id: toastId,
-        duration: 2000,
-        style: {
-          background: "#161b22",
-          color: "#fff",
-          border: "1px solid rgba(255,255,255,0.2)",
-        },
-        iconTheme: { primary: "#fff", secondary: "#000" },
-      });
-      router.push("/admin/dashboard");
+      // Goes through the shared auth context rather than calling adminApi
+      // directly. The direct call left the layout's copy of `admin` stale,
+      // which is what produced the sign-in redirect loop; `login()` updates
+      // the shared state and navigates once it's settled.
+      await login(email.trim(), password);
+      toast.success("Welcome back, Admin!", { id: toastId, duration: 2000 });
     } catch (err: unknown) {
       const msg =
         (err as { response?: { data?: { error?: string } } })?.response?.data
           ?.error || "Invalid credentials. Please try again.";
       setError(msg);
-      toast.error(msg, {
-        id: toastId,
-        duration: 4000,
-        style: {
-          background: "#161b22",
-          color: "#fff",
-          border: "1px solid rgba(239,68,68,0.3)",
-        },
-        iconTheme: { primary: "#ef4444", secondary: "#fff" },
-      });
+      toast.error(msg, { id: toastId, duration: 4000 });
       setPassword(""); // Clear password on failure for security
     } finally {
       setLoading(false);
