@@ -11,11 +11,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 const getDifficultyBadge = (difficulty: string) => {
   switch (difficulty.toLowerCase()) {
     case "easy":
-      return "text-emerald-400 bg-emerald-400/5 ring-emerald-400/20";
+      return "text-success-fg bg-success-subtle ring-success/20";
     case "medium":
-      return "text-amber-400 bg-amber-400/5 ring-amber-400/20";
+      return "text-warning-fg bg-warning-subtle ring-warning/20";
     case "hard":
-      return "text-rose-400 bg-rose-400/5 ring-rose-400/20";
+      return "text-destructive-fg bg-destructive-subtle ring-destructive/20";
     default:
       return "text-muted-foreground bg-muted/30 ring-border";
   }
@@ -106,9 +106,9 @@ export default function ScratchPad({
         </header>
 
         <div className="mt-8 flex min-h-0 flex-1 flex-col">
-          <div className="flex min-h-[45vh] flex-1 flex-col overflow-hidden rounded-2xl border border-border bg-card/50 backdrop-blur-sm transition-colors focus-within:border-blue-500/40">
+          <div className="flex min-h-[45vh] flex-1 flex-col overflow-hidden rounded-2xl border border-border bg-card/50 backdrop-blur-sm transition-colors focus-within:border-primary/40">
             <div className="flex flex-none items-center gap-2 border-b border-border bg-muted/20 px-5 py-3">
-              <NotebookPen className="h-3.5 w-3.5 text-blue-500" />
+              <NotebookPen className="h-3.5 w-3.5 text-primary-fg" />
               <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
                 Scratch Pad
               </span>
@@ -170,7 +170,7 @@ export default function ScratchPad({
 
             <Button
               onClick={onContinue}
-              className="h-11 gap-2 rounded-xl border-none bg-blue-600 px-6 text-[11px] font-bold uppercase tracking-widest text-white shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] transition-all hover:bg-blue-500 active:scale-95"
+              className="h-11 gap-2 rounded-xl border-none bg-primary px-6 text-[11px] font-bold uppercase tracking-widest text-foreground shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] transition-all hover:bg-primary active:scale-95"
             >
               Continue to Coding
               <ArrowRight className="h-3.5 w-3.5" />

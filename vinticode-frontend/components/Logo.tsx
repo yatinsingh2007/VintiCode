@@ -1,29 +1,48 @@
+import Link from "next/link";
 import { motion } from "motion/react";
+
+/*
+  The wordmark read "Allgrow" — the project's former name, still shown in the
+  user sidebar while the admin console said "VintiCode". Same product, two
+  different brands depending on which half of it you were in.
+
+  Also fixed here: the logo linked to "#" (a dead anchor that jumps to the top
+  of the page instead of navigating home), and LogoIcon carried a hardcoded
+  `text-black` that is invisible against the dark sidebar.
+*/
+const Mark = () => (
+  <div
+    aria-hidden="true"
+    className="h-5 w-6 shrink-0 rounded-tl-lg rounded-tr-sm rounded-br-lg rounded-bl-sm bg-primary"
+  />
+);
+
 export const Logo = () => {
   return (
-    <a
-      href="#"
-      className="relative z-20 flex items-center space-x-2 py-1 text-sm font-normal text-foreground"
+    <Link
+      href="/dashboard/home"
+      className="relative z-20 flex items-center space-x-2 rounded-md py-1 text-sm font-normal text-foreground"
     >
-      <div className="h-5 w-6 shrink-0 rounded-tl-lg rounded-tr-sm rounded-br-lg rounded-bl-sm bg-black dark:bg-white" />
+      <Mark />
       <motion.span
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         className="font-medium whitespace-pre text-foreground"
       >
-        Allgrow
+        VintiCode
       </motion.span>
-    </a>
+    </Link>
   );
 };
 
 export const LogoIcon = () => {
   return (
-    <a
-      href="#"
-      className="relative z-20 flex items-center space-x-2 py-1 text-sm font-normal text-black"
+    <Link
+      href="/dashboard/home"
+      aria-label="VintiCode home"
+      className="relative z-20 flex items-center space-x-2 rounded-md py-1 text-sm font-normal text-foreground"
     >
-      <div className="h-5 w-6 shrink-0 rounded-tl-lg rounded-tr-sm rounded-br-lg rounded-bl-sm bg-black dark:bg-white" />
-    </a>
+      <Mark />
+    </Link>
   );
 };

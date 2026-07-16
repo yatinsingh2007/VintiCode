@@ -7,7 +7,10 @@ function Card({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="card"
       className={cn(
-        "bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm w-[60vw]",
+        // No width here on purpose: a primitive must not dictate its own
+        // footprint. This previously hardcoded w-[60vw], forcing every
+        // consumer to fight it with overrides and inline styles.
+        "bg-card text-card-foreground flex flex-col gap-6 rounded-xl border border-border py-6 shadow-sm",
         className
       )}
       {...props}

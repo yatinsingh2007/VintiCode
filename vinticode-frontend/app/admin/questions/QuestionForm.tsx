@@ -36,21 +36,21 @@ interface Props {
 
 function Label({ children }: { children: React.ReactNode }) {
   return (
-    <label className="block text-sm font-medium text-gray-300 mb-1.5">
+    <label className="block text-sm font-medium text-foreground mb-1.5">
       {children}
     </label>
   );
 }
 
 function FieldHint({ children }: { children: React.ReactNode }) {
-  return <p className="text-xs text-gray-600 mt-1">{children}</p>;
+  return <p className="text-xs text-muted-foreground mt-1">{children}</p>;
 }
 
 const textareaClass =
-  "w-full bg-[#0d1117] border border-white/10 text-white placeholder-gray-600 rounded-lg px-4 py-3 text-sm font-mono outline-none focus:border-white focus:ring-1 focus:ring-white/30 transition-all duration-200 resize-y";
+  "w-full bg-background border border-border text-foreground placeholder:text-muted-foreground rounded-lg px-4 py-3 text-sm font-mono outline-none focus-visible:border-ring focus:ring-1 focus:ring-ring/50 transition-all duration-200 resize-y";
 
 const inputClass =
-  "w-full bg-[#0d1117] border border-white/10 text-white placeholder-gray-600 rounded-lg px-4 py-3 text-sm outline-none focus:border-white focus:ring-1 focus:ring-white/30 transition-all duration-200";
+  "w-full bg-background border border-border text-foreground placeholder:text-muted-foreground rounded-lg px-4 py-3 text-sm outline-none focus-visible:border-ring focus:ring-1 focus:ring-ring/50 transition-all duration-200";
 
 // ─── Main Component ─────────────────────────────────────────────────────
 
@@ -159,8 +159,8 @@ export default function QuestionForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
       {/* ── Section 1: Basic Info ── */}
-      <div className="bg-[#161b22] border border-white/8 rounded-xl p-6 space-y-5">
-        <h2 className="text-white font-semibold text-sm border-b border-white/8 pb-3">
+      <div className="bg-card border border-border rounded-xl p-6 space-y-5">
+        <h2 className="text-foreground font-semibold text-sm border-b border-border pb-3">
           Basic Information
         </h2>
 
@@ -176,7 +176,7 @@ export default function QuestionForm({
             className={inputClass}
           />
           {fieldErrors.title && (
-            <p className="text-red-400 text-xs mt-1">{fieldErrors.title}</p>
+            <p className="text-destructive-fg text-xs mt-1">{fieldErrors.title}</p>
           )}
         </div>
 
@@ -207,7 +207,7 @@ export default function QuestionForm({
             className={textareaClass}
           />
           {fieldErrors.description && (
-            <p className="text-red-400 text-xs mt-1">
+            <p className="text-destructive-fg text-xs mt-1">
               {fieldErrors.description}
             </p>
           )}
@@ -215,8 +215,8 @@ export default function QuestionForm({
       </div>
 
       {/* ── Section 2: I/O Specification ── */}
-      <div className="bg-[#161b22] border border-white/8 rounded-xl p-6 space-y-5">
-        <h2 className="text-white font-semibold text-sm border-b border-white/8 pb-3">
+      <div className="bg-card border border-border rounded-xl p-6 space-y-5">
+        <h2 className="text-foreground font-semibold text-sm border-b border-border pb-3">
           Input / Output Specification
         </h2>
 
@@ -233,7 +233,7 @@ export default function QuestionForm({
               className={textareaClass}
             />
             {fieldErrors.input_format && (
-              <p className="text-red-400 text-xs mt-1">
+              <p className="text-destructive-fg text-xs mt-1">
                 {fieldErrors.input_format}
               </p>
             )}
@@ -251,7 +251,7 @@ export default function QuestionForm({
               className={textareaClass}
             />
             {fieldErrors.output_format && (
-              <p className="text-red-400 text-xs mt-1">
+              <p className="text-destructive-fg text-xs mt-1">
                 {fieldErrors.output_format}
               </p>
             )}
@@ -272,7 +272,7 @@ export default function QuestionForm({
             />
             <FieldHint>Shown to users on the problem page.</FieldHint>
             {fieldErrors.sample_input && (
-              <p className="text-red-400 text-xs mt-1">
+              <p className="text-destructive-fg text-xs mt-1">
                 {fieldErrors.sample_input}
               </p>
             )}
@@ -291,7 +291,7 @@ export default function QuestionForm({
             />
             <FieldHint>Shown to users on the problem page.</FieldHint>
             {fieldErrors.sample_output && (
-              <p className="text-red-400 text-xs mt-1">
+              <p className="text-destructive-fg text-xs mt-1">
                 {fieldErrors.sample_output}
               </p>
             )}
@@ -300,18 +300,18 @@ export default function QuestionForm({
       </div>
 
       {/* ── Section 3: Test Cases ── */}
-      <div className="bg-[#161b22] border border-white/8 rounded-xl p-6 space-y-5">
-        <div className="flex items-center justify-between border-b border-white/8 pb-3">
+      <div className="bg-card border border-border rounded-xl p-6 space-y-5">
+        <div className="flex items-center justify-between border-b border-border pb-3">
           <div>
-            <h2 className="text-white font-semibold text-sm">Test Cases</h2>
-            <p className="text-gray-500 text-xs mt-0.5">
+            <h2 className="text-foreground font-semibold text-sm">Test Cases</h2>
+            <p className="text-muted-foreground text-xs mt-0.5">
               {publicCount} public · {hiddenCount} hidden
             </p>
           </div>
           <button
             type="button"
             onClick={addTestCase}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white text-xs font-medium rounded-lg border border-white/20 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-muted hover:bg-accent text-foreground text-xs font-medium rounded-lg border border-border-strong transition-colors"
           >
             <Plus className="w-3.5 h-3.5" />
             Add Test Case
@@ -324,24 +324,24 @@ export default function QuestionForm({
               key={i}
               className={`rounded-xl border p-4 space-y-4 transition-colors ${
                 tc.isHidden
-                  ? "border-amber-500/20 bg-amber-500/4"
-                  : "border-white/8 bg-[#0d1117]/60"
+                  ? "border-warning/20 bg-warning-subtle"
+                  : "border-border bg-background/60"
               }`}
             >
               {/* Test case header */}
               <div className="flex items-center gap-3">
-                <GripVertical className="w-4 h-4 text-gray-700 shrink-0" />
+                <GripVertical className="w-4 h-4 text-muted-foreground shrink-0" />
                 <div className="flex items-center gap-2 flex-1">
-                  <span className="text-gray-300 text-sm font-medium">
+                  <span className="text-foreground text-sm font-medium">
                     Test Case {i + 1}
                   </span>
                   {tc.isHidden ? (
-                    <span className="flex items-center gap-1 text-xs text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded">
+                    <span className="flex items-center gap-1 text-xs text-warning-fg bg-warning-subtle border border-warning/20 px-2 py-0.5 rounded">
                       <EyeOff className="w-3 h-3" />
                       Hidden
                     </span>
                   ) : (
-                    <span className="flex items-center gap-1 text-xs text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded">
+                    <span className="flex items-center gap-1 text-xs text-success-fg bg-success-subtle border border-success/20 px-2 py-0.5 rounded">
                       <Eye className="w-3 h-3" />
                       Public
                     </span>
@@ -351,7 +351,7 @@ export default function QuestionForm({
                 <button
                   type="button"
                   onClick={() => updateTestCase(i, "isHidden", !tc.isHidden)}
-                  className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
+                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
                   title={tc.isHidden ? "Make public" : "Make hidden"}
                 >
                   {tc.isHidden ? "Make Public" : "Make Hidden"}
@@ -361,7 +361,7 @@ export default function QuestionForm({
                   <button
                     type="button"
                     onClick={() => removeTestCase(i)}
-                    className="p-1 rounded text-gray-600 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                    className="p-1 rounded text-muted-foreground hover:text-destructive-fg hover:bg-destructive-subtle transition-colors"
                     title="Remove test case"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -381,7 +381,7 @@ export default function QuestionForm({
                     className={textareaClass}
                   />
                   {fieldErrors[`tc_${i}_input`] && (
-                    <p className="text-red-400 text-xs mt-1">
+                    <p className="text-destructive-fg text-xs mt-1">
                       {fieldErrors[`tc_${i}_input`]}
                     </p>
                   )}
@@ -398,7 +398,7 @@ export default function QuestionForm({
                     className={textareaClass}
                   />
                   {fieldErrors[`tc_${i}_output`] && (
-                    <p className="text-red-400 text-xs mt-1">
+                    <p className="text-destructive-fg text-xs mt-1">
                       {fieldErrors[`tc_${i}_output`]}
                     </p>
                   )}
@@ -422,7 +422,7 @@ export default function QuestionForm({
           ))}
         </div>
 
-        <div className="bg-amber-500/8 border border-amber-500/20 rounded-lg px-4 py-3 text-xs text-amber-300">
+        <div className="bg-warning-subtle border border-warning/20 rounded-lg px-4 py-3 text-xs text-warning-fg">
           <strong>Security:</strong> Hidden test cases are stored in the database
           but are never returned to users in any API response. Only admin
           endpoints expose the full <code>test_cases</code> JSON.
@@ -431,7 +431,7 @@ export default function QuestionForm({
 
       {/* ── Global error / Submit ── */}
       {error && (
-        <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm rounded-lg px-4 py-3">
+        <div className="bg-destructive-subtle border border-destructive/20 text-destructive-fg text-sm rounded-lg px-4 py-3">
           {error}
         </div>
       )}
@@ -441,12 +441,12 @@ export default function QuestionForm({
           type="submit"
           id="q-form-submit"
           disabled={loading}
-          className="flex items-center gap-2 px-6 py-3 bg-white hover:bg-gray-200
-                     text-black font-semibold rounded-lg text-sm transition-all duration-200
+          className="flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary-hover
+                     text-primary-foreground font-semibold rounded-lg text-sm transition-all duration-200
                      disabled:opacity-60 disabled:cursor-not-allowed shadow-lg"
         >
           {loading && (
-            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            <div className="w-4 h-4 border-2 border-border-strong border-t-white rounded-full animate-spin" />
           )}
           {submitLabel}
         </button>

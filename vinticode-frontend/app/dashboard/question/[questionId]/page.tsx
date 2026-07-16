@@ -15,9 +15,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { Badge, difficultyVariant } from "@/components/ui/badge";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { ArrowLeft, CheckCircle2, Play, Send, Terminal, AlertCircle, Sun, Moon } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Play, Send, Terminal, AlertCircle } from "lucide-react";
 
 interface submissionReportItem {
   verdict: string;
@@ -142,7 +144,8 @@ export default function Dashboard() {
   const [code, setCode] = useState<string>("");
   const [rloader, setRloader] = useState<boolean>(false);
   const [sloader, setSloader] = useState<boolean>(false);
-  const { theme, toggleTheme } = useContext(ThemeContext);
+  // Only `theme` is needed now — toggling moved to the shared ThemeToggle.
+  const { theme } = useContext(ThemeContext);
 
   const handleRun = async () => {
     try {
@@ -357,13 +360,13 @@ export default function Dashboard() {
   };
 
   return (
-    <PanelGroup direction="horizontal" className="fixed inset-0 h-dvh w-screen bg-background text-foreground overflow-hidden z-50 font-sans selection:bg-indigo-500/30">
+    <PanelGroup direction="horizontal" className="fixed inset-0 h-dvh w-screen bg-background text-foreground overflow-hidden z-50 font-sans selection:bg-primary-subtle">
       <Panel defaultSize={40} minSize={25} className="flex flex-col border-r border-border bg-background/50 backdrop-blur-xl">
         <div className="flex-none h-14 flex items-center gap-4 px-6 border-b border-border bg-muted/20 backdrop-blur-md">
           <Button
             variant="ghost"
             size="icon"
-            className="h-9 w-9 rounded-xl hover:bg-white/5 text-neutral-400 hover:text-white transition-all duration-300 active:scale-95"
+            className="h-9 w-9 rounded-xl hover:bg-accent text-muted-foreground hover:text-foreground transition-all duration-300 active:scale-95"
             onClick={() => router.push("/dashboard/home")}
           >
             <ArrowLeft className="h-4.5 w-4.5" />
@@ -375,7 +378,7 @@ export default function Dashboard() {
                 {questionData.title || "Loading Question..."}
               </h1>
               {questionData.done && (
-                <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-bold text-emerald-400 uppercase tracking-wider">
+                <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-success-subtle border border-success/20 text-[10px] font-bold text-success-fg uppercase tracking-wider">
                   <CheckCircle2 className="h-3 w-3" />
                   <span>Solved</span>
                 </div>
@@ -388,17 +391,15 @@ export default function Dashboard() {
           {questionData.title ? (
             <div className="space-y-10 max-w-3xl mx-auto pb-12">
               <div className="flex items-center gap-4">
-                <span
-                  className={`${questionData.difficulty === "Easy"
-                    ? "text-emerald-400 bg-emerald-400/5 ring-emerald-400/20"
-                    : questionData.difficulty === "Medium"
-                      ? "text-amber-400 bg-amber-400/5 ring-amber-400/20"
-                      : "text-rose-400 bg-rose-400/5 ring-rose-400/20"
-                    } inline-flex items-center px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider ring-1 ring-inset`}
-                >
+                {/* Third hand-rolled difficulty pill in the codebase — each
+                    with different colours, radius and casing. Now the shared
+                    Badge, which is also case-insensitive (this one only
+                    matched "Easy"/"Medium", so a lowercase value from the API
+                    silently fell through to the "hard" red styling). */}
+                <Badge variant={difficultyVariant(questionData.difficulty)}>
                   {questionData.difficulty}
-                </span>
-                <span className="text-[11px] text-neutral-500 font-medium uppercase tracking-widest">
+                </Badge>
+                <span className="text-[11px] text-muted-foreground font-medium uppercase tracking-widest">
                   Memory Limit: 256MB
                 </span>
               </div>
@@ -412,14 +413,14 @@ export default function Dashboard() {
 
               <div className="grid grid-cols-1 gap-8">
                 <div className="space-y-3">
-                  <h3 className="text-[11px] font-bold uppercase tracking-widest text-blue-500">Input Format</h3>
-                  <div className="p-5 rounded-xl bg-muted/30 text-[13px] text-foreground/80 font-mono leading-relaxed border border-border hover:border-indigo-500/30 transition-colors">
+                  <h3 className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Input Format</h3>
+                  <div className="p-5 rounded-xl bg-muted/30 text-[13px] text-foreground/80 font-mono leading-relaxed border border-border hover:border-primary/30 transition-colors">
                     {questionData.input_format}
                   </div>
                 </div>
                 <div className="space-y-3">
-                  <h3 className="text-[11px] font-bold uppercase tracking-widest text-green-500">Output Format</h3>
-                  <div className="p-5 rounded-xl bg-muted/30 text-[13px] text-foreground/80 font-mono leading-relaxed border border-border hover:border-indigo-500/30 transition-colors">
+                  <h3 className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Output Format</h3>
+                  <div className="p-5 rounded-xl bg-muted/30 text-[13px] text-foreground/80 font-mono leading-relaxed border border-border hover:border-primary/30 transition-colors">
                     {questionData.output_format}
                   </div>
                 </div>
@@ -428,7 +429,7 @@ export default function Dashboard() {
               <div className="space-y-8">
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-[11px] font-bold uppercase tracking-widest text-blue-500">Sample Input</h3>
+                    <h3 className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Sample Input</h3>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -447,7 +448,7 @@ export default function Dashboard() {
                 </div>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-[11px] font-bold uppercase tracking-widest text-yellow-400">Sample Output</h3>
+                    <h3 className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Sample Output</h3>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -475,7 +476,7 @@ export default function Dashboard() {
                       return (
                         <div
                           key={index}
-                          className="flex items-center justify-between p-4 rounded-xl bg-muted/20 border border-border hover:border-indigo-500/20 hover:bg-muted/30 transition-all duration-300 group"
+                          className="flex items-center justify-between p-4 rounded-xl bg-muted/20 border border-border hover:border-primary/30 hover:bg-muted/30 transition-all duration-300 group"
                         >
                           <div className="flex flex-col gap-1">
                             <span className="text-[10px] font-bold text-muted-foreground group-hover:text-foreground/60 uppercase tracking-widest transition-colors">Test Case</span>
@@ -483,24 +484,24 @@ export default function Dashboard() {
                           </div>
                           <div className="flex items-center">
                             {status === "pending" && (
-                              <span className="text-[10px] text-neutral-600 font-bold tracking-widest uppercase">Idle</span>
+                              <span className="text-[10px] text-muted-foreground font-bold tracking-widest uppercase">Idle</span>
                             )}
                             {status === "loading" && (
-                              <div className="flex items-center gap-2 text-indigo-400">
+                              <div className="flex items-center gap-2 text-primary-fg">
                                 <span className="text-[10px] font-bold uppercase tracking-widest animate-pulse">Running</span>
-                                <span className="h-3 w-3 animate-spin rounded-full border border-indigo-400 border-t-transparent"></span>
+                                <span className="h-3 w-3 animate-spin rounded-full border border-primary border-t-transparent"></span>
                               </div>
                             )}
                             {status === "accepted" && (
-                              <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-                                <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Passed</span>
-                                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
+                              <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-success-subtle border border-success/20">
+                                <span className="text-[10px] font-bold text-success-fg uppercase tracking-widest">Passed</span>
+                                <CheckCircle2 className="h-3.5 w-3.5 text-success-fg" />
                               </div>
                             )}
                             {status === "failed" && (
-                              <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-rose-500/10 border border-rose-500/20">
-                                <span className="text-[10px] font-bold text-rose-500 uppercase tracking-widest">Failed</span>
-                                <AlertCircle className="h-3.5 w-3.5 text-rose-500" />
+                              <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-destructive-subtle border border-destructive/20">
+                                <span className="text-[10px] font-bold text-destructive-fg uppercase tracking-widest">Failed</span>
+                                <AlertCircle className="h-3.5 w-3.5 text-destructive-fg" />
                               </div>
                             )}
                           </div>
@@ -513,21 +514,21 @@ export default function Dashboard() {
             </div>
           ) : (
             <div className="space-y-8 max-w-3xl mx-auto mt-10">
-              <Skeleton className="h-6 w-20 bg-white/5 rounded-full" />
-              <Skeleton className="h-10 w-3/4 bg-white/5 rounded-xl" />
+              <Skeleton className="h-6 w-20 bg-muted rounded-full" />
+              <Skeleton className="h-10 w-3/4 bg-muted rounded-xl" />
               <div className="space-y-4 pt-6">
-                <Skeleton className="h-4 w-full bg-white/5 rounded-md" />
-                <Skeleton className="h-4 w-full bg-white/5 rounded-md" />
-                <Skeleton className="h-4 w-2/3 bg-white/5 rounded-md" />
+                <Skeleton className="h-4 w-full bg-muted rounded-md" />
+                <Skeleton className="h-4 w-full bg-muted rounded-md" />
+                <Skeleton className="h-4 w-2/3 bg-muted rounded-md" />
               </div>
-              <Skeleton className="h-48 w-full bg-white/5 rounded-2xl" />
+              <Skeleton className="h-48 w-full bg-muted rounded-2xl" />
             </div>
           )}
         </div>
       </Panel>
 
-      <PanelResizeHandle className="w-1.5 flex items-center justify-center group bg-border/20 hover:bg-indigo-500/50 transition-all duration-300 relative z-50">
-        <div className="h-8 w-1 rounded-full bg-border group-hover:bg-white/40 transition-colors" />
+      <PanelResizeHandle className="w-1.5 flex items-center justify-center group bg-border/20 hover:bg-primary transition-all duration-300 relative z-50">
+        <div className="h-8 w-1 rounded-full bg-border group-hover:bg-primary transition-colors" />
       </PanelResizeHandle>
 
       <Panel defaultSize={60}>
@@ -575,51 +576,59 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={toggleTheme}
-                  className="h-9 w-9 rounded-xl hover:bg-muted text-muted-foreground hover:text-foreground transition-all duration-300"
-                >
-                  {theme === "dark" ? <Sun className="h-4.5 w-4.5" /> : <Moon className="h-4.5 w-4.5" />}
-                </Button>
+              <div className="flex items-center gap-2">
+                <ThemeToggle size="icon-sm" />
 
+                {/*
+                  Run is the secondary action and Submit the primary one, but
+                  both were rendered as equally loud saturated fills with
+                  baked-in rgba glow shadows — so the toolbar had two competing
+                  focal points and no hierarchy. Run is now `outline`, Submit
+                  keeps the brand fill. Both drop the hardcoded hues, the
+                  uppercase micro-type and the custom shadows.
+                */}
                 <Button
                   onClick={handleRun}
                   disabled={rloader}
+                  aria-busy={rloader}
+                  variant="outline"
                   size="sm"
-                  className="h-9 px-5 text-[11px] font-bold uppercase tracking-widest bg-blue-600 text-white hover:bg-blue-500 border-none shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] transition-all rounded-xl active:scale-95"
                 >
                   {rloader ? (
-                    <div className="flex items-center gap-2">
-                      <span className="h-3 w-3 animate-spin rounded-full border border-white/40 border-t-transparent" />
-                      <span>Running</span>
-                    </div>
+                    <>
+                      <span
+                        aria-hidden="true"
+                        className="h-3 w-3 animate-spin rounded-full border border-current/40 border-t-transparent"
+                      />
+                      Running…
+                    </>
                   ) : (
-                    <div className="flex items-center gap-2">
-                      <Play className="h-3.5 w-3.5" />
-                      <span>Run</span>
-                    </div>
+                    <>
+                      <Play className="h-3.5 w-3.5" aria-hidden="true" />
+                      Run
+                    </>
                   )}
                 </Button>
 
                 <Button
                   onClick={handleSubmit}
                   disabled={sloader}
+                  aria-busy={sloader}
                   size="sm"
-                  className="h-9 px-6 text-[11px] font-bold uppercase tracking-widest bg-emerald-600 text-white hover:bg-emerald-500 border-none transition-all rounded-xl shadow-[0_4px_14px_0_rgba(16,185,129,0.39)] active:scale-95"
                 >
                   {sloader ? (
-                    <div className="flex items-center gap-2">
-                      <span className="h-3 w-3 animate-spin rounded-full border border-white/40 border-t-transparent" />
-                      <span>Submitting</span>
-                    </div>
+                    <>
+                      <span
+                        aria-hidden="true"
+                        className="h-3 w-3 animate-spin rounded-full border border-current/40 border-t-transparent"
+                      />
+                      Submitting…
+                    </>
                   ) : (
-                    <div className="flex items-center gap-2">
-                      <Send className="h-3.5 w-3.5" />
-                      <span>Submit</span>
-                    </div>
+                    <>
+                      <Send className="h-3.5 w-3.5" aria-hidden="true" />
+                      Submit
+                    </>
                   )}
                 </Button>
               </div>
@@ -654,14 +663,14 @@ export default function Dashboard() {
             </div>
           </Panel>
 
-          <PanelResizeHandle className="h-1.5 flex items-center justify-center group bg-border/20 hover:bg-indigo-500/50 transition-all duration-300 relative z-50">
-            <div className="w-8 h-1 rounded-full bg-border group-hover:bg-white/40 transition-colors" />
+          <PanelResizeHandle className="h-1.5 flex items-center justify-center group bg-border/20 hover:bg-primary transition-all duration-300 relative z-50">
+            <div className="w-8 h-1 rounded-full bg-border group-hover:bg-primary transition-colors" />
           </PanelResizeHandle>
 
           <Panel defaultSize={35} minSize={20} className="flex flex-col bg-background">
             <div className="flex-none h-12 flex items-center justify-between px-6 border-b border-border bg-muted/20 backdrop-blur-md">
               <div className="flex items-center gap-6">
-                <div className="flex items-center gap-2 text-indigo-500">
+                <div className="flex items-center gap-2 text-primary-fg">
                   <Terminal className="h-4 w-4" />
                   <span className="text-[11px] font-bold uppercase tracking-widest">Execution Console</span>
                 </div>
@@ -670,10 +679,10 @@ export default function Dashboard() {
                   <div className="flex items-center gap-4 border-l border-border pl-6 animate-in fade-in slide-in-from-left-4 duration-500">
                     <div className="flex flex-col">
                       <span className="text-[8px] font-bold text-muted-foreground uppercase tracking-tighter">Status</span>
-                      <span className={`text-[10px] font-bold uppercase tracking-wider ${output?.status?.id === 3 ? "text-emerald-500" :
-                        output?.status?.id === 4 ? "text-rose-500" :
-                          output?.status?.id === 5 ? "text-amber-500" :
-                            "text-indigo-500"
+                      <span className={`text-[10px] font-bold uppercase tracking-wider ${output?.status?.id === 3 ? "text-success-fg" :
+                        output?.status?.id === 4 ? "text-destructive-fg" :
+                          output?.status?.id === 5 ? "text-warning-fg" :
+                            "text-primary-fg"
                         }`}>
                         {output?.status?.description}
                       </span>
@@ -714,21 +723,21 @@ export default function Dashboard() {
                   <div className="max-w-4xl">
                     {output.stderr ? (
                       <div className="space-y-4">
-                        <div className="flex items-center gap-2 text-rose-500/80">
+                        <div className="flex items-center gap-2 text-destructive-fg">
                           <AlertCircle className="h-3.5 w-3.5" />
                           <span className="text-[10px] font-bold uppercase tracking-widest">Runtime Error</span>
                         </div>
-                        <pre className="text-[13px] font-mono text-rose-500/90 whitespace-pre-wrap break-all leading-relaxed p-4 rounded-xl bg-rose-500/10 border border-rose-500/20">
+                        <pre className="text-[13px] font-mono text-destructive-fg whitespace-pre-wrap break-all leading-relaxed p-4 rounded-xl bg-destructive-subtle border border-destructive/20">
                           {output.stderr}
                         </pre>
                       </div>
                     ) : output.compile_output ? (
                       <div className="space-y-4">
-                        <div className="flex items-center gap-2 text-amber-500/80">
+                        <div className="flex items-center gap-2 text-warning-fg">
                           <AlertCircle className="h-3.5 w-3.5" />
                           <span className="text-[10px] font-bold uppercase tracking-widest">Compilation Error</span>
                         </div>
-                        <pre className="text-[13px] font-mono text-amber-500/90 whitespace-pre-wrap break-all leading-relaxed p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
+                        <pre className="text-[13px] font-mono text-warning-fg whitespace-pre-wrap break-all leading-relaxed p-4 rounded-xl bg-warning-subtle border border-warning/20">
                           {output.compile_output}
                         </pre>
                       </div>
@@ -738,7 +747,7 @@ export default function Dashboard() {
                           <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Standard Output</span>
                         </div>
                         {output.stdout ? (
-                          <pre className="text-[14px] font-mono text-foreground/90 whitespace-pre-wrap break-all leading-relaxed selection:bg-indigo-500/30">
+                          <pre className="text-[14px] font-mono text-foreground/90 whitespace-pre-wrap break-all leading-relaxed selection:bg-primary-subtle">
                             {output.stdout}
                           </pre>
                         ) : (
@@ -765,7 +774,7 @@ export default function Dashboard() {
                     placeholder="Enter process input..."
                     spellCheck={false}
                   />
-                  <div className="absolute bottom-4 right-4 text-[9px] font-bold text-muted-foreground group-focus-within:text-indigo-500 transition-colors uppercase tracking-tighter">
+                  <div className="absolute bottom-4 right-4 text-[9px] font-bold text-muted-foreground group-focus-within:text-primary-fg transition-colors uppercase tracking-tighter">
                     Editable Stdin
                   </div>
                 </div>

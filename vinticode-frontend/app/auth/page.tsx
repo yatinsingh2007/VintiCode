@@ -1,49 +1,100 @@
-"use client"
+"use client";
 import { useState } from "react";
 import Login from "@/section/Login";
 import Signup from "@/section/Signup";
-import { MoveLeftIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
 import { GridBeams } from "@/components/ui/grid-beams";
+import { cn } from "@/lib/utils";
 
+type Tab = "signup" | "login";
 
+const TABS: { id: Tab; label: string }[] = [
+  { id: "signup", label: "Sign Up" },
+  { id: "login", label: "Login" },
+];
 
-export default function ShineBorderDemo(): React.ReactNode {
-  const [activeTab, setActiveTab] = useState<string>("signup");
-  const router = useRouter();
+export default function AuthPage(): React.ReactNode {
+  const [activeTab, setActiveTab] = useState<Tab>("signup");
 
   return (
-    <GridBeams className="flex items-center justify-center w-full h-screen p-4">
-      <div
-        onClick={() => router.push('/')}
-        className="absolute top-5 left-5 p-2 bg-gray-800 rounded-full cursor-pointer hover:bg-gray-700 transition z-20"
+    <GridBeams className="flex min-h-svh w-full items-center justify-center p-4">
+      {/*
+        Was a <div onClick={router.push}>: not focusable, not keyboard
+        operable, no accessible name, and no real href to open in a new
+        tab. A Link is the correct element for navigation.
+      */}
+      <Link
+        href="/"
+        aria-label="Back to home"
+        className="absolute left-4 top-4 z-20 flex items-center gap-2 rounded-full border border-border bg-card/80 px-3 py-2 text-sm text-muted-foreground backdrop-blur-sm transition-colors hover:bg-accent hover:text-foreground sm:left-5 sm:top-5"
       >
-        <MoveLeftIcon className="text-white" />
-      </div>
-      <div className="w-full max-w-md bg-transparent rounded-xl shadow-lg relative flex flex-col h-[600px]">
-        {/* Tabs */}
-        <div className="flex w-full rounded-t-xl overflow-hidden border-b border-gray-700 z-10">
-          <button
-            onClick={() => setActiveTab("signup")}
-            className={`flex-1 py-3 text-sm font-bold transition-all duration-300 ${activeTab === "signup"
-              ? "bg-white text-black"
-              : "bg-black text-gray-300 hover:bg-gray-900"
-              }`}
+        <ArrowLeft className="size-4" aria-hidden="true" />
+        <span className="hidden sm:inline">Back</span>
+      </Link>
+
+      {/*
+        Height is no longer pinned to 600px. The signup form is taller than
+        login, so the fixed height forced it into an inner scroll area —
+        which, with scrollbars globally hidden, gave no hint the rest of the
+        form existed. The card now sizes to its content.
+      */}
+      <div className="relative z-10 w-full max-w-md">
+        <div className="overflow-hidden rounded-xl border border-border bg-card shadow-lg">
+          <div
+            role="tablist"
+            aria-label="Authentication"
+            className="flex w-full border-b border-border"
+            onKeyDown={(e) => {
+              // Arrow-key navigation is expected of a tablist.
+              if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+              e.preventDefault();
+              setActiveTab((t) => (t === "signup" ? "login" : "signup"));
+            }}
           >
-            Sign Up
-          </button>
-          <button
-            onClick={() => setActiveTab("login")}
-            className={`flex-1 py-3 text-sm font-bold transition-all duration-300 ${activeTab === "login"
-              ? "bg-white text-black"
-              : "bg-black text-gray-300 hover:bg-gray-900"
-              }`}
+            {TABS.map((tab) => {
+              const active = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  role="tab"
+                  id={`tab-${tab.id}`}
+                  aria-selected={active}
+                  aria-controls={`panel-${tab.id}`}
+                  tabIndex={active ? 0 : -1}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={cn(
+                    "relative flex-1 cursor-pointer py-3.5 text-sm font-semibold",
+                    "transition-colors duration-200",
+                    "focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ring",
+                    active
+                      ? "text-foreground"
+                      : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+                  )}
+                >
+                  {tab.label}
+                  {/* An underline reads as a tab; the previous full white
+                      fill read as a pressed button and inverted contrast. */}
+                  <span
+                    aria-hidden="true"
+                    className={cn(
+                      "absolute inset-x-0 bottom-0 h-0.5 origin-center transition-transform duration-200",
+                      active ? "scale-x-100 bg-primary" : "scale-x-0 bg-transparent"
+                    )}
+                  />
+                </button>
+              );
+            })}
+          </div>
+
+          <div
+            role="tabpanel"
+            id={`panel-${activeTab}`}
+            aria-labelledby={`tab-${activeTab}`}
+            className="p-5 sm:p-6"
           >
-            Login
-          </button>
-        </div>
-        <div className="p-6 overflow-y-auto flex-1">
-          {activeTab === "login" ? <Login /> : <Signup />}
+            {activeTab === "login" ? <Login /> : <Signup />}
+          </div>
         </div>
       </div>
     </GridBeams>

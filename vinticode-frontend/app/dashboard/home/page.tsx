@@ -1,12 +1,15 @@
 "use client";
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
 import { Logo, LogoIcon } from "@/components/Logo";
-import { Search, X, CheckCircle2, Sun, Moon } from "lucide-react";
-import { ThemeContext } from "@/context/ThemeContext";
+import { Search, X, CheckCircle2, ListX, Inbox } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { Badge, difficultyVariant } from "@/components/ui/badge";
+import { EmptyState, ErrorState } from "@/components/ui/states";
 import {
   IconArrowLeft,
   IconBrandTabler,
@@ -46,13 +49,9 @@ interface Question {
   done: boolean;
 }
 
-export default function SidebarDemo() {
-  return <SidebarDemoInner />;
-}
+const ITEMS_PER_PAGE = 9;
 
-function SidebarDemoInner() {
-  const [data, setData] = useState<Question[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function DashboardHomePage() {
   const [open, setOpen] = useState(false);
   const router = useRouter();
 
@@ -60,330 +59,339 @@ function SidebarDemoInner() {
     {
       label: "Dashboard",
       href: "/dashboard/home",
-      icon: <IconBrandTabler className="h-5 w-5 text-muted-foreground" />,
+      icon: <IconBrandTabler className="h-5 w-5 shrink-0 text-muted-foreground" />,
     },
     {
       label: "Profile",
       href: "/dashboard/profile",
-      icon: <IconUserBolt className="h-5 w-5 text-muted-foreground" />,
-    },
-    {
-      label: "Logout",
-      href: "#",
-      icon: <IconArrowLeft className="h-5 w-5 text-muted-foreground" />,
+      icon: <IconUserBolt className="h-5 w-5 shrink-0 text-muted-foreground" />,
     },
   ];
 
+  const handleLogout = async () => {
+    try {
+      const res = await api.get("/auth/logout", { withCredentials: true });
+      if (res.status === 200) {
+        toast.success("Logged out successfully");
+        router.push("/auth");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Logout failed");
+    }
+  };
+
   return (
-    <div
-      className={cn(
-        "mx-auto flex w-full h-screen flex-1 flex-col md:flex-row bg-background border border-border"
-      )}
-    >
+    <div className="mx-auto flex h-svh w-full flex-1 flex-col bg-background md:flex-row">
       <Sidebar open={open} setOpen={setOpen}>
         <SidebarBody className="justify-between gap-8">
-          <div className="flex flex-1 flex-col overflow-y-auto">
+          <div className="flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
             {open ? <Logo /> : <LogoIcon />}
 
-            <div className="mt-8 flex flex-col gap-1">
-              {loading
-                ? Array.from({ length: 4 }).map((_, idx) => (
-                  <SidebarShimmer key={idx} />
-                ))
-                : links.map((link, idx) => {
-                  if (link.label === "Logout") {
-                    return (
-                      <button
-                        key={idx}
-                        type="button"
-                        className="w-full text-left"
-                        onClick={async () => {
-                          try {
-                            const res = await api.get("/auth/logout", {
-                              withCredentials: true,
-                            });
+            <nav aria-label="Main" className="mt-8 flex flex-col gap-1">
+              {links.map((link, idx) => (
+                <SidebarLink key={idx} link={link} />
+              ))}
 
-                            if (res.status === 200) {
-                              toast.success("Logged out successfully");
-                              router.push("/auth");
-                            }
-                          } catch (err) {
-                            console.error(err);
-                            toast.error("Logout failed");
-                          }
-                        }}
-                      >
-                        <SidebarLink link={{ ...link, href: "#" }} />
-                      </button>
-                    );
-                  }
-
-                  return <SidebarLink key={idx} link={link} />;
-                })}
-            </div>
+              <button
+                type="button"
+                className="w-full cursor-pointer text-left"
+                onClick={handleLogout}
+              >
+                <SidebarLink
+                  link={{
+                    label: "Logout",
+                    href: "#",
+                    icon: (
+                      <IconArrowLeft className="h-5 w-5 shrink-0 text-muted-foreground" />
+                    ),
+                  }}
+                />
+              </button>
+            </nav>
           </div>
         </SidebarBody>
       </Sidebar>
 
-      <Dashboard
-        data={data}
-        loading={loading}
-        setData={setData}
-        setLoading={setLoading}
-      />
+      <Dashboard />
     </div>
   );
 }
 
-const SidebarShimmer = () => (
-  <div className="flex items-center space-x-2 px-2 py-2">
-    <Skeleton className="h-5 w-5 bg-muted rounded" />
-    <Skeleton className="h-4 w-20 bg-muted rounded" />
-  </div>
-);
-
+/* Mirrors the real card's height and internal rhythm to avoid layout shift. */
 const ShimmerCard = () => (
-  <div className="h-40 rounded-xl border border-border bg-card/50 backdrop-blur-sm p-5 animate-pulse flex flex-col justify-between shadow-lg">
+  <div className="flex h-[168px] flex-col justify-between rounded-xl border border-border bg-card p-5">
     <div className="space-y-3">
-      <div className="h-6 w-3/4 bg-muted rounded-lg" />
-      <div className="h-4 w-full bg-muted rounded-md" />
-      <div className="h-4 w-5/6 bg-muted rounded-md" />
+      <Skeleton className="h-5 w-3/4" />
+      <Skeleton className="h-4 w-full" />
+      <Skeleton className="h-4 w-5/6" />
     </div>
-    <div className="flex justify-between items-center">
-      <div className="h-6 w-20 bg-muted rounded-full" />
-      <div className="h-4 w-16 bg-muted rounded" />
+    <div className="flex items-center justify-between border-t border-border pt-4">
+      <Skeleton className="h-5 w-16 rounded-full" />
+      <Skeleton className="h-4 w-12" />
     </div>
   </div>
 );
 
-const getDifficultyBadge = (difficulty: string) => {
-  switch (difficulty.toLowerCase()) {
-    case "easy":
-      return "bg-green-500/10 text-green-400 border border-green-500/20 shadow-sm shadow-green-500/10";
-    case "medium":
-      return "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 shadow-sm shadow-yellow-500/10";
-    case "hard":
-      return "bg-red-500/10 text-red-400 border border-red-500/20 shadow-sm shadow-red-500/10";
-    default:
-      return "bg-muted text-muted-foreground border border-border";
-  }
-};
-
-interface DashboardProps {
-  data: Question[];
-  loading: boolean;
-  setData: React.Dispatch<React.SetStateAction<Question[]>>;
-  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
-const Dashboard: React.FC<DashboardProps> = ({
-  data,
-  loading,
-  setData,
-  setLoading,
-}) => {
-  const [ page, setPage ] = useState<number>(1);
-  const [ difficultyFilter, setDifficultyFilter ] = useState<string>("all");
-  const [searchQuery, setSearchQuery] = useState<string>("");
-
-  const [ allQuestions, setAllQuestions ] = useState<Question[]>([]);
-  const [ filteredQuestions, setFilteredQuestions ] = useState<Question[]>([]);
-  const [ paginatedQuestions, setPaginatedQuestions ] = useState<Question[]>([]);
-
-  const [ totalPages, setTotalPages ] = useState<number>(1);
-  const [ totalCount, setTotalCount ] = useState<number>(0);
+const Dashboard: React.FC = () => {
+  const [allQuestions, setAllQuestions] = useState<Question[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [page, setPage] = useState(1);
+  const [difficultyFilter, setDifficultyFilter] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const router = useRouter();
-  const { theme, toggleTheme } = useContext(ThemeContext);
-  const itemsPerPage = 9;
 
-  useEffect(() => {
-    const fetchQuestions = async () => {
-      setLoading(true);
-      try {
-        const resp = await api.get(`/dashboard/home`, {
-          withCredentials: true
-        });
-
-        const questions = resp.data.questions || resp.data || [];
-        setAllQuestions(questions);
-        setData(questions);
-
-      } catch (err: unknown) {
-        toast.error("Failed to fetch data");
-
-        if (axios.isAxiosError(err)) {
-          if (err.response?.status === 401) {
-            router.push("/auth");
-            return;
-          }
-        }
-
-      } finally {
-        setLoading(false);
+  const fetchQuestions = useCallback(async () => {
+    setLoading(true);
+    setError(false);
+    try {
+      const resp = await api.get(`/dashboard/home`, { withCredentials: true });
+      setAllQuestions(resp.data.questions || resp.data || []);
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err) && err.response?.status === 401) {
+        router.push("/auth");
+        return;
       }
-    };
-
-    fetchQuestions();
-  }, []);
+      // Previously only a toast fired and the grid rendered as "no matching
+      // questions found" — a failed request was indistinguishable from an
+      // empty result set, and there was no way to retry without a reload.
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
+  }, [router]);
 
   useEffect(() => {
-    let filtered = [...allQuestions];
+    fetchQuestions();
+  }, [fetchQuestions]);
 
-    if (searchQuery.trim()) {
-      const s = searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        (q) =>
-          q.title.toLowerCase().includes(s) ||
-          q.description.toLowerCase().includes(s)
-      );
-    }
-
-    if (difficultyFilter !== "all") {
-      filtered = filtered.filter(
-        (q) => q.difficulty.toLowerCase() === difficultyFilter.toLowerCase()
-      );
-    }
-
-    setFilteredQuestions(filtered);
-    setTotalCount(filtered.length);
-
-    const total = Math.ceil(filtered.length / itemsPerPage) || 1;
-    setTotalPages(total);
-
-    if (page > total) setPage(1);
+  /*
+    Filtering was spread across two effects that mirrored derived data into
+    three extra state variables, so every keystroke triggered a cascade of
+    re-renders and a frame where the list disagreed with the filters.
+    It's plain derived data — useMemo is enough.
+  */
+  const filteredQuestions = useMemo(() => {
+    const s = searchQuery.trim().toLowerCase();
+    return allQuestions.filter((q) => {
+      const matchesSearch =
+        !s ||
+        q.title.toLowerCase().includes(s) ||
+        q.description.toLowerCase().includes(s);
+      const matchesDifficulty =
+        difficultyFilter === "all" ||
+        q.difficulty?.toLowerCase() === difficultyFilter;
+      return matchesSearch && matchesDifficulty;
+    });
   }, [allQuestions, searchQuery, difficultyFilter]);
 
-  useEffect(() => {
-    const start = (page - 1) * itemsPerPage;
-    const paginated = filteredQuestions.slice(start, start + itemsPerPage);
+  const totalPages = Math.max(1, Math.ceil(filteredQuestions.length / ITEMS_PER_PAGE));
 
-    setPaginatedQuestions(paginated);
-    setData(paginated);
+  // Keep the page in range when filters shrink the result set.
+  useEffect(() => {
+    setPage(1);
+  }, [searchQuery, difficultyFilter]);
+
+  const paginatedQuestions = useMemo(() => {
+    const start = (page - 1) * ITEMS_PER_PAGE;
+    return filteredQuestions.slice(start, start + ITEMS_PER_PAGE);
   }, [filteredQuestions, page]);
 
-  return (
-    <div className="flex-1 w-full bg-background overflow-y-auto">
+  const hasFilters = searchQuery.trim() !== "" || difficultyFilter !== "all";
+  const clearFilters = () => {
+    setSearchQuery("");
+    setDifficultyFilter("all");
+  };
 
-      <div className="border-b border-border bg-muted/30 backdrop-blur-md px-6 py-6 space-y-4 sticky top-0 z-10 transition-colors duration-300">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">
+  const solvedCount = allQuestions.filter((q) => q.done).length;
+
+  return (
+    <div className="flex min-w-0 flex-1 flex-col overflow-y-auto bg-background">
+      <header className="sticky top-0 z-10 space-y-4 border-b border-border bg-background/80 px-4 py-5 backdrop-blur-md sm:px-6">
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            {/* The gradient blue→cyan clip-text heading was the only element
+                of its kind in the app and lowered contrast against both
+                themes. A solid heading is calmer and reads as more premium. */}
+            <h1 className="text-2xl font-semibold tracking-tight text-foreground">
               Practice Questions
-            </h2>
-            <p className="text-sm text-muted-foreground mt-1">
+            </h1>
+            <p className="mt-1 text-sm text-muted-foreground">
               Search, filter, and track your coding journey.
             </p>
           </div>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={toggleTheme}
-            className="h-10 w-10 rounded-xl border-border bg-card hover:bg-muted text-foreground transition-all duration-300"
-          >
-            {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-          </Button>
+          <ThemeToggle />
         </div>
 
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div className="relative w-full max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="relative w-full sm:max-w-md">
+            <Search
+              aria-hidden="true"
+              className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+            />
             <Input
-              placeholder="Search questions..."
+              type="search"
+              aria-label="Search questions"
+              placeholder="Search questions…"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-10 bg-card border-border text-foreground placeholder:text-muted-foreground focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all rounded-lg"
+              className="pl-9 pr-9"
             />
             {searchQuery && (
               <button
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                type="button"
+                aria-label="Clear search"
+                className="absolute right-0 top-0 flex h-9 w-9 cursor-pointer items-center justify-center rounded-r-md text-muted-foreground transition-colors hover:text-foreground"
                 onClick={() => setSearchQuery("")}
               >
-                <X className="h-4 w-4" />
+                <X className="size-4" aria-hidden="true" />
               </button>
             )}
           </div>
 
-          <Select value={difficultyFilter} onValueChange={setDifficultyFilter}>
-            <SelectTrigger className="bg-card border-border text-foreground min-w-[140px] focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all rounded-lg">
-              <SelectValue placeholder="Difficulty" />
-            </SelectTrigger>
-            <SelectContent className="bg-popover border-border text-popover-foreground rounded-lg">
-              <SelectItem value="all">All Levels</SelectItem>
-              <SelectItem value="easy">Easy</SelectItem>
-              <SelectItem value="medium">Medium</SelectItem>
-              <SelectItem value="hard">Hard</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="flex items-center gap-2">
+            <Select value={difficultyFilter} onValueChange={setDifficultyFilter}>
+              <SelectTrigger aria-label="Filter by difficulty" className="min-w-[140px]">
+                <SelectValue placeholder="Difficulty" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Levels</SelectItem>
+                <SelectItem value="easy">Easy</SelectItem>
+                <SelectItem value="medium">Medium</SelectItem>
+                <SelectItem value="hard">Hard</SelectItem>
+              </SelectContent>
+            </Select>
+            {hasFilters && (
+              <Button variant="ghost" size="sm" onClick={clearFilters}>
+                Clear
+              </Button>
+            )}
+          </div>
         </div>
-      </div>
 
+        {/*
+          A live result count: the list previously changed silently as you
+          typed, giving no confirmation the filter had applied and no sense
+          of overall progress.
+        */}
+        {!loading && !error && (
+          <p aria-live="polite" className="text-xs text-muted-foreground">
+            {filteredQuestions.length}{" "}
+            {filteredQuestions.length === 1 ? "question" : "questions"}
+            {hasFilters && ` of ${allQuestions.length}`}
+            {solvedCount > 0 && !hasFilters && ` · ${solvedCount} solved`}
+          </p>
+        )}
+      </header>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 p-6">
-        {loading &&
-          Array.from({ length: 9 }).map((_, idx) => <ShimmerCard key={idx} />)}
+      <div className="flex-1 p-4 sm:p-6">
+        {loading && (
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: ITEMS_PER_PAGE }).map((_, idx) => (
+              <ShimmerCard key={idx} />
+            ))}
+          </div>
+        )}
 
-        {!loading &&
-          paginatedQuestions.map((q) => (
-            <div
-              key={q.id}
-              onClick={() => router.push(`/dashboard/question/${q.id}/scratchpad`)}
-              className="group cursor-pointer rounded-xl border border-border bg-card/50 backdrop-blur-sm p-5 hover:border-blue-500/30 hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300 hover:-translate-y-1"
-            >
-              <div className="space-y-3">
-                <div className="flex items-start justify-between gap-2">
-                  <h4 className="text-lg font-semibold text-foreground line-clamp-1 group-hover:text-blue-500 transition-colors">
-                    {q.title}
-                  </h4>
+        {!loading && error && (
+          <ErrorState
+            title="Couldn't load questions"
+            description="Something went wrong while fetching the question list."
+            onRetry={fetchQuestions}
+          />
+        )}
 
-                  {q.done && (
-                    <span className="flex items-center gap-1 text-xs bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded-full border border-emerald-500/20 shrink-0">
-                      <CheckCircle2 className="h-3 w-3" />
-                      Solved
-                    </span>
-                  )}
+        {!loading && !error && paginatedQuestions.length > 0 && (
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {paginatedQuestions.map((q) => (
+              /*
+                Was a <div onClick>: unreachable by keyboard, invisible to
+                assistive tech, and impossible to open in a new tab. A Link
+                restores all three for free.
+              */
+              <Link
+                key={q.id}
+                href={`/dashboard/question/${q.id}/scratchpad`}
+                className={cn(
+                  "group flex h-[168px] flex-col justify-between rounded-xl border border-border bg-card p-5",
+                  "shadow-xs transition-[border-color,box-shadow,transform] duration-200",
+                  "hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md",
+                  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                )}
+              >
+                <div className="space-y-2">
+                  <div className="flex items-start justify-between gap-2">
+                    <h2 className="line-clamp-1 font-semibold text-foreground transition-colors group-hover:text-primary-fg">
+                      {q.title}
+                    </h2>
+                    {q.done && (
+                      <Badge variant="success" className="shrink-0">
+                        <CheckCircle2 aria-hidden="true" />
+                        Solved
+                      </Badge>
+                    )}
+                  </div>
+                  <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">
+                    {q.description}
+                  </p>
                 </div>
 
-                <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
-                  {q.description}
-                </p>
-              </div>
-
-              <div className="mt-4 pt-4 border-t border-border flex items-center justify-between">
-                <span
-                  className={`text-xs px-3 py-1.5 rounded-full font-medium ${getDifficultyBadge(
-                    q.difficulty
-                  )}`}
-                >
-                  {q.difficulty}
-                </span>
-
-                <span className="text-xs text-muted-foreground group-hover:text-blue-500 flex items-center gap-1 transition-colors">
-                  View
-                  <span className="group-hover:translate-x-1 transition-transform inline-block">→</span>
-                </span>
-              </div>
-            </div>
-          ))}
-
-        {!loading && paginatedQuestions.length === 0 && (
-          <div className="col-span-full text-center py-16 text-muted-foreground border border-border rounded-xl bg-muted/20 backdrop-blur-sm">
-            <div className="space-y-2">
-              <p className="text-lg font-medium text-foreground">No matching questions found</p>
-              <p className="text-sm text-muted-foreground">Try adjusting your search or filters</p>
-            </div>
+                <div className="flex items-center justify-between border-t border-border pt-4">
+                  <Badge variant={difficultyVariant(q.difficulty)}>
+                    {q.difficulty}
+                  </Badge>
+                  <span className="flex items-center gap-1 text-xs font-medium text-muted-foreground transition-colors group-hover:text-primary-fg">
+                    View
+                    <span
+                      aria-hidden="true"
+                      className="inline-block transition-transform duration-200 group-hover:translate-x-0.5"
+                    >
+                      →
+                    </span>
+                  </span>
+                </div>
+              </Link>
+            ))}
           </div>
+        )}
+
+        {/* Distinguishes "you filtered everything out" (recoverable, with a
+            way out) from "there's genuinely nothing here yet". */}
+        {!loading && !error && paginatedQuestions.length === 0 && (
+          hasFilters ? (
+            <EmptyState
+              icon={ListX}
+              title="No matching questions"
+              description="No questions match your current search and filters."
+              action={
+                <Button variant="outline" size="sm" onClick={clearFilters}>
+                  Clear filters
+                </Button>
+              }
+            />
+          ) : (
+            <EmptyState
+              icon={Inbox}
+              title="No questions available yet"
+              description="Check back soon — new practice questions are added regularly."
+            />
+          )
         )}
       </div>
 
-
-      <div className="border-t border-border bg-muted/30 backdrop-blur-md py-4 px-6 sticky bottom-0">
-        <DashboardPagination
-          totalPages={totalPages}
-          currentPage={page}
-          onPageChange={setPage}
-        />
-      </div>
+      {/* Pagination is meaningless with a single page; hiding it removes a
+          permanently-disabled control from the bottom of the screen. */}
+      {!loading && !error && totalPages > 1 && (
+        <div className="sticky bottom-0 border-t border-border bg-background/80 px-4 py-3 backdrop-blur-md sm:px-6">
+          <DashboardPagination
+            totalPages={totalPages}
+            currentPage={page}
+            onPageChange={setPage}
+          />
+        </div>
+      )}
     </div>
   );
 };

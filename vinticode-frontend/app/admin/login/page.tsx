@@ -22,9 +22,9 @@ function GridBackground() {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none select-none">
       {/* Radial glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] bg-white/5 rounded-full blur-[120px]" />
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gray-600/5 rounded-full blur-[100px]" />
-      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-white/3 rounded-full blur-[100px]" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] bg-primary/5 rounded-full blur-[120px]" />
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px]" />
+      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-primary/5 rounded-full blur-[100px]" />
 
       {/* Grid lines */}
       <svg
@@ -51,15 +51,15 @@ function GridBackground() {
 
       {/* Floating orbs */}
       <div
-        className="absolute top-[15%] left-[10%] w-2 h-2 rounded-full bg-white/20"
+        className="absolute top-[15%] left-[10%] w-2 h-2 rounded-full bg-primary/20"
         style={{ animation: "float1 6s ease-in-out infinite" }}
       />
       <div
-        className="absolute top-[60%] left-[85%] w-1.5 h-1.5 rounded-full bg-gray-400/20"
+        className="absolute top-[60%] left-[85%] w-1.5 h-1.5 rounded-full bg-muted-foreground/20"
         style={{ animation: "float2 8s ease-in-out infinite" }}
       />
       <div
-        className="absolute top-[80%] left-[20%] w-1 h-1 rounded-full bg-white/10"
+        className="absolute top-[80%] left-[20%] w-1 h-1 rounded-full bg-primary/10"
         style={{ animation: "float1 10s ease-in-out infinite 2s" }}
       />
     </div>
@@ -98,7 +98,7 @@ function AdminInput({
     <div>
       <label
         htmlFor={id}
-        className="block text-sm font-medium text-gray-300 mb-2"
+        className="block text-sm font-medium text-foreground mb-2"
       >
         {label}
       </label>
@@ -106,14 +106,14 @@ function AdminInput({
         className={`
           relative flex items-center rounded-xl border transition-all duration-200
           ${focused
-            ? "border-white ring-2 ring-white/20 bg-[#0d1117]"
-            : "border-white/10 bg-[#0d1117] hover:border-white/20"
+            ? "border-border-strong ring-2 ring-ring/50 bg-background"
+            : "border-border bg-background hover:border-border-strong"
           }
         `}
       >
         <Icon
           className={`absolute left-3.5 w-4 h-4 transition-colors duration-200 ${
-            focused ? "text-white" : "text-gray-600"
+            focused ? "text-foreground" : "text-muted-foreground"
           }`}
         />
         <input
@@ -127,7 +127,7 @@ function AdminInput({
           autoComplete={autoComplete}
           disabled={disabled}
           className={`
-            flex-1 bg-transparent text-white placeholder-gray-600
+            flex-1 bg-transparent text-foreground placeholder:text-muted-foreground
             pl-10 pr-4 py-3 text-sm outline-none
             disabled:opacity-50 disabled:cursor-not-allowed
           `}
@@ -145,8 +145,8 @@ function AdminInput({
 // ─────────────────────────────────────────────
 function FeaturePill({ text }: { text: string }) {
   return (
-    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-white/5 text-gray-400 border border-white/8">
-      <span className="w-1.5 h-1.5 rounded-full bg-white shrink-0" />
+    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-primary/5 text-muted-foreground border border-border">
+      <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
       {text}
     </span>
   );
@@ -253,14 +253,14 @@ export default function AdminLoginPage() {
   // Show nothing while checking existing session
   if (checkingSession) {
     return (
-      <div className="min-h-screen bg-[#0d1117] flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center">
-            <Shield className="w-6 h-6 text-black" />
+          <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center">
+            <Shield className="w-6 h-6 text-primary-foreground" />
           </div>
           <div className="flex items-center gap-2">
-            <Loader2 className="w-4 h-4 animate-spin text-white" />
-            <span className="text-gray-400 text-sm">
+            <Loader2 className="w-4 h-4 animate-spin text-foreground" />
+            <span className="text-muted-foreground text-sm">
               Checking session…
             </span>
           </div>
@@ -297,43 +297,43 @@ export default function AdminLoginPage() {
         }
       `}</style>
 
-      <div className="min-h-screen bg-[#0d1117] flex relative">
+      <div className="min-h-screen bg-background flex relative">
         <GridBackground />
 
         {/* ─── Left panel: branding (hidden on mobile) ─── */}
         <div className="hidden lg:flex flex-col justify-between w-[45%] px-14 py-12 relative z-10">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-lg shadow-white/10">
-              <Shield className="w-5 h-5 text-black" />
+            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg ">
+              <Shield className="w-5 h-5 text-primary-foreground" />
             </div>
             <div>
-              <p className="text-white font-bold text-base leading-none">
+              <p className="text-foreground font-bold text-base leading-none">
                 VintiCode
               </p>
-              <p className="text-gray-400 text-xs mt-0.5">Admin Console</p>
+              <p className="text-muted-foreground text-xs mt-0.5">Admin Console</p>
             </div>
           </div>
 
           {/* Hero copy */}
           <div className="space-y-6">
             <div className="space-y-4">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
-                <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                <span className="text-gray-300 text-xs font-medium">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/5 border border-border">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                <span className="text-foreground text-xs font-medium">
                   Secure Admin Access
                 </span>
               </div>
-              <h1 className="text-4xl font-bold text-white leading-tight">
+              <h1 className="text-4xl font-bold text-foreground leading-tight">
                 Control your
                 <br />
-                <span className="bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+                <span className="bg-primary bg-clip-text text-transparent">
                   platform with
                 </span>
                 <br />
                 confidence.
               </h1>
-              <p className="text-gray-400 text-base leading-relaxed max-w-sm">
+              <p className="text-muted-foreground text-base leading-relaxed max-w-sm">
                 Manage users, questions, and submissions from a unified
                 dashboard built for speed and clarity.
               </p>
@@ -348,8 +348,8 @@ export default function AdminLoginPage() {
           </div>
 
           {/* Bottom quote */}
-          <div className="border-l-2 border-white/20 pl-4">
-            <p className="text-gray-400 text-sm italic">
+          <div className="border-l-2 border-border-strong pl-4">
+            <p className="text-muted-foreground text-sm italic">
               &quot;Access is a privilege. Manage responsibly.&quot;
             </p>
           </div>
@@ -363,27 +363,27 @@ export default function AdminLoginPage() {
           >
             {/* Mobile logo */}
             <div className="flex flex-col items-center mb-8 lg:hidden">
-              <div className="w-14 h-14 rounded-2xl bg-white flex items-center justify-center shadow-lg shadow-white/10 mb-4">
-                <Shield className="w-7 h-7 text-black" />
+              <div className="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center shadow-lg  mb-4">
+                <Shield className="w-7 h-7 text-primary-foreground" />
               </div>
-              <h1 className="text-white text-xl font-bold">VintiCode Admin</h1>
-              <p className="text-gray-500 text-sm mt-1">Control Panel</p>
+              <h1 className="text-foreground text-xl font-bold">VintiCode Admin</h1>
+              <p className="text-muted-foreground text-sm mt-1">Control Panel</p>
             </div>
 
             {/* Card */}
-            <div className="bg-[#161b22]/80 backdrop-blur-xl border border-white/8 rounded-2xl p-8 shadow-2xl shadow-black/50">
+            <div className="bg-card/80 backdrop-blur-xl border border-border rounded-2xl p-8 shadow-2xl ">
               {/* Card header */}
               <div className="mb-8">
                 <div className="hidden lg:block">
-                  <h2 className="text-white text-2xl font-bold">
+                  <h2 className="text-foreground text-2xl font-bold">
                     Sign in to Admin
                   </h2>
-                  <p className="text-gray-400 text-sm mt-1">
+                  <p className="text-muted-foreground text-sm mt-1">
                     Enter your admin credentials to continue
                   </p>
                 </div>
                 <div className="lg:hidden text-center">
-                  <h2 className="text-white text-xl font-bold">Admin Sign In</h2>
+                  <h2 className="text-foreground text-xl font-bold">Admin Sign In</h2>
                 </div>
               </div>
 
@@ -415,7 +415,7 @@ export default function AdminLoginPage() {
                     <button
                       type="button"
                       onClick={() => setShowPassword((v) => !v)}
-                      className="text-gray-500 hover:text-gray-300 transition-colors"
+                      className="text-muted-foreground hover:text-foreground transition-colors"
                       aria-label={showPassword ? "Hide password" : "Show password"}
                     >
                       {showPassword ? (
@@ -431,7 +431,7 @@ export default function AdminLoginPage() {
                 {error && (
                   <div
                     role="alert"
-                    className="flex items-start gap-3 bg-red-500/10 border border-red-500/25 text-red-400 text-sm rounded-xl px-4 py-3 animate-fade-in"
+                    className="flex items-start gap-3 bg-destructive-subtle border border-destructive/20 text-destructive-fg text-sm rounded-xl px-4 py-3 animate-fade-in"
                   >
                     <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
                     <span>{error}</span>
@@ -445,17 +445,17 @@ export default function AdminLoginPage() {
                   disabled={loading}
                   className={`
                     relative w-full group overflow-hidden
-                    bg-white hover:bg-gray-100
-                    text-black font-semibold py-3 rounded-xl text-sm
+                    bg-primary hover:bg-primary-hover
+                    text-primary-foreground font-semibold py-3 rounded-xl text-sm
                     transition-all duration-300
                     disabled:opacity-60 disabled:cursor-not-allowed
                     flex items-center justify-center gap-2
-                    shadow-lg shadow-white/5
-                    focus:outline-none focus:ring-2 focus:ring-white/50
+                    shadow-lg 
+                    focus:outline-none focus:ring-2 focus:ring-ring/50
                   `}
                 >
                   {/* Shimmer effect on hover */}
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700" />
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-transparent via-border to-transparent -skew-x-12 translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700" />
 
                   {loading ? (
                     <>
@@ -472,8 +472,8 @@ export default function AdminLoginPage() {
               </form>
 
               {/* Security notice */}
-              <div className="mt-6 pt-5 border-t border-white/8">
-                <div className="flex items-center gap-2 text-gray-600 text-xs">
+              <div className="mt-6 pt-5 border-t border-border">
+                <div className="flex items-center gap-2 text-muted-foreground text-xs">
                   <Lock className="w-3 h-3" />
                   <span>
                     Protected by JWT · Session expires in 8 hours
@@ -482,7 +482,7 @@ export default function AdminLoginPage() {
               </div>
             </div>
 
-            <p className="text-center text-gray-700 text-xs mt-6">
+            <p className="text-center text-muted-foreground text-xs mt-6">
               Unauthorized access attempts are logged and monitored.
             </p>
           </div>

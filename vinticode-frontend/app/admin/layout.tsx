@@ -3,9 +3,10 @@
 import { useEffect, useState, ReactNode } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import adminApi from "@/lib/adminApi";
 import { useAdminAuth } from "@/lib/useAdminAuth";
 import toast from "react-hot-toast";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   LayoutDashboard,
   BookOpen,
@@ -17,8 +18,6 @@ import {
   Menu,
   X,
   BarChart3,
-  Bell,
-  Settings,
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -29,9 +28,6 @@ const NAV_ITEMS = [
   { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
 ];
 
-// ─────────────────────────────────────────────
-// Sidebar
-// ─────────────────────────────────────────────
 function AdminSidebar({
   open,
   onClose,
@@ -48,106 +44,110 @@ function AdminSidebar({
   return (
     <>
       {/* Mobile backdrop */}
-      {open && (
-        <div
-          className="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm lg:hidden"
-          onClick={onClose}
-        />
-      )}
+      <div
+        onClick={onClose}
+        aria-hidden="true"
+        className={`fixed inset-0 z-30 bg-foreground/40 backdrop-blur-sm transition-opacity duration-300 lg:hidden ${
+          open ? "opacity-100" : "pointer-events-none opacity-0"
+        }`}
+      />
 
       <aside
+        aria-label="Admin sidebar"
         className={`
-          fixed top-0 left-0 z-40 h-full w-[240px] flex flex-col
-          bg-[#0d1117] border-r border-white/[0.06]
-          transition-transform duration-300 ease-in-out
+          fixed top-0 left-0 z-40 flex h-full w-[248px] flex-col
+          bg-sidebar border-r border-sidebar-border
+          transition-transform duration-300 ease-out
           ${open ? "translate-x-0" : "-translate-x-full"}
-          lg:translate-x-0 lg:static lg:z-auto shadow-2xl
+          lg:translate-x-0 lg:static lg:z-auto
         `}
       >
-        {/* Logo */}
-        <div className="flex items-center gap-3 px-5 py-5 border-b border-white/[0.06]">
-          <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center shadow-lg shadow-white/5 shrink-0">
-            <Shield className="w-4.5 h-4.5 text-black" />
+        {/* Brand — height matches the top bar so the two rules align */}
+        <div className="flex h-14 shrink-0 items-center gap-3 border-b border-sidebar-border px-4">
+          <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary">
+            <Shield className="size-4 text-primary-foreground" aria-hidden="true" />
           </div>
           <div className="min-w-0">
-            <p className="text-white font-bold text-sm leading-none">
+            <p className="text-sm font-semibold leading-tight text-sidebar-foreground">
               VintiCode
             </p>
-            <p className="text-gray-400 text-xs mt-0.5">Admin Console</p>
+            <p className="text-[11px] leading-tight text-muted-foreground">
+              Admin Console
+            </p>
           </div>
           <button
-            className="ml-auto lg:hidden text-gray-500 hover:text-white transition-colors"
+            className="ml-auto rounded-md p-1 text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground lg:hidden"
             onClick={onClose}
             aria-label="Close sidebar"
           >
-            <X className="w-4 h-4" />
+            <X className="size-4" />
           </button>
         </div>
 
-        {/* Nav */}
         <nav
-          className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto"
+          className="flex-1 space-y-1 overflow-y-auto p-3"
           aria-label="Admin navigation"
         >
           {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
-            const active =
-              pathname === href || pathname.startsWith(href + "/");
+            const active = pathname === href || pathname.startsWith(href + "/");
             return (
               <Link
                 key={href}
                 href={href}
                 onClick={onClose}
+                // aria-current is what tells a screen reader which page it's
+                // on; colour alone conveyed this before.
+                aria-current={active ? "page" : undefined}
                 className={`
-                  flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium
-                  transition-all duration-200 group relative
+                  group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium
+                  transition-colors duration-150
                   ${
                     active
-                      ? "bg-white/10 text-white border border-white/20"
-                      : "text-gray-500 hover:bg-white/[0.04] hover:text-gray-200 border border-transparent"
+                      ? "bg-primary-subtle text-primary-fg"
+                      : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
                   }
                 `}
               >
                 {active && (
-                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-white rounded-r" />
+                  <span
+                    aria-hidden="true"
+                    className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-r-full bg-primary"
+                  />
                 )}
                 <Icon
-                  className={`w-4 h-4 shrink-0 transition-colors duration-200 ${
+                  aria-hidden="true"
+                  className={`size-4 shrink-0 transition-colors duration-150 ${
                     active
-                      ? "text-white"
-                      : "text-gray-600 group-hover:text-gray-400"
+                      ? "text-primary-fg"
+                      : "text-muted-foreground group-hover:text-sidebar-foreground"
                   }`}
                 />
-                <span className="flex-1">{label}</span>
-                {active && (
-                  <ChevronRight className="w-3 h-3 text-white/60" />
-                )}
+                <span className="flex-1 truncate">{label}</span>
               </Link>
             );
           })}
         </nav>
 
-        {/* User & Logout */}
-        <div className="px-3 pb-4 border-t border-white/[0.06] pt-4 space-y-2">
-          {/* Admin identity */}
-          <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-white/[0.03] border border-white/[0.05]">
-            <div className="w-7 h-7 rounded-full bg-white flex items-center justify-center shrink-0">
-              <span className="text-black text-xs font-bold">
+        <div className="space-y-2 border-t border-sidebar-border p-3">
+          <div className="flex items-center gap-3 rounded-lg bg-sidebar-accent/60 px-3 py-2">
+            <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+              <span className="text-[11px] font-semibold">
                 {adminEmail ? adminEmail.charAt(0).toUpperCase() : "A"}
               </span>
             </div>
             <div className="min-w-0">
-              <p className="text-white text-xs font-medium truncate">
+              <p className="truncate text-xs font-medium text-sidebar-foreground">
                 {adminEmail || "Admin"}
               </p>
-              <p className="text-gray-600 text-[10px]">Administrator</p>
+              <p className="text-[10px] text-muted-foreground">Administrator</p>
             </div>
           </div>
 
           <button
             onClick={onLogout}
-            className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-red-400/80 hover:bg-red-500/8 hover:text-red-400 transition-all duration-200 border border-transparent hover:border-red-500/15"
+            className="flex w-full cursor-pointer items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors duration-150 hover:bg-destructive-subtle hover:text-destructive-fg"
           >
-            <LogOut className="w-4 h-4" />
+            <LogOut className="size-4" aria-hidden="true" />
             Sign Out
           </button>
         </div>
@@ -156,106 +156,112 @@ function AdminSidebar({
   );
 }
 
-// ─────────────────────────────────────────────
-// Skeleton loading screen
-// ─────────────────────────────────────────────
+/*
+  Mirrors the real layout's geometry (248px rail, 14px-tall bar, same grid
+  and radii) so the page doesn't visibly reflow when content arrives.
+*/
 function AdminSkeleton() {
   return (
-    <div className="min-h-screen bg-[#0d1117] flex">
-      {/* Sidebar skeleton */}
-      <div className="hidden lg:flex flex-col w-[240px] bg-[#0d1117] border-r border-white/[0.06] p-4 gap-4">
-        <div className="h-12 rounded-xl bg-white/5 animate-pulse" />
-        <div className="space-y-2 mt-4">
-          {[...Array(5)].map((_, i) => (
-            <div
-              key={i}
-              className="h-10 rounded-lg bg-white/5 animate-pulse"
-              style={{ animationDelay: `${i * 0.1}s` }}
-            />
+    <div className="flex min-h-screen bg-background">
+      <div className="hidden w-[248px] shrink-0 flex-col gap-4 border-r border-sidebar-border bg-sidebar p-3 lg:flex">
+        <div className="flex h-14 items-center gap-3 border-b border-sidebar-border pb-3">
+          <Skeleton className="size-8 rounded-lg" />
+          <div className="space-y-1.5">
+            <Skeleton className="h-3 w-20" />
+            <Skeleton className="h-2 w-14" />
+          </div>
+        </div>
+        <div className="space-y-1">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Skeleton key={i} className="h-9 rounded-lg" />
           ))}
         </div>
         <div className="mt-auto space-y-2">
-          <div className="h-10 rounded-lg bg-white/5 animate-pulse" />
-          <div className="h-10 rounded-lg bg-white/5 animate-pulse" />
+          <Skeleton className="h-11 rounded-lg" />
+          <Skeleton className="h-9 rounded-lg" />
         </div>
       </div>
 
-      {/* Content skeleton */}
-      <div className="flex-1 flex flex-col">
-        <div className="h-14 border-b border-white/[0.06] bg-[#0d1117] px-6 flex items-center gap-3">
-          <div className="h-6 w-32 rounded bg-white/5 animate-pulse" />
+      <div className="flex min-w-0 flex-1 flex-col">
+        <div className="flex h-14 items-center border-b border-border px-6">
+          <Skeleton className="h-4 w-32" />
         </div>
-        <div className="p-6 space-y-6">
-          <div className="grid grid-cols-3 gap-4">
-            {[...Array(3)].map((_, i) => (
-              <div
-                key={i}
-                className="h-24 rounded-xl bg-white/5 animate-pulse"
-                style={{ animationDelay: `${i * 0.1}s` }}
-              />
+        <div className="space-y-6 p-4 lg:p-6 xl:p-8">
+          <div className="space-y-2">
+            <Skeleton className="h-6 w-40" />
+            <Skeleton className="h-4 w-64" />
+          </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <Skeleton key={i} className="h-[86px] rounded-xl" />
             ))}
           </div>
-          <div className="h-64 rounded-xl bg-white/5 animate-pulse" />
+          <Skeleton className="h-64 rounded-xl" />
         </div>
       </div>
     </div>
   );
 }
 
-// ─────────────────────────────────────────────
-// Main Admin Layout
-// ─────────────────────────────────────────────
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const { admin, checking, logout } = useAdminAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Protected route check
+  const isLoginPage = pathname === "/admin/login";
+
   useEffect(() => {
-    if (!checking && !admin && pathname !== "/admin/login") {
+    if (!checking && !admin && !isLoginPage) {
       router.replace("/admin/login");
     }
-  }, [admin, checking, pathname, router]);
+  }, [admin, checking, isLoginPage, router]);
 
-  // Close sidebar on route change
   useEffect(() => {
     setSidebarOpen(false);
   }, [pathname]);
 
+  // Escape closes the mobile drawer — expected of any overlay nav.
+  useEffect(() => {
+    if (!sidebarOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setSidebarOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [sidebarOpen]);
+
+  // Body scroll lock while the drawer is open, so the page behind it
+  // doesn't scroll under the user's finger.
+  useEffect(() => {
+    document.body.style.overflow = sidebarOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [sidebarOpen]);
+
   const handleLogout = async () => {
-    const toastId = toast.loading("Signing out…", {
-      style: {
-        background: "#161b22",
-        color: "#fff",
-        border: "1px solid rgba(255,255,255,0.08)",
-      },
-    });
-    await logout();
-    toast.success("Signed out successfully.", {
-      id: toastId,
-      duration: 2000,
-      style: {
-        background: "#161b22",
-        color: "#fff",
-        border: "1px solid rgba(255,255,255,0.08)",
-      },
-    });
+    const toastId = toast.loading("Signing out…");
+    await logout(); // Never rejects: clears local state even if the call fails.
+    toast.success("Signed out successfully.", { id: toastId });
   };
 
-  if (checking) {
-    return <AdminSkeleton />;
-  }
+  /*
+    The login page renders inside this layout too. It previously got the
+    full chrome-less treatment only by accident; returning children early
+    keeps the shell (and its auth-gated sidebar) off the login screen.
+  */
+  if (isLoginPage) return <>{children}</>;
 
+  if (checking) return <AdminSkeleton />;
 
-  // Get current page label for top bar
   const currentPage =
     NAV_ITEMS.find(
       (item) => pathname === item.href || pathname.startsWith(item.href + "/")
     )?.label ?? "Admin";
 
   return (
-    <div className="min-h-screen bg-[#0d1117] flex">
+    <div className="flex min-h-screen bg-background">
       <AdminSidebar
         open={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
@@ -263,56 +269,50 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         onLogout={handleLogout}
       />
 
-      {/* Main content */}
-      <div className="flex-1 flex flex-col min-w-0">
-        {/* Top bar */}
-        <header className="sticky top-0 z-20 flex items-center gap-3 px-4 lg:px-6 h-14 border-b border-white/[0.06] bg-[#0d1117]/95 backdrop-blur-sm">
-          {/* Mobile menu trigger */}
+      <div className="flex min-w-0 flex-1 flex-col">
+        <header className="sticky top-0 z-20 flex h-14 shrink-0 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur-md lg:px-6">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="lg:hidden text-gray-500 hover:text-white transition-colors p-1 rounded-lg hover:bg-white/5"
+            className="cursor-pointer rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground lg:hidden"
             aria-label="Open sidebar"
+            aria-expanded={sidebarOpen}
           >
-            <Menu className="w-5 h-5" />
+            <Menu className="size-5" />
           </button>
 
-          {/* Breadcrumb / page title */}
-          <div className="hidden lg:flex items-center gap-2 text-sm text-gray-500">
-            <span>Admin</span>
-            <ChevronRight className="w-3 h-3" />
-            <span className="text-gray-200 font-medium">{currentPage}</span>
-          </div>
+          <nav aria-label="Breadcrumb" className="hidden lg:block">
+            <ol className="flex items-center gap-2 text-sm text-muted-foreground">
+              <li>Admin</li>
+              <li aria-hidden="true">
+                <ChevronRight className="size-3" />
+              </li>
+              <li className="font-medium text-foreground" aria-current="page">
+                {currentPage}
+              </li>
+            </ol>
+          </nav>
 
-          {/* Mobile: just the shield icon + page name */}
           <div className="flex items-center gap-2 lg:hidden">
-            <Shield className="w-4 h-4 text-white" />
-            <span className="text-white font-semibold text-sm">
+            <span className="text-sm font-semibold text-foreground">
               {currentPage}
             </span>
           </div>
 
-          {/* Right: admin badge */}
-          <div className="ml-auto flex items-center gap-3">
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.06]">
-              <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-gray-400 text-xs font-medium truncate max-w-[160px]">
+          <div className="ml-auto flex items-center gap-2">
+            <div className="hidden items-center gap-2 rounded-lg border border-border bg-card px-3 py-1.5 sm:flex">
+              <span
+                aria-hidden="true"
+                className="size-1.5 shrink-0 rounded-full bg-success"
+              />
+              <span className="max-w-[160px] truncate text-xs font-medium text-muted-foreground">
                 {admin?.email}
               </span>
             </div>
-
-            {/* Mobile: just avatar */}
-            <div className="sm:hidden w-8 h-8 rounded-full bg-white flex items-center justify-center">
-              <span className="text-black text-xs font-bold">
-                {admin?.email ? admin.email.charAt(0).toUpperCase() : "A"}
-              </span>
-            </div>
+            <ThemeToggle size="icon-sm" />
           </div>
         </header>
 
-        {/* Page content */}
-        <main className="flex-1 p-4 lg:p-6 xl:p-8 overflow-auto">
-          {children}
-        </main>
+        <main className="flex-1 overflow-auto p-4 lg:p-6 xl:p-8">{children}</main>
       </div>
     </div>
   );

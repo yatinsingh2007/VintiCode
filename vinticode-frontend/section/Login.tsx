@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ShineBorder } from "@/components/magicui/shine-border";
+import { PasswordInput } from "@/components/ui/password-input";
 import { useState } from "react";
 import api from "@/lib/axios";
 import toast from "react-hot-toast";
@@ -19,7 +19,6 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 
 interface Credentials {
-  name: string;
   email: string;
   password: string;
 }
@@ -27,102 +26,107 @@ interface Credentials {
 export default function Login() {
   const router = useRouter();
   const [details, setDetails] = useState<Credentials>({
-    name: "",
     email: "",
     password: "",
   });
-  const [passwordType, setPasswordType] =
-    useState<"password" | "text">("password");
   const [loading, setLoading] = useState<boolean>(false);
+  const [formError, setFormError] = useState<string | null>(null);
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
+    setFormError(null);
     try {
       const res = await api.post("/auth/login", {
         email: details.email,
         password: details.password,
       });
       if (res.status !== 200) {
-        return toast.error("Login failed");
+        setFormError("Login failed. Please try again.");
+        return;
       }
-      toast.success("Logged in successfully!");
+      toast.success("Welcome back!");
       router.push("/dashboard/home");
-      toast.dismiss();
-      setDetails({ name: "", email: "", password: "" });
+      setDetails({ email: "", password: "" });
     } catch (err) {
       console.error(err);
-      if (axios.isAxiosError(err)) {
-        return toast.error(err.response?.data?.error || "Login failed");
-      }
-      return toast.error("An unexpected error occurred");
+      const message = axios.isAxiosError(err)
+        ? err.response?.data?.error ?? "Incorrect email or password."
+        : "An unexpected error occurred. Please try again.";
+      // Errors were toast-only: they appeared away from the form and
+      // vanished after a few seconds, leaving the user staring at a form
+      // with no indication of what went wrong. Now shown inline and kept.
+      setFormError(message);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Card className="relative overflow-hidden max-w-[400px] w-full border-2 border-black bg-black text-white" style={{ width: "60vw" }}>
-      <ShineBorder shineColor={["#A07CFE", "#FE8FB5", "#FFBE7B"]} />
+    // Chrome comes from the auth panel that hosts this form; the card here
+    // is only a layout container, so its border/padding are neutralised.
+    <Card className="w-full gap-5 border-0 bg-transparent py-0 shadow-none [&>*]:px-0">
       <CardHeader>
-        <CardTitle>Login</CardTitle>
-        <CardDescription className="text-gray-200">
-          Enter your credentials to access your account
+        <CardTitle className="text-xl">Welcome back</CardTitle>
+        <CardDescription>
+          Enter your credentials to access your account.
         </CardDescription>
       </CardHeader>
-      <form onSubmit={handleLogin}>
+
+      <form onSubmit={handleLogin} noValidate>
         <CardContent>
           <div className="grid gap-4">
+            {formError && (
+              <p
+                role="alert"
+                className="rounded-md border border-destructive/20 bg-destructive-subtle px-3 py-2 text-sm text-destructive-fg"
+              >
+                {formError}
+              </p>
+            )}
+
             <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="login-email">Email</Label>
               <Input
-                id="email"
+                id="login-email"
+                name="email"
                 type="email"
+                inputMode="email"
                 placeholder="name@example.com"
+                required
+                // Lets password managers recognise and fill the form.
+                autoComplete="email"
+                aria-invalid={formError ? true : undefined}
                 value={details.email}
-                onChange={(e) =>
-                  setDetails({ ...details, email: e.target.value })
-                }
+                onChange={(e) => setDetails({ ...details, email: e.target.value })}
               />
             </div>
-            <div className="grid gap-2 relative">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type={passwordType}
-                placeholder="*********"
+
+            <div className="grid gap-2">
+              <Label htmlFor="login-password">Password</Label>
+              <PasswordInput
+                id="login-password"
+                name="password"
+                placeholder="Enter your password"
+                required
+                autoComplete="current-password"
+                aria-invalid={formError ? true : undefined}
                 value={details.password}
-                onChange={(e) =>
-                  setDetails({ ...details, password: e.target.value })
-                }
+                onChange={(e) => setDetails({ ...details, password: e.target.value })}
               />
-              {passwordType === "password" ? (
-                <EyeOff
-                  className="absolute right-3 top-7 cursor-pointer"
-                  onClick={() => setPasswordType("text")}
-                />
-              ) : (
-                <Eye
-                  className="absolute right-3 top-7 cursor-pointer"
-                  onClick={() => setPasswordType("password")}
-                />
-              )}
             </div>
           </div>
         </CardContent>
-        <CardFooter>
-          <Button
-            className="w-full bg-white text-black hover:scale-105 hover:bg-white hover:text-black cursor-pointer mt-4 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-            type="submit"
-            disabled={loading}
-          >
+
+        <CardFooter className="pt-6">
+          <Button className="w-full" type="submit" disabled={loading} aria-busy={loading}>
             {loading ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Signing In...
+                <Loader2 className="animate-spin" aria-hidden="true" />
+                Signing in…
               </>
             ) : (
-              "Sign In"
+              "Sign in"
             )}
           </Button>
         </CardFooter>

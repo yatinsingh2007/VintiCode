@@ -47,7 +47,7 @@ export default function EditQuestionPage() {
       <div className="flex items-center gap-3">
         <Link
           href="/admin/questions"
-          className="flex items-center gap-1.5 text-gray-400 hover:text-white text-sm transition-colors"
+          className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground text-sm transition-colors"
         >
           <ChevronLeft className="w-4 h-4" />
           Back to Questions
@@ -55,15 +55,15 @@ export default function EditQuestionPage() {
       </div>
 
       <div>
-        <h1 className="text-2xl font-bold text-white">Edit Question</h1>
-        <p className="text-gray-400 text-sm mt-1">
+        <h1 className="text-2xl font-bold text-foreground">Edit Question</h1>
+        <p className="text-muted-foreground text-sm mt-1">
           Update the question details and test cases below.
         </p>
       </div>
 
       {fetchLoading ? (
         <div className="flex items-center justify-center py-20">
-          <Loader2 className="w-8 h-8 animate-spin text-white" />
+          <Loader2 className="w-8 h-8 animate-spin text-foreground" />
         </div>
       ) : initialData ? (
         <QuestionForm
@@ -74,7 +74,7 @@ export default function EditQuestionPage() {
           error={error}
         />
       ) : (
-        <div className="bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl px-5 py-4 text-sm">
+        <div className="bg-destructive-subtle border border-destructive/20 text-destructive-fg rounded-xl px-5 py-4 text-sm">
           {error || "Could not load question."}
         </div>
       )}

@@ -26,13 +26,13 @@ function statusBadge(status: string) {
   const base = "flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium";
   if (status === "accepted")
     return (
-      <span className={`${base} bg-emerald-500/15 text-emerald-400`}>
+      <span className={`${base} bg-success-subtle text-success-fg`}>
         <CheckCircle2 className="w-3 h-3" />
         Accepted
       </span>
     );
   return (
-    <span className={`${base} bg-red-500/15 text-red-400`}>
+    <span className={`${base} bg-destructive-subtle text-destructive-fg`}>
       <XCircle className="w-3 h-3" />
       Rejected
     </span>
@@ -56,13 +56,13 @@ export default function UserDetailPage() {
   if (loading)
     return (
       <div className="flex items-center justify-center py-24">
-        <Loader2 className="w-8 h-8 animate-spin text-white" />
+        <Loader2 className="w-8 h-8 animate-spin text-foreground" />
       </div>
     );
 
   if (!user)
     return (
-      <div className="text-center py-20 text-gray-500">User not found.</div>
+      <div className="text-center py-20 text-muted-foreground">User not found.</div>
     );
 
   const accepted = user.solvedQuestions.filter(
@@ -76,73 +76,73 @@ export default function UserDetailPage() {
     <div className="max-w-4xl mx-auto space-y-6">
       <Link
         href="/admin/users"
-        className="flex items-center gap-1.5 text-gray-400 hover:text-white text-sm transition-colors"
+        className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground text-sm transition-colors"
       >
         <ChevronLeft className="w-4 h-4" />
         Back to Users
       </Link>
 
       {/* Profile card */}
-      <div className="bg-[#161b22] border border-white/8 rounded-xl p-6 flex items-center gap-5">
-        <div className="w-14 h-14 rounded-2xl bg-white flex items-center justify-center shrink-0">
-          <span className="text-black text-xl font-bold">
+      <div className="bg-card border border-border rounded-xl p-6 flex items-center gap-5">
+        <div className="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center shrink-0">
+          <span className="text-primary-foreground text-xl font-bold">
             {user.name.charAt(0).toUpperCase()}
           </span>
         </div>
         <div className="flex-1 min-w-0">
-          <h1 className="text-white text-xl font-bold">{user.name}</h1>
-          <p className="text-gray-400 text-sm">{user.email}</p>
-          <p className="text-gray-600 text-xs mt-1">
+          <h1 className="text-foreground text-xl font-bold">{user.name}</h1>
+          <p className="text-muted-foreground text-sm">{user.email}</p>
+          <p className="text-muted-foreground text-xs mt-1">
             Joined {new Date(user.createdAt).toLocaleDateString()}
           </p>
         </div>
         <div className="flex gap-6 text-center shrink-0">
           <div>
-            <p className="text-2xl font-bold text-emerald-400">{accepted}</p>
-            <p className="text-gray-500 text-xs">Accepted</p>
+            <p className="text-2xl font-bold text-success-fg">{accepted}</p>
+            <p className="text-muted-foreground text-xs">Accepted</p>
           </div>
           <div>
-            <p className="text-2xl font-bold text-red-400">{rejected}</p>
-            <p className="text-gray-500 text-xs">Rejected</p>
+            <p className="text-2xl font-bold text-destructive-fg">{rejected}</p>
+            <p className="text-muted-foreground text-xs">Rejected</p>
           </div>
           <div>
-            <p className="text-2xl font-bold text-white">
+            <p className="text-2xl font-bold text-foreground">
               {user.solvedQuestions.length}
             </p>
-            <p className="text-gray-500 text-xs">Total</p>
+            <p className="text-muted-foreground text-xs">Total</p>
           </div>
         </div>
       </div>
 
       {/* Submissions table */}
-      <div className="bg-[#161b22] border border-white/8 rounded-xl overflow-hidden">
-        <div className="px-5 py-4 border-b border-white/8">
-          <h2 className="text-white font-semibold text-sm">
+      <div className="bg-card border border-border rounded-xl overflow-hidden">
+        <div className="px-5 py-4 border-b border-border">
+          <h2 className="text-foreground font-semibold text-sm">
             Submission History
           </h2>
         </div>
-        <div className="divide-y divide-white/5">
+        <div className="divide-y divide-border">
           {user.solvedQuestions.length === 0 ? (
-            <p className="text-gray-500 text-sm text-center py-10">
+            <p className="text-muted-foreground text-sm text-center py-10">
               No submissions yet.
             </p>
           ) : (
             user.solvedQuestions.map((s) => (
               <div
                 key={s.id}
-                className="flex items-center gap-4 px-5 py-3 hover:bg-white/3 transition-colors"
+                className="flex items-center gap-4 px-5 py-3 hover:bg-accent transition-colors"
               >
                 <div className="flex-1 min-w-0">
-                  <p className="text-white text-sm font-medium truncate">
+                  <p className="text-foreground text-sm font-medium truncate">
                     {s.question?.title ?? "—"}
                   </p>
-                  <p className="text-gray-600 text-xs">
+                  <p className="text-muted-foreground text-xs">
                     Language ID: {s.languageId}
                   </p>
                 </div>
                 <div className="flex items-center gap-3 shrink-0">
                   {statusBadge(s.status)}
-                  <span className="text-gray-600 text-xs">
+                  <span className="text-muted-foreground text-xs">
                     {new Date(s.createdAt).toLocaleDateString()}
                   </span>
                 </div>
