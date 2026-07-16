@@ -327,7 +327,7 @@ const Dashboard: React.FC<DashboardProps> = ({
           paginatedQuestions.map((q) => (
             <div
               key={q.id}
-              onClick={() => router.push(`/dashboard/question/${q.id}`)}
+              onClick={() => router.push(`/dashboard/question/${q.id}/scratchpad`)}
               className="group cursor-pointer rounded-xl border border-border bg-card/50 backdrop-blur-sm p-5 hover:border-blue-500/30 hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300 hover:-translate-y-1"
             >
               <div className="space-y-3">
