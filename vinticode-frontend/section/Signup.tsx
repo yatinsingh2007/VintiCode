@@ -11,8 +11,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { PasswordInput } from "@/components/ui/password-input";
-import { Loader2 } from "lucide-react";
+import { ShineBorder } from "@/components/magicui/shine-border";
+import { EyeOff, Eye, Loader2 } from "lucide-react";
 import React, { useState } from "react";
 import api from "@/lib/axios";
 import toast from "react-hot-toast";
@@ -25,8 +25,6 @@ interface User {
   confirmPassword: string;
 }
 
-const MIN_PASSWORD_LENGTH = 8;
-
 export default function SignupCard() {
   const [userDetails, setUserDetails] = useState<User>({
     name: "",
@@ -34,32 +32,15 @@ export default function SignupCard() {
     password: "",
     confirmPassword: "",
   });
+  const [passwordType, setPasswordType] =
+    useState<"password" | "text">("password");
   const [loading, setLoading] = useState<boolean>(false);
-  const [formError, setFormError] = useState<string | null>(null);
-
-  /*
-    Mismatched passwords were only reported by a toast on submit. Deriving
-    it lets us warn the moment the user has typed enough to be sure — a
-    fix in place rather than a message that flies past the corner.
-  */
-  const mismatch =
-    userDetails.confirmPassword.length > 0 &&
-    userDetails.password !== userDetails.confirmPassword;
-  const tooShort =
-    userDetails.password.length > 0 &&
-    userDetails.password.length < MIN_PASSWORD_LENGTH;
 
   const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setFormError(null);
 
     if (userDetails.password !== userDetails.confirmPassword) {
-      setFormError("Passwords do not match.");
-      return;
-    }
-    if (userDetails.password.length < MIN_PASSWORD_LENGTH) {
-      setFormError(`Password must be at least ${MIN_PASSWORD_LENGTH} characters.`);
-      return;
+      return toast.error("Passwords do not match");
     }
 
     setLoading(true);
@@ -70,52 +51,46 @@ export default function SignupCard() {
         password: userDetails.password,
       });
       if (resp.status !== 201) {
-        setFormError("Signup failed. Please try again.");
-        return;
+        return toast.error("Signup failed");
       }
-      toast.success("Account created. You can log in now.");
+      toast.success("Account created successfully! Please login.");
       setUserDetails({ name: "", email: "", password: "", confirmPassword: "" });
     } catch (err) {
       console.error(err);
-      const message = isAxiosError(err)
-        ? err.response?.data?.error ?? "Signup failed. Please try again."
-        : "An unexpected error occurred. Please try again.";
-      setFormError(message);
+      if (isAxiosError(err)) {
+        return toast.error(err.response?.data?.error || "Signup failed");
+      }
+      return toast.error("An unexpected error occurred");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    // Chrome comes from the auth panel that hosts this form; the card here
-    // is only a layout container, so its border/padding are neutralised.
-    <Card className="w-full gap-5 border-0 bg-transparent py-0 shadow-none [&>*]:px-0">
+    <Card
+      className="relative overflow-hidden max-w-[350px] w-full border-2 border-black bg-black text-white"
+      style={{ width: "60vw" }}
+    >
+      <ShineBorder shineColor={["#A07CFE", "#FE8FB5", "#FFBE7B"]} />
+
       <CardHeader>
-        <CardTitle className="text-xl">Create your account</CardTitle>
-        <CardDescription>Start building your DSA intuition today.</CardDescription>
+        <CardTitle>Register</CardTitle>
+        <CardDescription className="text-gray-200">
+          Create a new account to get started
+        </CardDescription>
       </CardHeader>
 
-      <form onSubmit={handleSignup} noValidate>
+      <form onSubmit={handleSignup}>
         <CardContent>
           <div className="grid gap-4">
-            {formError && (
-              <p
-                role="alert"
-                className="rounded-md border border-destructive/20 bg-destructive-subtle px-3 py-2 text-sm text-destructive-fg"
-              >
-                {formError}
-              </p>
-            )}
-
+            {/* Full Name */}
             <div className="grid gap-2">
-              <Label htmlFor="signup-name">Full name</Label>
+              <Label htmlFor="fullname">Full Name</Label>
               <Input
-                id="signup-name"
-                name="name"
+                id="fullname"
                 type="text"
                 placeholder="John Doe"
                 required
-                autoComplete="name"
                 value={userDetails.name}
                 onChange={(e) =>
                   setUserDetails({ ...userDetails, name: e.target.value })
@@ -123,16 +98,14 @@ export default function SignupCard() {
               />
             </div>
 
+            {/* Email */}
             <div className="grid gap-2">
-              <Label htmlFor="signup-email">Email</Label>
+              <Label htmlFor="email">Email</Label>
               <Input
-                id="signup-email"
-                name="email"
+                id="email"
                 type="email"
-                inputMode="email"
                 placeholder="name@example.com"
                 required
-                autoComplete="email"
                 value={userDetails.email}
                 onChange={(e) =>
                   setUserDetails({ ...userDetails, email: e.target.value })
@@ -140,41 +113,40 @@ export default function SignupCard() {
               />
             </div>
 
-            <div className="grid gap-2">
-              <Label htmlFor="signup-password">Password</Label>
-              <PasswordInput
-                id="signup-password"
-                name="password"
-                placeholder="At least 8 characters"
+            {/* Password */}
+            <div className="grid gap-2 relative">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type={passwordType}
+                placeholder="********"
                 required
-                minLength={MIN_PASSWORD_LENGTH}
-                autoComplete="new-password"
-                aria-invalid={tooShort || undefined}
-                aria-describedby="signup-password-hint"
                 value={userDetails.password}
                 onChange={(e) =>
                   setUserDetails({ ...userDetails, password: e.target.value })
                 }
               />
-              {/* Requirements stated up front rather than after a failure */}
-              <p
-                id="signup-password-hint"
-                className={`text-xs ${tooShort ? "text-destructive-fg" : "text-muted-foreground"}`}
-              >
-                Use at least {MIN_PASSWORD_LENGTH} characters.
-              </p>
+              {passwordType === "password" ? (
+                <EyeOff
+                  className="absolute right-3 top-7 cursor-pointer"
+                  onClick={() => setPasswordType("text")}
+                />
+              ) : (
+                <Eye
+                  className="absolute right-3 top-7 cursor-pointer"
+                  onClick={() => setPasswordType("password")}
+                />
+              )}
             </div>
 
-            <div className="grid gap-2">
-              <Label htmlFor="signup-confirm">Confirm password</Label>
-              <PasswordInput
-                id="signup-confirm"
-                name="confirmPassword"
-                placeholder="Re-enter your password"
+            {/* Confirm Password */}
+            <div className="grid gap-2 relative">
+              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Input
+                id="confirmPassword"
+                type={passwordType}
+                placeholder="********"
                 required
-                autoComplete="new-password"
-                aria-invalid={mismatch || undefined}
-                aria-describedby={mismatch ? "signup-confirm-error" : undefined}
                 value={userDetails.confirmPassword}
                 onChange={(e) =>
                   setUserDetails({
@@ -183,29 +155,33 @@ export default function SignupCard() {
                   })
                 }
               />
-              {mismatch && (
-                <p id="signup-confirm-error" className="text-xs text-destructive-fg">
-                  Passwords don&apos;t match.
-                </p>
+              {passwordType === "password" ? (
+                <EyeOff
+                  className="absolute right-3 top-7 cursor-pointer"
+                  onClick={() => setPasswordType("text")}
+                />
+              ) : (
+                <Eye
+                  className="absolute right-3 top-7 cursor-pointer"
+                  onClick={() => setPasswordType("password")}
+                />
               )}
             </div>
           </div>
         </CardContent>
-
-        <CardFooter className="pt-6">
+        <CardFooter>
           <Button
-            className="w-full"
+            className="w-full bg-white text-black hover:bg-white hover:text-black hover:scale-105 cursor-pointer mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
             type="submit"
-            disabled={loading || mismatch || tooShort}
-            aria-busy={loading}
+            disabled={loading}
           >
             {loading ? (
               <>
-                <Loader2 className="animate-spin" aria-hidden="true" />
-                Creating account…
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Creating Account...
               </>
             ) : (
-              "Create account"
+              "Create Account"
             )}
           </Button>
         </CardFooter>
