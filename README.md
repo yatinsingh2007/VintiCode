@@ -10,7 +10,7 @@
 
 Every other platform starts at the editor. VintiCode starts one step earlier.
 
-Before a user writes a single line of code, they are guided through a **Scratch Pad** — a private planning space where they can write pseudocode, notes, and ideas. An optional **AI Approach Review**, powered by Gemini 1.5 Flash, then evaluates whether they have enough understanding to begin implementing.
+Before a user writes a single line of code, they are guided through a **Scratch Pad** — a private planning space where they can write pseudocode, notes, and ideas. An optional **AI Approach Review**, powered by Gemini 2.0 Flash, then evaluates whether they have enough understanding to begin implementing.
 
 The AI behaves like a supportive mentor, not a gatekeeper. It never blocks the user from coding. It simply asks: _"Have you thought about this enough to start?"_
 
@@ -45,7 +45,7 @@ This reinforces habits that matter in real interviews:
 
 ### AI Approach Review
 - Triggered by "Review My Approach" inside the Scratch Pad
-- Calls **Gemini 1.5 Flash** via direct REST API
+- Calls **Gemini 2.0 Flash** via direct REST API
 - Evaluates technical understanding, not writing quality or English fluency
 - Returns one of two verdicts:
   - **Ready to Start Coding** — the user has enough direction
@@ -143,7 +143,7 @@ graph TD
     Worker -->|"Update job state"| Redis
     Worker -->|"Save submission"| DB
 
-    R4 -->|"Build and POST prompt"| Gemini(["Gemini 1.5 Flash - Google AI"])
+    R4 -->|"Build and POST prompt"| Gemini(["Gemini 2.0 Flash - Google AI"])
     Gemini -->|"JSON response"| R4
     R4 -->|"Save review"| DB
 
@@ -312,7 +312,7 @@ sequenceDiagram
 sequenceDiagram
     participant FE as Frontend
     participant BE as Backend
-    participant GM as Gemini 1.5 Flash
+    participant GM as Gemini 2.0 Flash
     participant DB as PostgreSQL
 
     FE->>BE: POST /api/scratchpad/review
@@ -370,7 +370,7 @@ Redis is **not** used as a database. It is a temporary job-state cache. The fron
 | Database | PostgreSQL via Prisma ORM |
 | Cache | Redis via ioredis (hosted on Upstash) |
 | Code Execution | Judge0 via RapidAPI |
-| AI Review | Gemini 1.5 Flash via direct REST call |
+| AI Review | Gemini 2.0 Flash via direct REST call |
 | Auth | JWT with separate secrets for user and admin |
 | Validation | validator.js, bcrypt |
 
@@ -466,7 +466,7 @@ USER_1='{"x-rapidapi-key":"...","x-rapidapi-host":"judge0-ce.p.rapidapi.com"}'
 USER_2='...'
 
 # Gemini AI — get a free key at aistudio.google.com
-GEMINI_API_URL="https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
+GEMINI_API_URL="https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
 GEMINI_API_KEY=""
 ```
 
