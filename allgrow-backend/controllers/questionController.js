@@ -1,6 +1,7 @@
 const { prisma } = require("../prisma/prismaClient");
 const { api } = require("../utils");
-const { redis } = require("../redis/redis");
+const { getRedis } = require("../redis/redis");
+const redis = getRedis();
 
 const runCode = async (req, res) => {
   const randomInt = Math.floor(Math.random() * 5) + 1;

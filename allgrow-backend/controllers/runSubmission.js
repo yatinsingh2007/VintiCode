@@ -1,7 +1,8 @@
 require("dotenv").config();
 const { prisma } = require("../prisma/prismaClient");
 const { api } = require("../utils");
-const { redis } = require("../redis/redis");
+const { getRedis } = require("../redis/redis");
+const redis = getRedis();
 
 async function runSubmission(req, res) {
   try {
