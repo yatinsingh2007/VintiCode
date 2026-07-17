@@ -51,13 +51,15 @@ model Submissions {
 }
 
 model ScratchPad {
-  id          String   @id @default(uuid())
-  userId      String
-  questionId  String
-  status      Status
-  explanation String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id             String   @id @default(uuid())
+  userId         String
+  questionId     String
+  status         Status
+  explanation    String
+  aiSummary      String?
+  aiSuggestions  String[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   user        User          @relation("UserScratchPad", fields: [userId], references: [id])
   question    Questions     @relation("QuestionScratchPad", fields: [questionId], references: [id])
