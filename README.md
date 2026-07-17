@@ -52,7 +52,7 @@ This reinforces habits that matter in real interviews:
   - **Consider Thinking a Bit More** — the approach needs more planning
 - Includes an encouraging summary and up to 3 gentle hints
 - Never reveals the algorithm or solves the problem
-- Full review (user notes + AI verdict + AI summary + suggestions) saved to the database
+- Full review (user notes, AI verdict, AI summary, suggestions) saved to the database
 - User can always continue to coding regardless of the verdict
 
 ### Code Editor
@@ -84,7 +84,7 @@ This reinforces habits that matter in real interviews:
 flowchart TD
     A([Landing Page]) --> B{Authenticated?}
     B -- Yes --> D
-    B -- No --> C([Auth: Register / Login])
+    B -- No --> C([Auth: Register or Login])
     C --> D([Question Dashboard])
     D --> E([Scratch Pad])
 
@@ -93,8 +93,8 @@ flowchart TD
     F -- Review My Approach --> G([Gemini AI Review])
 
     G --> G1{AI Verdict}
-    G1 -- READY → accepted --> G2([Feedback Card: Ready])
-    G1 -- THINK_MORE → rejected --> G3([Feedback Card: Think More])
+    G1 -- READY --> G2([Feedback: Ready to Code])
+    G1 -- THINK_MORE --> G3([Feedback: Consider More Planning])
 
     G2 --> H1{User Choice}
     G3 --> H2{User Choice}
@@ -112,8 +112,8 @@ flowchart TD
     J --> L([Console Output])
     K --> M([Test Case Results])
     M --> N{All Passed?}
-    N -- Yes --> O([Accepted ✓])
-    N -- No --> P([Failed ✗])
+    N -- Yes --> O([Accepted])
+    N -- No --> P([Failed])
 ```
 
 ---
@@ -122,36 +122,37 @@ flowchart TD
 
 ```mermaid
 graph TD
-    Browser([Next.js 16 Frontend\nReact 19 · TypeScript])
+    FE["Next.js 16 - React 19 - TypeScript"]
 
-    Browser -->|REST API\nAxios · withCredentials\nJWT cookie| Backend
+    FE -->|"REST API - Axios - JWT Cookie"| BE
 
-    subgraph Backend [Express.js Backend · Port 7777]
-        Auth[/api/auth\nRegister · Login · Logout · Verify]
-        Dashboard[/api/dashboard\nQuestion list · Question detail]
-        Questions[/api/questions\nRun · Submit · Poll · History]
-        Scratchpad[/api/scratchpad\nAI Approach Review]
-        Profile[/api/userprofile\nProfile · Submissions]
-        Admin[/api/admin\nAdmin CRUD · Analytics]
+    subgraph BE ["Express.js Backend - Port 7777"]
+        direction TB
+        R1["api/auth"]
+        R2["api/dashboard"]
+        R3["api/questions"]
+        R4["api/scratchpad"]
+        R5["api/userprofile"]
+        R6["api/admin"]
     end
 
-    Questions -->|Store job state\nTTL 300–1800s| Redis[(Redis\nUpstash)]
-    Questions -->|Sandboxed\ncode execution| Judge0([Judge0 API\nvia RapidAPI])
-    Judge0 -->|Result| Questions
-    Questions -->|Background worker\nPOST /api/run-submission| Worker([runSubmission.js\nTest case loop])
-    Worker --> Redis
-    Worker --> DB
+    R3 -->|"Cache job state - TTL 300 to 1800s"| Redis[("Redis - Upstash")]
+    R3 -->|"Sandboxed code execution"| Judge0(["Judge0 API - RapidAPI"])
+    Judge0 -->|"Result"| R3
+    R3 -->|"Fire and forget"| Worker(["runSubmission.js - Test case loop"])
+    Worker -->|"Update job state"| Redis
+    Worker -->|"Save submission"| DB
 
-    Scratchpad -->|Build prompt\nPOST REST call| Gemini([Gemini 1.5 Flash\nGoogle AI])
-    Gemini -->|JSON response| Scratchpad
-    Scratchpad -->|Save review| DB
+    R4 -->|"Build and POST prompt"| Gemini(["Gemini 1.5 Flash - Google AI"])
+    Gemini -->|"JSON response"| R4
+    R4 -->|"Save review"| DB
 
-    Auth --> DB
-    Dashboard --> DB
-    Profile --> DB
-    Admin --> DB
+    R1 -->|"Read and write"| DB
+    R2 -->|"Read"| DB
+    R5 -->|"Read"| DB
+    R6 -->|"Read and write"| DB
 
-    DB[(PostgreSQL\nNeon · Prisma ORM)]
+    DB[("PostgreSQL - Neon - Prisma ORM")]
 ```
 
 ---
@@ -184,22 +185,22 @@ erDiagram
     }
 
     ScratchPad {
-        uuid     id             PK
-        uuid     userId         FK
-        uuid     questionId     FK
-        enum     status
-        text     explanation
-        text     aiSummary
-        string[] aiSuggestions
-        date     createdAt
-        date     updatedAt
+        uuid   id            PK
+        uuid   userId        FK
+        uuid   questionId    FK
+        enum   status
+        text   explanation
+        text   aiSummary
+        text   aiSuggestions
+        date   createdAt
+        date   updatedAt
     }
 
     Submissions {
-        uuid   id           PK
-        uuid   userId       FK
-        uuid   questionId   FK
-        uuid   scratchpadId FK "nullable"
+        uuid   id            PK
+        uuid   userId        FK
+        uuid   questionId    FK
+        uuid   scratchpadId  FK
         int    languageId
         text   code
         enum   status
@@ -214,8 +215,9 @@ erDiagram
     ScratchPad ||--o{ Submissions : "linked to"
 ```
 
-> **Status enum** — shared by both `ScratchPad` and `Submissions`:
-> `accepted` (AI said READY / code passed all tests) · `rejected` (AI said THINK_MORE / code failed)
+> **Status enum** used by both `ScratchPad` and `Submissions`:
+> `accepted` — AI said READY, or code passed all tests.
+> `rejected` — AI said THINK_MORE, or code failed one or more tests.
 
 ---
 
@@ -228,30 +230,32 @@ sequenceDiagram
     participant RD as Redis
     participant J0 as Judge0 API
 
-    FE->>BE: POST /api/questions/runCode/:id\n{ code, language_id, input }
-    BE->>RD: SET submission:{id} = { status: "processing" }  TTL 300s
-    BE->>J0: POST /submissions\n{ source_code, language_id, stdin }
-    J0-->>BE: { token }
+    FE->>BE: POST /api/questions/runCode/:id
+    Note over FE,BE: Body: code, language_id, input
+    BE->>RD: SET submission:{id} status=processing TTL 300s
+    BE->>J0: POST /submissions
+    Note over BE,J0: source_code, language_id, stdin
+    J0-->>BE: token
 
-    loop Poll every 1.2s (max 15 attempts)
+    loop Poll every 1.2s up to 15 times
         BE->>J0: GET /submissions/{token}
-        J0-->>BE: { status: { id }, stdout, stderr }
-        alt status.id <= 2 (still running)
-            BE->>BE: wait 1.2s
-        else status.id = 5 (TLE)
-            BE->>RD: SET result = { status: "TLE" }  TTL 600s
-        else completed
-            BE->>RD: SET result = { status: "completed", ... }  TTL 600s
+        J0-->>BE: status id, stdout, stderr
+        alt status.id is 1 or 2 - still running
+            BE->>BE: wait and retry
+        else status.id is 5 - time limit exceeded
+            BE->>RD: SET result status=TLE TTL 600s
+        else finished
+            BE->>RD: SET result status=completed TTL 600s
         end
     end
 
-    BE-->>FE: { submissionId }
+    BE-->>FE: submissionId
 
-    loop Poll every 1s
+    loop Frontend polls every 1s
         FE->>BE: GET /api/questions/runCode/result/:submissionId
         BE->>RD: GET submission:{id}
-        RD-->>BE: { status, result }
-        BE-->>FE: { status, result }
+        RD-->>BE: status and result
+        BE-->>FE: status and result
     end
 
     FE->>FE: Render output in console
@@ -270,30 +274,31 @@ sequenceDiagram
     participant J0 as Judge0 API
     participant DB as PostgreSQL
 
-    FE->>BE: POST /api/questions/submitCode/:id\n{ code, language_id }
-    BE->>DB: Fetch question + test cases
-    DB-->>BE: { test_cases: [...] }
-    BE->>RD: SET submissions:{id} = { status: "queued", testCases, code }  TTL 1800s
+    FE->>BE: POST /api/questions/submitCode/:id
+    Note over FE,BE: Body: code, language_id
+    BE->>DB: Fetch question and test cases
+    DB-->>BE: test_cases array
+    BE->>RD: SET submissions:{id} status=queued TTL 1800s
     BE->>WK: fire-and-forget POST /api/run-submission/:id
-    BE-->>FE: { submissionId, status: "queued" }
+    BE-->>FE: submissionId and status=queued
 
-    Note over WK,J0: Background worker processes all test cases
+    Note over WK,J0: Worker runs independently in the background
     loop For each test case
-        WK->>J0: POST /submissions\n{ source_code, stdin, expected_output }
-        J0-->>WK: { token }
-        WK->>J0: GET /submissions/{token} (poll)
-        J0-->>WK: { stdout, stderr, status }
-        WK->>WK: Compare output vs expected
+        WK->>J0: POST /submissions with source_code and stdin
+        J0-->>WK: token
+        WK->>J0: GET /submissions/{token}
+        J0-->>WK: stdout, stderr, status
+        WK->>WK: Compare stdout to expected output
     end
 
-    WK->>RD: SET submissions:{id} = { status: "completed", report: {...} }
-    WK->>DB: INSERT INTO Submissions\n{ userId, questionId, code, status }
+    WK->>RD: SET submissions:{id} status=completed with full report
+    WK->>DB: INSERT Submissions row with userId, questionId, code, status
 
-    loop Poll every 1s (max 40 attempts)
+    loop Frontend polls every 1s up to 40 times
         FE->>BE: GET /api/questions/submission/result/:submissionId
         BE->>RD: GET submissions:{id}
-        RD-->>BE: { status, report }
-        BE-->>FE: { status, report }
+        RD-->>BE: status and report
+        BE-->>FE: status and report
     end
 
     FE->>FE: Render per-test-case status cards
@@ -310,31 +315,37 @@ sequenceDiagram
     participant GM as Gemini 1.5 Flash
     participant DB as PostgreSQL
 
-    FE->>BE: POST /api/scratchpad/review\n{ questionId, questionTitle, questionDescription, approach }
-    Note over BE: Validate userId (JWT), questionId, approach
+    FE->>BE: POST /api/scratchpad/review
+    Note over FE,BE: Body: questionId, questionTitle, questionDescription, approach
 
-    BE->>GM: POST REST API\n{ contents: [{ parts: [{ text: prompt }] }] }
-    Note over GM: Evaluate technical direction\nNot grammar or writing quality
-    GM-->>BE: { candidates[0].content.parts[0].text }
-    Note over BE: Strip markdown · Parse JSON\nValidate status field
+    Note over BE: Validate userId from JWT, questionId, approach text
 
-    BE->>DB: INSERT INTO ScratchPad\n{ userId, questionId, status, explanation, aiSummary, aiSuggestions }
-    DB-->>BE: { id: scratchpadId }
+    BE->>GM: POST to Gemini REST API
+    Note over BE,GM: Prompt instructs: evaluate technical direction only, not grammar or writing quality
+    GM-->>BE: Raw JSON text in candidates array
 
-    BE-->>FE: { status, summary, suggestions, scratchpadId }
-    FE->>FE: Render ApproachReview card\nREADY → green badge\nTHINK_MORE → yellow badge
+    Note over BE: Strip markdown fences, parse JSON, validate status field
+
+    BE->>DB: INSERT INTO ScratchPad
+    Note over BE,DB: userId, questionId, status, explanation, aiSummary, aiSuggestions
+    DB-->>BE: scratchpadId
+
+    BE-->>FE: status, summary, suggestions, scratchpadId
+
+    Note over FE: READY shows green badge and emphasises Continue to Coding
+    Note over FE: THINK_MORE shows yellow badge and emphasises Edit Approach
 ```
 
 ---
 
 ## Redis — What Gets Stored
 
-| Key Pattern | Written by | TTL | Contains |
-|---|---|---|---|
-| `submission:{id}` | `runCode` controller | 300–600s | `{ status, result }` for custom-input run |
-| `submissions:{id}` | `submitCode` controller + worker | 1800s | `{ status, report, testCases, code }` for full submit |
+| Key | Written by | TTL | Contains |
+|-----|------------|-----|----------|
+| `submission:{id}` | `runCode` controller | 300 - 600s | status and result for a single custom-input run |
+| `submissions:{id}` | `submitCode` controller + worker | 1800s | status, full test-case report, code, userId |
 
-Redis is **not** used as a database. It is a temporary job-state cache. Results are read by the frontend during polling, and full submission records are persisted to PostgreSQL by the background worker.
+Redis is **not** used as a database. It is a temporary job-state cache. The frontend polls it during execution. The background worker writes the final `Submissions` record to PostgreSQL once all test cases finish.
 
 ---
 
@@ -357,10 +368,10 @@ Redis is **not** used as a database. It is a temporary job-state cache. Results 
 |---------|------------------|
 | Framework | Express.js 5 (Controller / Router pattern) |
 | Database | PostgreSQL via Prisma ORM |
-| Cache | Redis (ioredis / Upstash) |
+| Cache | Redis via ioredis (hosted on Upstash) |
 | Code Execution | Judge0 via RapidAPI |
-| AI Review | Gemini 1.5 Flash (direct REST call) |
-| Auth | JWT — separate secrets for user and admin |
+| AI Review | Gemini 1.5 Flash via direct REST call |
+| Auth | JWT with separate secrets for user and admin |
 | Validation | validator.js, bcrypt |
 
 ---
@@ -449,12 +460,12 @@ ADMIN_JWT_SECRET=""
 ADMIN_EMAIL=""
 ADMIN_PASSWORD=""
 
-# Judge0 — rotate keys to avoid rate limits
+# Judge0 — rotate multiple keys to avoid rate limits
 JUDGE0_API="https://judge0-ce.p.rapidapi.com"
 USER_1='{"x-rapidapi-key":"...","x-rapidapi-host":"judge0-ce.p.rapidapi.com"}'
 USER_2='...'
 
-# Gemini AI  →  get a free key at aistudio.google.com
+# Gemini AI — get a free key at aistudio.google.com
 GEMINI_API_URL="https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
 GEMINI_API_KEY=""
 ```
