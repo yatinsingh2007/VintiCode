@@ -1,6 +1,9 @@
 const axios = require("axios");
 const { prisma } = require("../prisma/prismaClient");
 
+const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
+const GROQ_MODEL = "llama-3.1-8b-instant";
+
 const buildPrompt = (questionTitle, questionDescription, approach) => `
 You are a supportive software engineering mentor helping students practice for technical interviews.
 
@@ -35,7 +38,7 @@ TONE:
 
 ---
 
-Respond with ONLY valid JSON — no markdown, no code blocks, no extra text:
+You MUST respond with ONLY valid JSON — no markdown, no code blocks, no extra text.
 
 If the student has enough understanding to begin:
 {"status":"READY","summary":"2-4 encouraging sentences","suggestions":["hint","hint"]}
@@ -66,10 +69,9 @@ const reviewApproach = async (req, res) => {
       .json({ error: "Your scratch pad is empty. Write something first before reviewing." });
   }
 
-  const geminiUrl = process.env.GEMINI_API_URL;
-  const geminiKey = process.env.GEMINI_API_KEY;
+  const groqKey = process.env.GROQ_API_KEY;
 
-  if (!geminiUrl || !geminiKey) {
+  if (!groqKey) {
     return res.status(500).json({ error: "AI review is not configured on the server." });
   }
 
@@ -80,17 +82,25 @@ const reviewApproach = async (req, res) => {
       approach.trim(),
     );
 
-    const geminiResponse = await axios.post(
-      `${geminiUrl}?key=${geminiKey}`,
+    const groqResponse = await axios.post(
+      GROQ_URL,
       {
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.4, maxOutputTokens: 512 },
+        model: GROQ_MODEL,
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.4,
+        max_tokens: 512,
+        response_format: { type: "json_object" },
       },
-      { headers: { "Content-Type": "application/json" }, timeout: 20000 },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${groqKey}`,
+        },
+        timeout: 20000,
+      },
     );
 
-    const rawText =
-      geminiResponse.data?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+    const rawText = groqResponse.data?.choices?.[0]?.message?.content ?? "";
 
     const cleaned = rawText
       .trim()
@@ -101,7 +111,7 @@ const reviewApproach = async (req, res) => {
     const parsed = JSON.parse(cleaned);
 
     if (!["READY", "THINK_MORE"].includes(parsed.status)) {
-      throw new Error("Unexpected status value in Gemini response.");
+      throw new Error("Unexpected status value in AI response.");
     }
 
     const aiResult = {
@@ -112,7 +122,6 @@ const reviewApproach = async (req, res) => {
         .map(String),
     };
 
-    // Map AI verdict to DB enum and persist the full review
     const dbStatus = aiResult.status === "READY" ? "accepted" : "rejected";
 
     const record = await prisma.scratchPad.create({
@@ -129,7 +138,7 @@ const reviewApproach = async (req, res) => {
     return res.status(200).json({ ...aiResult, scratchpadId: record.id });
   } catch (err) {
     console.error("[ScratchPad Review] message:", err.message);
-    console.error("[ScratchPad Review] gemini error:", err.response?.data ?? "no response body");
+    console.error("[ScratchPad Review] ai error:", err.response?.data ?? "no response body");
     return res
       .status(500)
       .json({ error: "Failed to analyze your approach. Please try again." });
