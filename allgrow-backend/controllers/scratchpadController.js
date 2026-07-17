@@ -128,7 +128,8 @@ const reviewApproach = async (req, res) => {
 
     return res.status(200).json({ ...aiResult, scratchpadId: record.id });
   } catch (err) {
-    console.error("[ScratchPad Review]", err.message);
+    console.error("[ScratchPad Review] message:", err.message);
+    console.error("[ScratchPad Review] gemini error:", err.response?.data ?? "no response body");
     return res
       .status(500)
       .json({ error: "Failed to analyze your approach. Please try again." });
