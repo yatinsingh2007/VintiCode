@@ -10,7 +10,7 @@
 
 Every other platform starts at the editor. VintiCode starts one step earlier.
 
-Before a user writes a single line of code, they are guided through a **Scratch Pad** — a private planning space where they can write pseudocode, notes, and ideas. An optional **AI Approach Review**, powered by Gemini, then evaluates whether they have enough understanding to begin implementing.
+Before a user writes a single line of code, they are guided through a **Scratch Pad** — a private planning space where they can write pseudocode, notes, and ideas. An optional **AI Approach Review**, powered by Gemini 1.5 Flash, then evaluates whether they have enough understanding to begin implementing.
 
 The AI behaves like a supportive mentor, not a gatekeeper. It never blocks the user from coding. It simply asks: _"Have you thought about this enough to start?"_
 
@@ -32,83 +32,309 @@ This reinforces habits that matter in real interviews:
 ### Authentication
 - Register and login with email and password
 - Secure JWT-based sessions stored in `httpOnly` cookies
-- 7-day session persistence
-- Protected routes with automatic 401 redirects
+- 7-day session persistence with automatic 401 redirects
 
 ### Question Dashboard
-- List of all available coding challenges
-- Difficulty badges (Easy / Medium / Hard)
-- Visual indicator showing which questions have been solved
+- List of all available coding challenges with difficulty badges
+- Visual indicator showing which questions have already been solved
 
 ### Scratch Pad (Pre-Coding Planning)
 - Private Monaco Editor workspace before every question
-- Completely optional — users can skip it at any time
+- Completely optional — users can skip at any time
 - Character counter, dark/light theme support
 
 ### AI Approach Review
 - Triggered by "Review My Approach" inside the Scratch Pad
 - Calls **Gemini 1.5 Flash** via direct REST API
-- Evaluates technical understanding, not writing quality
+- Evaluates technical understanding, not writing quality or English fluency
 - Returns one of two verdicts:
   - **Ready to Start Coding** — the user has enough direction
   - **Consider Thinking a Bit More** — the approach needs more planning
 - Includes an encouraging summary and up to 3 gentle hints
 - Never reveals the algorithm or solves the problem
-- Review result is saved to the database (`accepted` / `rejected`)
+- Full review (user notes + AI verdict + AI summary + suggestions) saved to the database
 - User can always continue to coding regardless of the verdict
 
 ### Code Editor
 - Monaco Editor with syntax highlighting
 - Language support: **Python**, **C++**, **Java**, **JavaScript**
-- Font size selector (12–24px)
-- Dark and light themes
+- Font size selector, dark/light themes
 - Resizable split-panel layout (problem statement / editor / console)
 
 ### Code Execution
-- **Run with custom input** — immediate single execution via Judge0
-- **Submit** — runs all hidden test cases asynchronously
-- Async architecture: submission queued in Redis, results polled by the client
+- **Run** — immediate single execution with custom input via Judge0
+- **Submit** — runs all hidden test cases asynchronously via a background worker
 - Per-test-case status cards (Pending / Loading / Accepted / Failed)
-- Output truncation for large stdout (> 3000 characters)
-- Time Limit Exceeded detection
+- Time Limit Exceeded detection, output truncation for large stdout
 
 ### Profile Page
 - Submission history with question titles and verdicts
 - Solved-question counts broken down by difficulty
 
 ### Admin Suite
-- Separate authentication layer with its own JWT secret
-- **Dashboard** — platform-wide analytics
-- **Question Management** — full CRUD for coding challenges including test cases
-- **User Management** — view all users and their profiles
-- **Submission Oversight** — browse all submissions across the platform
-- Monochrome design system built for focus and clarity
+- Separate JWT authentication layer
+- Platform analytics, question CRUD, user management, submission oversight
+- Monochrome design system built for operator focus
 
 ---
 
 ## User Workflow
 
+```mermaid
+flowchart TD
+    A([Landing Page]) --> B{Authenticated?}
+    B -- Yes --> D
+    B -- No --> C([Auth: Register / Login])
+    C --> D([Question Dashboard])
+    D --> E([Scratch Pad])
+
+    E --> F{User Action}
+    F -- Skip --> H
+    F -- Review My Approach --> G([Gemini AI Review])
+
+    G --> G1{AI Verdict}
+    G1 -- READY → accepted --> G2([Feedback Card: Ready])
+    G1 -- THINK_MORE → rejected --> G3([Feedback Card: Think More])
+
+    G2 --> H1{User Choice}
+    G3 --> H2{User Choice}
+
+    H1 -- Continue --> H
+    H1 -- Edit Approach --> E
+    H2 -- Continue Anyway --> H
+    H2 -- Edit Approach --> E
+
+    H([Code Editor])
+    H --> I{Action}
+    I -- Run --> J([Custom Input Execution])
+    I -- Submit --> K([All Test Cases])
+
+    J --> L([Console Output])
+    K --> M([Test Case Results])
+    M --> N{All Passed?}
+    N -- Yes --> O([Accepted ✓])
+    N -- No --> P([Failed ✗])
 ```
-Landing Page
-     ↓
- Auth (Register / Login)
-     ↓
- Question Dashboard
-     ↓
- Scratch Pad  ←─────────────────┐
-  ↙          ↘                  │
-Skip     Review My Approach      │
-  ↓              ↓               │
-  │         Gemini API           │
-  │              ↓               │
-  │       AI Feedback Card       │
-  │        ↙         ↘           │
-  │  Edit Approach  Continue ────┘
-  ↓
-Code Editor
-  ├── Run (custom input → immediate result)
-  └── Submit (all test cases → async polling)
+
+---
+
+## System Architecture
+
+```mermaid
+graph TD
+    Browser([Next.js 16 Frontend\nReact 19 · TypeScript])
+
+    Browser -->|REST API\nAxios · withCredentials\nJWT cookie| Backend
+
+    subgraph Backend [Express.js Backend · Port 7777]
+        Auth[/api/auth\nRegister · Login · Logout · Verify]
+        Dashboard[/api/dashboard\nQuestion list · Question detail]
+        Questions[/api/questions\nRun · Submit · Poll · History]
+        Scratchpad[/api/scratchpad\nAI Approach Review]
+        Profile[/api/userprofile\nProfile · Submissions]
+        Admin[/api/admin\nAdmin CRUD · Analytics]
+    end
+
+    Questions -->|Store job state\nTTL 300–1800s| Redis[(Redis\nUpstash)]
+    Questions -->|Sandboxed\ncode execution| Judge0([Judge0 API\nvia RapidAPI])
+    Judge0 -->|Result| Questions
+    Questions -->|Background worker\nPOST /api/run-submission| Worker([runSubmission.js\nTest case loop])
+    Worker --> Redis
+    Worker --> DB
+
+    Scratchpad -->|Build prompt\nPOST REST call| Gemini([Gemini 1.5 Flash\nGoogle AI])
+    Gemini -->|JSON response| Scratchpad
+    Scratchpad -->|Save review| DB
+
+    Auth --> DB
+    Dashboard --> DB
+    Profile --> DB
+    Admin --> DB
+
+    DB[(PostgreSQL\nNeon · Prisma ORM)]
 ```
+
+---
+
+## Database Schema
+
+```mermaid
+erDiagram
+    User {
+        uuid   id        PK
+        string name
+        string email     UK
+        string password
+        date   createdAt
+        date   updatedAt
+    }
+
+    Questions {
+        uuid   id            PK
+        string title         UK
+        string description
+        string input_format
+        string output_format
+        string sample_input
+        string sample_output
+        json   test_cases
+        string difficulty
+        date   createdAt
+        date   updatedAt
+    }
+
+    ScratchPad {
+        uuid     id             PK
+        uuid     userId         FK
+        uuid     questionId     FK
+        enum     status
+        text     explanation
+        text     aiSummary
+        string[] aiSuggestions
+        date     createdAt
+        date     updatedAt
+    }
+
+    Submissions {
+        uuid   id           PK
+        uuid   userId       FK
+        uuid   questionId   FK
+        uuid   scratchpadId FK "nullable"
+        int    languageId
+        text   code
+        enum   status
+        date   createdAt
+        date   updatedAt
+    }
+
+    User ||--o{ ScratchPad   : "writes"
+    User ||--o{ Submissions  : "submits"
+    Questions ||--o{ ScratchPad  : "has"
+    Questions ||--o{ Submissions : "has"
+    ScratchPad ||--o{ Submissions : "linked to"
+```
+
+> **Status enum** — shared by both `ScratchPad` and `Submissions`:
+> `accepted` (AI said READY / code passed all tests) · `rejected` (AI said THINK_MORE / code failed)
+
+---
+
+## Code Execution — Run Flow
+
+```mermaid
+sequenceDiagram
+    participant FE as Frontend
+    participant BE as Backend
+    participant RD as Redis
+    participant J0 as Judge0 API
+
+    FE->>BE: POST /api/questions/runCode/:id\n{ code, language_id, input }
+    BE->>RD: SET submission:{id} = { status: "processing" }  TTL 300s
+    BE->>J0: POST /submissions\n{ source_code, language_id, stdin }
+    J0-->>BE: { token }
+
+    loop Poll every 1.2s (max 15 attempts)
+        BE->>J0: GET /submissions/{token}
+        J0-->>BE: { status: { id }, stdout, stderr }
+        alt status.id <= 2 (still running)
+            BE->>BE: wait 1.2s
+        else status.id = 5 (TLE)
+            BE->>RD: SET result = { status: "TLE" }  TTL 600s
+        else completed
+            BE->>RD: SET result = { status: "completed", ... }  TTL 600s
+        end
+    end
+
+    BE-->>FE: { submissionId }
+
+    loop Poll every 1s
+        FE->>BE: GET /api/questions/runCode/result/:submissionId
+        BE->>RD: GET submission:{id}
+        RD-->>BE: { status, result }
+        BE-->>FE: { status, result }
+    end
+
+    FE->>FE: Render output in console
+```
+
+---
+
+## Code Execution — Submit Flow
+
+```mermaid
+sequenceDiagram
+    participant FE as Frontend
+    participant BE as Backend
+    participant RD as Redis
+    participant WK as Background Worker
+    participant J0 as Judge0 API
+    participant DB as PostgreSQL
+
+    FE->>BE: POST /api/questions/submitCode/:id\n{ code, language_id }
+    BE->>DB: Fetch question + test cases
+    DB-->>BE: { test_cases: [...] }
+    BE->>RD: SET submissions:{id} = { status: "queued", testCases, code }  TTL 1800s
+    BE->>WK: fire-and-forget POST /api/run-submission/:id
+    BE-->>FE: { submissionId, status: "queued" }
+
+    Note over WK,J0: Background worker processes all test cases
+    loop For each test case
+        WK->>J0: POST /submissions\n{ source_code, stdin, expected_output }
+        J0-->>WK: { token }
+        WK->>J0: GET /submissions/{token} (poll)
+        J0-->>WK: { stdout, stderr, status }
+        WK->>WK: Compare output vs expected
+    end
+
+    WK->>RD: SET submissions:{id} = { status: "completed", report: {...} }
+    WK->>DB: INSERT INTO Submissions\n{ userId, questionId, code, status }
+
+    loop Poll every 1s (max 40 attempts)
+        FE->>BE: GET /api/questions/submission/result/:submissionId
+        BE->>RD: GET submissions:{id}
+        RD-->>BE: { status, report }
+        BE-->>FE: { status, report }
+    end
+
+    FE->>FE: Render per-test-case status cards
+```
+
+---
+
+## AI Approach Review Flow
+
+```mermaid
+sequenceDiagram
+    participant FE as Frontend
+    participant BE as Backend
+    participant GM as Gemini 1.5 Flash
+    participant DB as PostgreSQL
+
+    FE->>BE: POST /api/scratchpad/review\n{ questionId, questionTitle, questionDescription, approach }
+    Note over BE: Validate userId (JWT), questionId, approach
+
+    BE->>GM: POST REST API\n{ contents: [{ parts: [{ text: prompt }] }] }
+    Note over GM: Evaluate technical direction\nNot grammar or writing quality
+    GM-->>BE: { candidates[0].content.parts[0].text }
+    Note over BE: Strip markdown · Parse JSON\nValidate status field
+
+    BE->>DB: INSERT INTO ScratchPad\n{ userId, questionId, status, explanation, aiSummary, aiSuggestions }
+    DB-->>BE: { id: scratchpadId }
+
+    BE-->>FE: { status, summary, suggestions, scratchpadId }
+    FE->>FE: Render ApproachReview card\nREADY → green badge\nTHINK_MORE → yellow badge
+```
+
+---
+
+## Redis — What Gets Stored
+
+| Key Pattern | Written by | TTL | Contains |
+|---|---|---|---|
+| `submission:{id}` | `runCode` controller | 300–600s | `{ status, result }` for custom-input run |
+| `submissions:{id}` | `submitCode` controller + worker | 1800s | `{ status, report, testCases, code }` for full submit |
+
+Redis is **not** used as a database. It is a temporary job-state cache. Results are read by the frontend during polling, and full submission records are persisted to PostgreSQL by the background worker.
 
 ---
 
@@ -131,97 +357,11 @@ Code Editor
 |---------|------------------|
 | Framework | Express.js 5 (Controller / Router pattern) |
 | Database | PostgreSQL via Prisma ORM |
-| Cache / Queue | Redis (ioredis) + BullMQ |
-| Code Execution | Judge0 (via RapidAPI) |
-| AI Review | Gemini 1.5 Flash (direct REST API) |
-| Auth | JWT (separate user + admin secrets) |
+| Cache | Redis (ioredis / Upstash) |
+| Code Execution | Judge0 via RapidAPI |
+| AI Review | Gemini 1.5 Flash (direct REST call) |
+| Auth | JWT — separate secrets for user and admin |
 | Validation | validator.js, bcrypt |
-
----
-
-## Architecture
-
-```
-Next.js Frontend
-      │
-      │  REST API (Axios, withCredentials)
-      ▼
-Express.js Backend
-      │
-      ├── /api/auth          Register, Login, Logout, Verify
-      ├── /api/dashboard     Question list, Question detail
-      ├── /api/questions     Run, Submit, Poll results, History
-      ├── /api/scratchpad    AI Approach Review → save to DB
-      ├── /api/userprofile   Profile, Submission history
-      └── /api/admin         Admin CRUD (separate JWT)
-            │
-            ├── Redis          Async job state (run / submit results)
-            ├── Judge0 API     Sandboxed code execution
-            ├── Gemini API     Approach review (direct REST call)
-            └── PostgreSQL     Users, Questions, Submissions, ScratchPads
-```
-
-### Code Execution Flow
-
-**Run (custom input)**
-```
-POST /questions/runCode/:id
-  → Store "processing" in Redis
-  → Submit to Judge0 (async)
-  → Poll Judge0 until complete
-  → Store result in Redis
-  → Client polls GET /questions/runCode/result/:submissionId
-```
-
-**Submit (all test cases)**
-```
-POST /questions/submitCode/:id
-  → Queue job in Redis
-  → Fire background worker (POST /api/run-submission/:id)
-  → Worker loops through all test cases via Judge0
-  → Store report in Redis + create Submissions record in DB
-  → Client polls GET /questions/submission/result/:submissionId
-```
-
-### Approach Review Flow
-
-```
-POST /api/scratchpad/review
-  → geminiService: build prompt → call Gemini 1.5 Flash REST API
-  → scratchpadService: map READY→accepted / THINK_MORE→rejected
-  → Save ScratchPad record to PostgreSQL
-  → Return { status, summary, suggestions, scratchpadId }
-```
-
----
-
-## Database Schema
-
-```
-User
-  id, name, email, password, createdAt, updatedAt
-  → scratchPads[]
-  → submissions[]
-
-Questions
-  id, title, description, input_format, output_format,
-  sample_input, sample_output, test_cases (JSON), difficulty
-  → scratchpad[]
-  → solvedQuestions[]
-
-ScratchPad
-  id, userId, questionId
-  status        (accepted | rejected)   ← AI verdict
-  explanation   (user's raw notes)
-  createdAt, updatedAt
-  → submissions[]
-
-Submissions
-  id, userId, questionId, languageId,
-  scratchpadId (optional FK to ScratchPad),
-  code, status (accepted | rejected)
-  createdAt, updatedAt
-```
 
 ---
 
@@ -230,18 +370,15 @@ Submissions
 ```
 VintiCode/
 ├── allgrow-backend/
-│   ├── app.js                    Entry point, route registration
+│   ├── app.js                       Entry point, route registration
 │   ├── controllers/
-│   │   ├── authController.js
-│   │   ├── dashboardController.js
-│   │   ├── questionController.js
-│   │   ├── scratchpadController.js
-│   │   ├── profileController.js
-│   │   ├── adminController.js
-│   │   └── runSubmission.js      Background test-case worker
-│   ├── services/
-│   │   ├── geminiService.js      Prompt building + Gemini REST call
-│   │   └── scratchpadService.js  Business logic + DB save
+│   │   ├── authController.js        Register, Login, Logout, Verify
+│   │   ├── dashboardController.js   Question list, Question detail
+│   │   ├── questionController.js    Run, Submit, Poll, History
+│   │   ├── scratchpadController.js  Gemini call + DB save (all-in-one)
+│   │   ├── profileController.js     Profile, Submission counts
+│   │   ├── adminController.js       Admin CRUD
+│   │   └── runSubmission.js         Background test-case worker
 │   ├── routes/
 │   │   ├── auth.js
 │   │   ├── dashboard.js
@@ -250,7 +387,7 @@ VintiCode/
 │   │   ├── profile.js
 │   │   └── admin.js
 │   ├── middleware/
-│   │   └── middleware.js         JWT auth (user + admin tiers)
+│   │   └── middleware.js            JWT auth (user + admin tiers)
 │   ├── prisma/
 │   │   ├── schema.prisma
 │   │   └── prismaClient.js
@@ -259,14 +396,14 @@ VintiCode/
 │
 └── vinticode-frontend/
     ├── app/
-    │   ├── page.tsx                          Landing page
-    │   ├── auth/page.tsx                     Login / Register
+    │   ├── page.tsx                             Landing page
+    │   ├── auth/page.tsx                        Login / Register
     │   ├── dashboard/
-    │   │   ├── home/page.tsx                 Question list
-    │   │   ├── profile/page.tsx              Submission history
+    │   │   ├── home/page.tsx                    Question list
+    │   │   ├── profile/page.tsx                 Submission history
     │   │   └── question/[questionId]/
-    │   │       ├── page.tsx                  Code editor
-    │   │       └── scratchpad/page.tsx       Scratch Pad + AI Review
+    │   │       ├── page.tsx                     Code editor
+    │   │       └── scratchpad/page.tsx          Scratch Pad + AI Review
     │   └── admin/
     │       ├── login/page.tsx
     │       ├── dashboard/page.tsx
@@ -278,9 +415,9 @@ VintiCode/
     │   ├── scratchpad/
     │   │   ├── ScratchPad.tsx
     │   │   └── ApproachReview.tsx
-    │   └── ui/                               Design system components
+    │   └── ui/                                  Design system components
     └── lib/
-        ├── axios.ts                          Shared axios instance
+        ├── axios.ts                             Shared axios instance
         ├── authApi.ts
         ├── dashboardApi.ts
         ├── questionsApi.ts
@@ -300,10 +437,10 @@ PORT=7777
 FRONTEND_URL="http://localhost:3001"
 BACKEND_URL="http://localhost:7777"
 
-# Database
+# Database (PostgreSQL)
 DATABASE_URL="postgresql://..."
 
-# Redis
+# Cache (Redis)
 REDIS_URL="rediss://..."
 
 # Auth
@@ -312,12 +449,12 @@ ADMIN_JWT_SECRET=""
 ADMIN_EMAIL=""
 ADMIN_PASSWORD=""
 
-# Judge0 (RapidAPI) — rotate keys to avoid rate limits
+# Judge0 — rotate keys to avoid rate limits
 JUDGE0_API="https://judge0-ce.p.rapidapi.com"
 USER_1='{"x-rapidapi-key":"...","x-rapidapi-host":"judge0-ce.p.rapidapi.com"}'
 USER_2='...'
 
-# Gemini AI (get a free key at aistudio.google.com)
+# Gemini AI  →  get a free key at aistudio.google.com
 GEMINI_API_URL="https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
 GEMINI_API_KEY=""
 ```
