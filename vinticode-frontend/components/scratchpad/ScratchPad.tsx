@@ -3,10 +3,12 @@
 import { useContext } from "react";
 import Editor, { OnChange } from "@monaco-editor/react";
 import { motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, Lock, NotebookPen } from "lucide-react";
+import { ArrowLeft, ArrowRight, Lock, NotebookPen, Sparkles } from "lucide-react";
 import { ThemeContext } from "@/context/ThemeContext";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ApproachReview, ReviewError } from "./ApproachReview";
+import type { ApproachReviewResult, ReviewState } from "@/lib/scratchpadApi";
 
 const getDifficultyBadge = (difficulty: string) => {
   switch (difficulty.toLowerCase()) {
@@ -33,6 +35,37 @@ export interface ScratchPadProps {
   onSkip: () => void;
   onBack?: () => void;
   loading?: boolean;
+  // Review props
+  onReview: () => void;
+  reviewState: ReviewState;
+  reviewResult: ApproachReviewResult | null;
+  reviewError: string;
+  onDismissReview: () => void;
+}
+
+function Spinner() {
+  return (
+    <svg
+      className="h-3.5 w-3.5 animate-spin"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <circle
+        className="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="3"
+      />
+      <path
+        className="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+      />
+    </svg>
+  );
 }
 
 export default function ScratchPad({
@@ -44,12 +77,21 @@ export default function ScratchPad({
   onSkip,
   onBack,
   loading = false,
+  onReview,
+  reviewState,
+  reviewResult,
+  reviewError,
+  onDismissReview,
 }: ScratchPadProps) {
   const { theme } = useContext(ThemeContext);
 
   const handleChange: OnChange = (value) => {
     onNotesChange(value ?? "");
   };
+
+  const isReviewing = reviewState === "loading";
+  const showResult = reviewState === "result" && reviewResult !== null;
+  const showError = reviewState === "error";
 
   return (
     <motion.div
@@ -105,8 +147,8 @@ export default function ScratchPad({
           </p>
         </header>
 
-        <div className="mt-8 flex min-h-0 flex-1 flex-col">
-          <div className="flex min-h-[45vh] flex-1 flex-col overflow-hidden rounded-2xl border border-border bg-card/50 backdrop-blur-sm transition-colors focus-within:border-primary/40">
+        <div className="mt-8 flex min-h-0 flex-1 flex-col gap-4">
+          <div className="flex min-h-[35vh] flex-1 flex-col overflow-hidden rounded-2xl border border-border bg-card/50 backdrop-blur-sm transition-colors focus-within:border-primary/40">
             <div className="flex flex-none items-center gap-2 border-b border-border bg-muted/20 px-5 py-3">
               <NotebookPen className="h-3.5 w-3.5 text-primary-fg" />
               <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
@@ -159,23 +201,64 @@ export default function ScratchPad({
             </div>
           </div>
 
-          <div className="mt-6 flex flex-none flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
-            <Button
-              variant="ghost"
-              onClick={onSkip}
-              className="h-11 rounded-xl px-5 text-[11px] font-bold uppercase tracking-widest text-muted-foreground transition-all hover:bg-muted hover:text-foreground active:scale-95"
-            >
-              Skip Scratch Pad
-            </Button>
+          {(showResult || showError) && (
+            <div className="flex-none">
+              {showResult && (
+                <ApproachReview
+                  result={reviewResult!}
+                  onContinue={onContinue}
+                  onEditApproach={onDismissReview}
+                />
+              )}
+              {showError && (
+                <ReviewError
+                  message={reviewError}
+                  onRetry={onReview}
+                  onContinue={onContinue}
+                />
+              )}
+            </div>
+          )}
 
-            <Button
-              onClick={onContinue}
-              className="h-11 gap-2 rounded-xl border-none bg-primary px-6 text-[11px] font-bold uppercase tracking-widest text-foreground shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] transition-all hover:bg-primary active:scale-95"
-            >
-              Continue to Coding
-              <ArrowRight className="h-3.5 w-3.5" />
-            </Button>
-          </div>
+          {!showResult && !showError && (
+            <div className="flex flex-none flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
+              <Button
+                variant="ghost"
+                onClick={onSkip}
+                className="h-11 rounded-xl px-5 text-[11px] font-bold uppercase tracking-widest text-muted-foreground transition-all hover:bg-muted hover:text-foreground active:scale-95"
+              >
+                Skip Scratch Pad
+              </Button>
+
+              <Button
+                variant="outline"
+                onClick={onReview}
+                disabled={isReviewing}
+                aria-busy={isReviewing}
+                className="h-11 gap-2 rounded-xl px-5 text-[11px] font-bold uppercase tracking-widest transition-all active:scale-95"
+              >
+                {isReviewing ? (
+                  <>
+                    <Spinner />
+                    Analyzing your approach...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="h-3.5 w-3.5" />
+                    Review My Approach
+                  </>
+                )}
+              </Button>
+
+              <Button
+                onClick={onContinue}
+                className="h-11 gap-2 rounded-xl border-none bg-primary px-6 text-[11px] font-bold uppercase tracking-widest text-foreground shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] transition-all hover:bg-primary active:scale-95"
+              >
+                Continue to Coding
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </motion.div>

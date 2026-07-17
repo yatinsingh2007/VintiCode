@@ -8,6 +8,7 @@ const { checkUserAuthentication } = require("./middleware/middleware");
 const authRouter = require("./routes/auth");
 const dashboardRouter = require("./routes/dashboard");
 const questionsRouter = require("./routes/questions");
+const scratchpadRouter = require("./routes/scratchpad");
 const profileRouter = require("./routes/profile");
 const adminRouter = require("./routes/admin");
 const { runSubmission } = require("./controllers/runSubmission");
@@ -30,6 +31,7 @@ app.post("/api/run-submission/:submissionId", runSubmission);
 app.use("/api/auth", authRouter);
 app.use("/api/dashboard", checkUserAuthentication, dashboardRouter);
 app.use("/api/questions", checkUserAuthentication, questionsRouter);
+app.use("/api/scratchpad", checkUserAuthentication, scratchpadRouter);
 app.use("/api/userprofile", checkUserAuthentication, profileRouter);
 app.use("/api/admin", adminRouter);
 
