@@ -46,9 +46,9 @@ If the student needs more planning:
 `.trim();
 
 const reviewApproach = async (questionTitle, questionDescription, approach) => {
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.GEMINI_API_URL;
   if (!apiKey) {
-    throw new Error("GEMINI_API_KEY is not configured.");
+    throw new Error("GEMINI_API_URL is not configured.");
   }
 
   const prompt = buildPrompt(questionTitle, questionDescription, approach);
