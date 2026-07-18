@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon app.js",
-    "start": "node app.js"
+    "start": "node app.js",
+    "lint": "eslint ."
   },
   "keywords": [],
   "author": "",
@@ -28,5 +29,10 @@
     "prisma": "^6.16.2",
     "uuid": "^13.0.0",
     "validator": "^13.15.15"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "eslint": "^9.0.0",
+    "globals": "^15.0.0"
   }
 }
