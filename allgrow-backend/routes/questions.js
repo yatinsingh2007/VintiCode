@@ -9,6 +9,7 @@ const {
   getLatestSubmission,
   getPlayground,
   savePlayground,
+  deletePlayground,
 } = require("../controllers/questionController");
 
 const router = express.Router();
@@ -22,5 +23,6 @@ router.get("/submission/:id", getSubmissionById);
 router.get("/latestSubmission/:id", getLatestSubmission);
 router.get("/playground/:id", getPlayground);
 router.put("/playground/:id", savePlayground);
+router.delete("/playground/:id", deletePlayground);
 
 module.exports = router;

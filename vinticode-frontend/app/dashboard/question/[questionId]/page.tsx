@@ -193,6 +193,12 @@ export default function Dashboard() {
     if (ok) router.push("/dashboard/home");
   };
 
+  const handleLeaveWithoutSaving = () => {
+    // Delete the playground so next load shows latest submission or blank
+    api.delete(`/questions/playground/${questionId}`).catch(() => {});
+    router.push("/dashboard/home");
+  };
+
   const handleRun = async () => {
     try {
       setRloader(true);
@@ -855,7 +861,7 @@ export default function Dashboard() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => router.push("/dashboard/home")}
+              onClick={handleLeaveWithoutSaving}
             >
               Leave
             </Button>

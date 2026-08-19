@@ -313,6 +313,22 @@ const savePlayground = async (req, res) => {
   }
 };
 
+const deletePlayground = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { id: questionId } = req.params;
+
+    await prisma.playground.deleteMany({
+      where: { userId, questionId },
+    });
+
+    return res.status(200).json({ message: "Playground cleared" });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
 module.exports = {
   runCode,
   getRunResult,
@@ -323,4 +339,5 @@ module.exports = {
   getLatestSubmission,
   getPlayground,
   savePlayground,
+  deletePlayground,
 };
