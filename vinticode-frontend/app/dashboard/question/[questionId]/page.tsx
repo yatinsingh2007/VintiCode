@@ -3,7 +3,7 @@
 import Editor, { OnChange } from "@monaco-editor/react";
 import { useParams, useRouter } from "next/navigation";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useRef, useCallback } from "react";
 import { ThemeContext } from "@/context/ThemeContext";
 import { Skeleton } from "@/components/ui/skeleton";
 import api from "@/lib/axios";
@@ -68,6 +68,13 @@ interface Output {
   };
 }
 
+const languages: languageDetails[] = [
+  { language: "python", id: 71 },
+  { language: "cpp", id: 54 },
+  { language: "java", id: 62 },
+  { language: "javascript", id: 63 },
+];
+
 export default function Dashboard() {
   const { questionId } = useParams();
   const router = useRouter();
@@ -113,15 +120,28 @@ export default function Dashboard() {
     }
   }, [questionData]);
 
+  // Load saved playground first; fall back to latest submission code.
   useEffect(() => {
     (async () => {
       try {
-        const resp = await api.get(`/questions/latestSubmission/${questionId}`, {
+        const resp = await api.get(`/questions/playground/${questionId}`, {
           withCredentials: true,
         });
-        setCode(resp.data?.code);
-      } catch (err) {
-        console.log(err);
+        if (resp.data?.code) setCode(resp.data.code);
+        if (resp.data?.languageId) {
+          const saved = languages.find((l) => l.id === resp.data.languageId);
+          if (saved) setLanguage(saved);
+        }
+      } catch {
+        // No playground yet — fall back to latest submission
+        try {
+          const resp = await api.get(`/questions/latestSubmission/${questionId}`, {
+            withCredentials: true,
+          });
+          if (resp.data?.code) setCode(resp.data.code);
+        } catch {
+          // No submission either — blank editor is fine
+        }
       }
     })();
   }, [questionId]);
@@ -148,6 +168,18 @@ export default function Dashboard() {
   const [showConfetti, setShowConfetti] = useState<boolean>(false);
   // Only `theme` is needed now — toggling moved to the shared ThemeToggle.
   const { theme } = useContext(ThemeContext);
+
+  const autosaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const savePlayground = useCallback((codeToSave: string, lang: languageDetails) => {
+    if (autosaveTimer.current) clearTimeout(autosaveTimer.current);
+    autosaveTimer.current = setTimeout(() => {
+      api.put(`/questions/playground/${questionId}`, {
+        code: codeToSave,
+        languageId: lang.id,
+      }).catch(() => {});
+    }, 1500);
+  }, [questionId]);
 
   const handleRun = async () => {
     try {
@@ -339,15 +371,11 @@ export default function Dashboard() {
   const handleCodeChange: OnChange = (value) => {
     if (value !== undefined) {
       setCode(value);
+      savePlayground(value, language);
     }
   };
 
-  const languages: languageDetails[] = [
-    { language: "python", id: 71 },
-    { language: "cpp", id: 54 },
-    { language: "java", id: 62 },
-    { language: "javascript", id: 63 },
-  ];
+
 
   const handleClearOutput = () => {
     setOutput({
@@ -545,7 +573,10 @@ export default function Dashboard() {
                   <Select
                     onValueChange={(value) => {
                       const selected = languages.find((lang) => lang.language === value);
-                      if (selected) setLanguage(selected);
+                      if (selected) {
+                        setLanguage(selected);
+                        savePlayground(code, selected);
+                      }
                     }}
                     value={language.language}
                   >

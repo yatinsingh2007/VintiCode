@@ -274,6 +274,45 @@ const getLatestSubmission = async (req, res) => {
   }
 };
 
+const getPlayground = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { id: questionId } = req.params;
+
+    const playground = await prisma.playground.findUnique({
+      where: { userId_questionId: { userId, questionId } },
+    });
+
+    if (!playground) {
+      return res.status(404).json({ error: "Playground not found" });
+    }
+
+    return res.status(200).json(playground);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+const savePlayground = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { id: questionId } = req.params;
+    const { code, languageId } = req.body;
+
+    const playground = await prisma.playground.upsert({
+      where: { userId_questionId: { userId, questionId } },
+      update: { code, languageId },
+      create: { userId, questionId, code, languageId },
+    });
+
+    return res.status(200).json(playground);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
 module.exports = {
   runCode,
   getRunResult,
@@ -282,4 +321,6 @@ module.exports = {
   getSubmissionsByQuestionId,
   getSubmissionById,
   getLatestSubmission,
+  getPlayground,
+  savePlayground,
 };

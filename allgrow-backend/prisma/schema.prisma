@@ -16,6 +16,7 @@ model User {
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
   scratchPads     ScratchPad[]  @relation("UserScratchPad")
+  playGrounds     Playground[]  @relation("UserPlayGround")
 }
 
 model Questions {
@@ -32,6 +33,7 @@ model Questions {
   updatedAt       DateTime      @updatedAt
   solvedQuestions Submissions[] @relation("QuestionSolved")
   scratchpad      ScratchPad[]  @relation("QuestionScratchPad")
+  playgrounds     Playground[]  @relation("QuestionPlayGround")
 }
 
 model Submissions {
@@ -51,20 +53,37 @@ model Submissions {
 }
 
 model ScratchPad {
-  id             String   @id @default(uuid())
-  userId         String
-  questionId     String
-  status         Status
-  explanation    String
-  aiSummary      String?
-  aiSuggestions  String[]
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id            String   @id @default(uuid())
+  userId        String
+  questionId    String
+  status        Status
+  explanation   String
+  aiSummary     String?
+  aiSuggestions String[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   user        User          @relation("UserScratchPad", fields: [userId], references: [id])
   question    Questions     @relation("QuestionScratchPad", fields: [questionId], references: [id])
   submissions Submissions[]
+  playgrounds Playground[]  @relation("scrathpad")
 }
+
+model Playground {
+  id           String  @id @default(uuid())
+  userId       String
+  questionId   String
+  scratchPadId String?
+  languageId   Int?
+  code         String
+
+  user       User        @relation("UserPlayGround", fields: [userId], references: [id])
+  question   Questions   @relation("QuestionPlayGround", fields: [questionId], references: [id])
+  scratchPad ScratchPad? @relation("scrathpad", fields: [scratchPadId], references: [id])
+
+  @@unique([userId, questionId])
+}
+
 
 enum Status {
   accepted
