@@ -20,6 +20,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { ArrowLeft, CheckCircle2, Play, Send, Terminal, AlertCircle } from "lucide-react";
+import { Confetti } from "@/components/magicui/confetti";
 
 interface submissionReportItem {
   verdict: string;
@@ -144,6 +145,7 @@ export default function Dashboard() {
   const [code, setCode] = useState<string>("");
   const [rloader, setRloader] = useState<boolean>(false);
   const [sloader, setSloader] = useState<boolean>(false);
+  const [showConfetti, setShowConfetti] = useState<boolean>(false);
   // Only `theme` is needed now — toggling moved to the shared ThemeToggle.
   const { theme } = useContext(ThemeContext);
 
@@ -293,6 +295,7 @@ export default function Dashboard() {
 
             if (result?.verdict === "accepted") {
               toast.success("All Test Cases Passed!");
+              setShowConfetti(true);
             } else {
               toast.error("Some Test Cases Failed");
             }
@@ -360,6 +363,8 @@ export default function Dashboard() {
   };
 
   return (
+    <>
+      <Confetti trigger={showConfetti} onComplete={() => setShowConfetti(false)} />
     <PanelGroup direction="horizontal" className="fixed inset-0 h-dvh w-screen bg-background text-foreground overflow-hidden z-50 font-sans selection:bg-primary-subtle">
       <Panel defaultSize={40} minSize={25} className="flex flex-col border-r border-border bg-background/50 backdrop-blur-xl">
         <div className="flex-none h-14 flex items-center gap-4 px-6 border-b border-border bg-muted/20 backdrop-blur-md">
@@ -784,5 +789,6 @@ export default function Dashboard() {
         </PanelGroup>
       </Panel>
     </PanelGroup>
+    </>
   );
 }
