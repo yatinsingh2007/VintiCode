@@ -1,7 +1,8 @@
 "use client";
 
 import { Editor } from "@monaco-editor/react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import { ThemeContext } from "@/context/ThemeContext";
 import api from "@/lib/axios";
 import { useParams, useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -30,6 +31,7 @@ interface SubmissionData {
 export default function Submission() {
   const { submissionId } = useParams();
   const router = useRouter();
+  const { theme } = useContext(ThemeContext);
   const [submissionData, setSubmissionData] = useState<SubmissionData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -49,8 +51,6 @@ export default function Submission() {
         setLoading(false);
       }
     })();
-
-    document.body.style.backgroundColor = "#000000";
   }, [submissionId]);
 
   const getLanguageFromId = (id: number): string => {
@@ -237,7 +237,7 @@ export default function Submission() {
                   padding: { top: 16, bottom: 16 },
                   fontFamily: "Monaco, 'Courier New', monospace",
                 }}
-                theme="vs-dark"
+                theme={theme === "dark" ? "vs-dark" : "light"}
               />
             </div>
           </CardContent>

@@ -1,55 +1,30 @@
 "use client";
+
 import { Button } from "@/components/ui/button";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ShineBorder } from "@/components/magicui/shine-border";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { useState } from "react";
 import api from "@/lib/axios";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 
-interface Credentials {
-  name: string;
-  email: string;
-  password: string;
-}
-
 export default function Login() {
   const router = useRouter();
-  const [details, setDetails] = useState<Credentials>({
-    name: "",
-    email: "",
-    password: "",
-  });
-  const [passwordType, setPasswordType] =
-    useState<"password" | "text">("password");
-  const [loading, setLoading] = useState<boolean>(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await api.post("/auth/login", {
-        email: details.email,
-        password: details.password,
-      });
-      if (res.status !== 200) {
-        return toast.error("Login failed");
-      }
+      const res = await api.post("/auth/login", { email, password });
+      if (res.status !== 200) return toast.error("Login failed");
       toast.success("Logged in successfully!");
       router.push("/dashboard/home");
-      toast.dismiss();
-      setDetails({ name: "", email: "", password: "" });
     } catch (err) {
       console.error(err);
       if (axios.isAxiosError(err)) {
@@ -62,71 +37,67 @@ export default function Login() {
   };
 
   return (
-    <Card className="relative overflow-hidden max-w-[400px] w-full border-2 border-black bg-black text-white" style={{ width: "60vw" }}>
-      <ShineBorder shineColor={["#A07CFE", "#FE8FB5", "#FFBE7B"]} />
-      <CardHeader>
-        <CardTitle>Login</CardTitle>
-        <CardDescription className="text-gray-200">
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-xl font-bold text-foreground">Welcome back</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
           Enter your credentials to access your account
-        </CardDescription>
-      </CardHeader>
-      <form onSubmit={handleLogin}>
-        <CardContent>
-          <div className="grid gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="name@example.com"
-                value={details.email}
-                onChange={(e) =>
-                  setDetails({ ...details, email: e.target.value })
-                }
-              />
-            </div>
-            <div className="grid gap-2 relative">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type={passwordType}
-                placeholder="*********"
-                value={details.password}
-                onChange={(e) =>
-                  setDetails({ ...details, password: e.target.value })
-                }
-              />
-              {passwordType === "password" ? (
-                <EyeOff
-                  className="absolute right-3 top-7 cursor-pointer"
-                  onClick={() => setPasswordType("text")}
-                />
+        </p>
+      </div>
+
+      <form onSubmit={handleLogin} className="space-y-4">
+        <div className="space-y-1.5">
+          <Label htmlFor="login-email">Email</Label>
+          <Input
+            id="login-email"
+            type="email"
+            placeholder="name@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            autoComplete="email"
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <Label htmlFor="login-password">Password</Label>
+          <div className="relative">
+            <Input
+              id="login-password"
+              type={showPassword ? "text" : "password"}
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="pr-10"
+              required
+              autoComplete="current-password"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? (
+                <Eye className="h-4 w-4" />
               ) : (
-                <Eye
-                  className="absolute right-3 top-7 cursor-pointer"
-                  onClick={() => setPasswordType("password")}
-                />
+                <EyeOff className="h-4 w-4" />
               )}
-            </div>
+            </button>
           </div>
-        </CardContent>
-        <CardFooter>
-          <Button
-            className="w-full bg-white text-black hover:scale-105 hover:bg-white hover:text-black cursor-pointer mt-4 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-            type="submit"
-            disabled={loading}
-          >
-            {loading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Signing In...
-              </>
-            ) : (
-              "Sign In"
-            )}
-          </Button>
-        </CardFooter>
+        </div>
+
+        <Button type="submit" className="w-full" disabled={loading}>
+          {loading ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Signing in…
+            </>
+          ) : (
+            "Sign In"
+          )}
+        </Button>
       </form>
-    </Card>
+    </div>
   );
 }

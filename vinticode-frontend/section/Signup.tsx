@@ -1,60 +1,34 @@
 "use client";
 
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { ShineBorder } from "@/components/magicui/shine-border";
-import { EyeOff, Eye, Loader2 } from "lucide-react";
-import React, { useState } from "react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { useState } from "react";
 import api from "@/lib/axios";
 import toast from "react-hot-toast";
 import { isAxiosError } from "axios";
 
-interface User {
-  name: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-}
-
-export default function SignupCard() {
-  const [userDetails, setUserDetails] = useState<User>({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
-  const [passwordType, setPasswordType] =
-    useState<"password" | "text">("password");
-  const [loading, setLoading] = useState<boolean>(false);
+export default function Signup() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    if (userDetails.password !== userDetails.confirmPassword) {
-      return toast.error("Passwords do not match");
-    }
-
+    if (password !== confirmPassword) return toast.error("Passwords do not match");
     setLoading(true);
     try {
-      const resp = await api.post("/auth/register", {
-        name: userDetails.name,
-        email: userDetails.email,
-        password: userDetails.password,
-      });
-      if (resp.status !== 201) {
-        return toast.error("Signup failed");
-      }
-      toast.success("Account created successfully! Please login.");
-      setUserDetails({ name: "", email: "", password: "", confirmPassword: "" });
+      const resp = await api.post("/auth/register", { name, email, password });
+      if (resp.status !== 201) return toast.error("Signup failed");
+      toast.success("Account created! Please log in.");
+      setName("");
+      setEmail("");
+      setPassword("");
+      setConfirmPassword("");
     } catch (err) {
       console.error(err);
       if (isAxiosError(err)) {
@@ -67,125 +41,96 @@ export default function SignupCard() {
   };
 
   return (
-    <Card
-      className="relative overflow-hidden max-w-[350px] w-full border-2 border-black bg-black text-white"
-      style={{ width: "60vw" }}
-    >
-      <ShineBorder shineColor={["#A07CFE", "#FE8FB5", "#FFBE7B"]} />
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-xl font-bold text-foreground">Create an account</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Start your coding journey today
+        </p>
+      </div>
 
-      <CardHeader>
-        <CardTitle>Register</CardTitle>
-        <CardDescription className="text-gray-200">
-          Create a new account to get started
-        </CardDescription>
-      </CardHeader>
+      <form onSubmit={handleSignup} className="space-y-4">
+        <div className="space-y-1.5">
+          <Label htmlFor="signup-name">Full Name</Label>
+          <Input
+            id="signup-name"
+            type="text"
+            placeholder="John Doe"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            autoComplete="name"
+          />
+        </div>
 
-      <form onSubmit={handleSignup}>
-        <CardContent>
-          <div className="grid gap-4">
-            {/* Full Name */}
-            <div className="grid gap-2">
-              <Label htmlFor="fullname">Full Name</Label>
-              <Input
-                id="fullname"
-                type="text"
-                placeholder="John Doe"
-                required
-                value={userDetails.name}
-                onChange={(e) =>
-                  setUserDetails({ ...userDetails, name: e.target.value })
-                }
-              />
-            </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="signup-email">Email</Label>
+          <Input
+            id="signup-email"
+            type="email"
+            placeholder="name@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            autoComplete="email"
+          />
+        </div>
 
-            {/* Email */}
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="name@example.com"
-                required
-                value={userDetails.email}
-                onChange={(e) =>
-                  setUserDetails({ ...userDetails, email: e.target.value })
-                }
-              />
-            </div>
-
-            {/* Password */}
-            <div className="grid gap-2 relative">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type={passwordType}
-                placeholder="********"
-                required
-                value={userDetails.password}
-                onChange={(e) =>
-                  setUserDetails({ ...userDetails, password: e.target.value })
-                }
-              />
-              {passwordType === "password" ? (
-                <EyeOff
-                  className="absolute right-3 top-7 cursor-pointer"
-                  onClick={() => setPasswordType("text")}
-                />
+        <div className="space-y-1.5">
+          <Label htmlFor="signup-password">Password</Label>
+          <div className="relative">
+            <Input
+              id="signup-password"
+              type={showPassword ? "text" : "password"}
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="pr-10"
+              required
+              autoComplete="new-password"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? (
+                <Eye className="h-4 w-4" />
               ) : (
-                <Eye
-                  className="absolute right-3 top-7 cursor-pointer"
-                  onClick={() => setPasswordType("password")}
-                />
+                <EyeOff className="h-4 w-4" />
               )}
-            </div>
-
-            {/* Confirm Password */}
-            <div className="grid gap-2 relative">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
-              <Input
-                id="confirmPassword"
-                type={passwordType}
-                placeholder="********"
-                required
-                value={userDetails.confirmPassword}
-                onChange={(e) =>
-                  setUserDetails({
-                    ...userDetails,
-                    confirmPassword: e.target.value,
-                  })
-                }
-              />
-              {passwordType === "password" ? (
-                <EyeOff
-                  className="absolute right-3 top-7 cursor-pointer"
-                  onClick={() => setPasswordType("text")}
-                />
-              ) : (
-                <Eye
-                  className="absolute right-3 top-7 cursor-pointer"
-                  onClick={() => setPasswordType("password")}
-                />
-              )}
-            </div>
+            </button>
           </div>
-        </CardContent>
-        <CardFooter>
-          <Button
-            className="w-full bg-white text-black hover:bg-white hover:text-black hover:scale-105 cursor-pointer mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
-            type="submit"
-            disabled={loading}
-          >
-            {loading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Creating Account...
-              </>
-            ) : (
-              "Create Account"
-            )}
-          </Button>
-        </CardFooter>
+        </div>
+
+        <div className="space-y-1.5">
+          <Label htmlFor="signup-confirm">Confirm Password</Label>
+          <div className="relative">
+            <Input
+              id="signup-confirm"
+              type={showPassword ? "text" : "password"}
+              placeholder="••••••••"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="pr-10"
+              required
+              autoComplete="new-password"
+            />
+          </div>
+        </div>
+
+        <Button type="submit" className="w-full" disabled={loading}>
+          {loading ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Creating account…
+            </>
+          ) : (
+            "Create Account"
+          )}
+        </Button>
       </form>
-    </Card>
+    </div>
   );
 }

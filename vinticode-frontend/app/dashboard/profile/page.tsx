@@ -80,8 +80,6 @@ export default function Profile() {
         setLoading(false);
       }
     })();
-
-    document.body.style.backgroundColor = "#000000";
   }, []);
 
   const acceptedCount = submissions.filter(s => s.status === "accepted").length;
@@ -95,7 +93,7 @@ export default function Profile() {
       <div className="mx-auto max-w-6xl w-full">
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary bg-clip-text text-transparent md:text-4xl">
+            <h1 className="text-3xl font-bold text-foreground md:text-4xl">
               Profile
             </h1>
             <p className="mt-2 text-sm text-muted-foreground">
@@ -237,7 +235,7 @@ export default function Profile() {
                     </div>
                     <span className="text-sm font-medium text-foreground">Acceptance Rate</span>
                   </div>
-                  <p className="text-3xl font-bold bg-gradient-to-r from-primary to-primary bg-clip-text text-transparent mb-1">{acceptanceRate}%</p>
+                  <p className="text-3xl font-bold tabular-nums text-primary-fg mb-1">{acceptanceRate}%</p>
                   <p className="text-xs text-muted-foreground">
                     Success percentage
                   </p>

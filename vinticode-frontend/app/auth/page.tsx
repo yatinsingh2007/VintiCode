@@ -2,48 +2,61 @@
 import { useState } from "react";
 import Login from "@/section/Login";
 import Signup from "@/section/Signup";
-import { MoveLeftIcon } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { GridBeams } from "@/components/ui/grid-beams";
+import { Button } from "@/components/ui/button";
+import { ShineBorder } from "@/components/magicui/shine-border";
+import { cn } from "@/lib/utils";
 
+const tabs = [
+  { id: "signup", label: "Sign Up" },
+  { id: "login", label: "Login" },
+] as const;
 
-
-export default function ShineBorderDemo(): React.ReactNode {
-  const [activeTab, setActiveTab] = useState<string>("signup");
+export default function AuthPage(): React.ReactNode {
+  const [activeTab, setActiveTab] = useState<"signup" | "login">("signup");
   const router = useRouter();
 
   return (
-    <GridBeams className="flex items-center justify-center w-full h-screen p-4">
-      <div
-        onClick={() => router.push('/')}
-        className="absolute top-5 left-5 p-2 bg-gray-800 rounded-full cursor-pointer hover:bg-gray-700 transition z-20"
+    <GridBeams className="flex items-center justify-center w-full min-h-screen p-4">
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={() => router.push("/")}
+        className="absolute top-4 left-4 z-20 rounded-full text-white/70 hover:text-white hover:bg-white/10"
       >
-        <MoveLeftIcon className="text-white" />
-      </div>
-      <div className="w-full max-w-md bg-transparent rounded-xl shadow-lg relative flex flex-col h-[600px]">
-        {/* Tabs */}
-        <div className="flex w-full rounded-t-xl overflow-hidden border-b border-gray-700 z-10">
-          <button
-            onClick={() => setActiveTab("signup")}
-            className={`flex-1 py-3 text-sm font-bold transition-all duration-300 ${activeTab === "signup"
-              ? "bg-white text-black"
-              : "bg-black text-gray-300 hover:bg-gray-900"
-              }`}
-          >
-            Sign Up
-          </button>
-          <button
-            onClick={() => setActiveTab("login")}
-            className={`flex-1 py-3 text-sm font-bold transition-all duration-300 ${activeTab === "login"
-              ? "bg-white text-black"
-              : "bg-black text-gray-300 hover:bg-gray-900"
-              }`}
-          >
-            Login
-          </button>
-        </div>
-        <div className="p-6 overflow-y-auto flex-1">
-          {activeTab === "login" ? <Login /> : <Signup />}
+        <ArrowLeft />
+      </Button>
+
+      {/* Force dark mode tokens — GridBeams bg is always dark */}
+      <div className="dark w-full max-w-md">
+        <div className="relative overflow-hidden rounded-2xl bg-card border border-border shadow-2xl">
+          <ShineBorder shineColor={["#A07CFE", "#FE8FB5", "#FFBE7B"]} />
+
+          <div className="px-4 pt-4 pb-4 border-b border-border">
+            <div className="flex rounded-xl bg-muted p-1 gap-1">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setActiveTab(tab.id)}
+                  className={cn(
+                    "flex-1 py-2 text-sm font-semibold rounded-lg transition-all duration-200",
+                    activeTab === tab.id
+                      ? "bg-card text-foreground shadow-xs"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="p-6">
+            {activeTab === "login" ? <Login /> : <Signup />}
+          </div>
         </div>
       </div>
     </GridBeams>
