@@ -3,7 +3,7 @@
 import Editor, { OnChange } from "@monaco-editor/react";
 import { useParams, useRouter } from "next/navigation";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
-import { useEffect, useState, useContext, useRef, useCallback } from "react";
+import { useEffect, useState, useContext } from "react";
 import { ThemeContext } from "@/context/ThemeContext";
 import { Skeleton } from "@/components/ui/skeleton";
 import api from "@/lib/axios";
@@ -19,7 +19,7 @@ import { Badge, difficultyVariant } from "@/components/ui/badge";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { ArrowLeft, CheckCircle2, Play, Send, Terminal, AlertCircle } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Play, Send, Terminal, AlertCircle, Save } from "lucide-react";
 import { Confetti } from "@/components/magicui/confetti";
 
 interface submissionReportItem {
@@ -166,20 +166,32 @@ export default function Dashboard() {
   const [rloader, setRloader] = useState<boolean>(false);
   const [sloader, setSloader] = useState<boolean>(false);
   const [showConfetti, setShowConfetti] = useState<boolean>(false);
+  const [showBackDialog, setShowBackDialog] = useState<boolean>(false);
+  const [saveLoader, setSaveLoader] = useState<boolean>(false);
   // Only `theme` is needed now — toggling moved to the shared ThemeToggle.
   const { theme } = useContext(ThemeContext);
 
-  const autosaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const handleSavePlayground = async (): Promise<boolean> => {
+    setSaveLoader(true);
+    try {
+      await api.put(`/questions/playground/${questionId}`, {
+        code,
+        languageId: language.id,
+      });
+      toast.success("Playground saved!");
+      return true;
+    } catch {
+      toast.error("Failed to save playground");
+      return false;
+    } finally {
+      setSaveLoader(false);
+    }
+  };
 
-  const savePlayground = useCallback((codeToSave: string, lang: languageDetails) => {
-    if (autosaveTimer.current) clearTimeout(autosaveTimer.current);
-    autosaveTimer.current = setTimeout(() => {
-      api.put(`/questions/playground/${questionId}`, {
-        code: codeToSave,
-        languageId: lang.id,
-      }).catch(() => {});
-    }, 1500);
-  }, [questionId]);
+  const handleSaveAndLeave = async () => {
+    const ok = await handleSavePlayground();
+    if (ok) router.push("/dashboard/home");
+  };
 
   const handleRun = async () => {
     try {
@@ -371,7 +383,6 @@ export default function Dashboard() {
   const handleCodeChange: OnChange = (value) => {
     if (value !== undefined) {
       setCode(value);
-      savePlayground(value, language);
     }
   };
 
@@ -400,7 +411,7 @@ export default function Dashboard() {
             variant="ghost"
             size="icon"
             className="h-9 w-9 rounded-xl hover:bg-accent text-muted-foreground hover:text-foreground transition-all duration-300 active:scale-95"
-            onClick={() => router.push("/dashboard/home")}
+            onClick={() => setShowBackDialog(true)}
           >
             <ArrowLeft className="h-4.5 w-4.5" />
           </Button>
@@ -573,10 +584,7 @@ export default function Dashboard() {
                   <Select
                     onValueChange={(value) => {
                       const selected = languages.find((lang) => lang.language === value);
-                      if (selected) {
-                        setLanguage(selected);
-                        savePlayground(code, selected);
-                      }
+                      if (selected) setLanguage(selected);
                     }}
                     value={language.language}
                   >
@@ -615,14 +623,22 @@ export default function Dashboard() {
               <div className="flex items-center gap-2">
                 <ThemeToggle size="icon-sm" />
 
-                {/*
-                  Run is the secondary action and Submit the primary one, but
-                  both were rendered as equally loud saturated fills with
-                  baked-in rgba glow shadows — so the toolbar had two competing
-                  focal points and no hierarchy. Run is now `outline`, Submit
-                  keeps the brand fill. Both drop the hardcoded hues, the
-                  uppercase micro-type and the custom shadows.
-                */}
+                <Button
+                  onClick={handleSavePlayground}
+                  disabled={saveLoader}
+                  aria-busy={saveLoader}
+                  variant="ghost"
+                  size="sm"
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  {saveLoader ? (
+                    <span aria-hidden="true" className="h-3 w-3 animate-spin rounded-full border border-current/40 border-t-transparent" />
+                  ) : (
+                    <Save className="h-3.5 w-3.5" aria-hidden="true" />
+                  )}
+                  Save
+                </Button>
+
                 <Button
                   onClick={handleRun}
                   disabled={rloader}
@@ -820,6 +836,46 @@ export default function Dashboard() {
         </PanelGroup>
       </Panel>
     </PanelGroup>
+
+    {/* Back-navigation warning dialog */}
+    {showBackDialog && (
+      <div className="fixed inset-0 z-[100] flex items-center justify-center">
+        <div
+          className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+          onClick={() => setShowBackDialog(false)}
+        />
+        <div className="relative z-10 w-full max-w-sm mx-4 rounded-2xl border border-border bg-card shadow-2xl p-6 space-y-4">
+          <div className="space-y-1.5">
+            <h2 className="text-base font-semibold text-foreground">Leave without saving?</h2>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Your current code hasn't been saved to the playground. Save it so it's restored the next time you open this question.
+            </p>
+          </div>
+          <div className="flex items-center justify-end gap-2 pt-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => router.push("/dashboard/home")}
+            >
+              Leave
+            </Button>
+            <Button
+              size="sm"
+              onClick={handleSaveAndLeave}
+              disabled={saveLoader}
+              aria-busy={saveLoader}
+            >
+              {saveLoader ? (
+                <span aria-hidden="true" className="h-3 w-3 animate-spin rounded-full border border-current/40 border-t-transparent" />
+              ) : (
+                <Save className="h-3.5 w-3.5" aria-hidden="true" />
+              )}
+              Save & Leave
+            </Button>
+          </div>
+        </div>
+      </div>
+    )}
     </>
   );
 }
