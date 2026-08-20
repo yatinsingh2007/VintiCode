@@ -50,6 +50,15 @@ model Submissions {
   user       User        @relation("UserSolved", fields: [userId], references: [id])
   question   Questions   @relation("QuestionSolved", fields: [questionId], references: [id])
   scratchPad ScratchPad? @relation(fields: [scratchpadId], references: [id])
+
+  // getLatestSubmission + getSubmissionsByQuestionId: filter userId+questionId, sort by createdAt
+  @@index([userId, questionId, createdAt])
+  // getCountOfSubmittedQuestions: filter userId+status, distinct on questionId (all in-index)
+  // getHome solved check: EXISTS(userId, status, questionId)
+  @@index([userId, status, questionId])
+  // getSubmissions (profile list): filter userId, sort by createdAt — (userId,questionId,createdAt)
+  // can't serve this since questionId breaks the sort order
+  @@index([userId, createdAt])
 }
 
 model ScratchPad {
