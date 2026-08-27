@@ -146,24 +146,11 @@ async function runSubmission(req, res) {
       data: {
         userId,
         questionId,
-        status: finalVerdict,
+        status: finalVerdict === "accepted" ? "accepted" : "rejected",
         languageId: language_id,
         code,
-        report: JSON.stringify(report),
       },
     });
-
-    if (finalVerdict === "accepted") {
-      await prisma.solvedQuestions.create({
-        data: {
-          userId,
-          questionId,
-          status: "accepted",
-          code,
-          languageId: language_id,
-        },
-      });
-    }
 
     return res.status(200).json({
       success: true,
