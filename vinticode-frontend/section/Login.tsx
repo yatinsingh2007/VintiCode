@@ -1,22 +1,11 @@
 "use client";
-import { Button } from "@/components/ui/button";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { ShineBorder } from "@/components/magicui/shine-border";
+import { Eye, EyeOff, Loader2, ArrowRight } from "lucide-react";
 import { useState } from "react";
 import api from "@/lib/axios";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import { PlayButton, PlayInput, PlayLabel, A } from "@/components/playground";
 
 interface Credentials {
   name: string;
@@ -62,71 +51,75 @@ export default function Login() {
   };
 
   return (
-    <Card className="relative overflow-hidden max-w-[400px] w-full border-2 border-black bg-black text-white" style={{ width: "60vw" }}>
-      <ShineBorder shineColor={["#A07CFE", "#FE8FB5", "#FFBE7B"]} />
-      <CardHeader>
-        <CardTitle>Login</CardTitle>
-        <CardDescription className="text-gray-200">
-          Enter your credentials to access your account
-        </CardDescription>
-      </CardHeader>
-      <form onSubmit={handleLogin}>
-        <CardContent>
-          <div className="grid gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="name@example.com"
-                value={details.email}
-                onChange={(e) =>
-                  setDetails({ ...details, email: e.target.value })
-                }
-              />
-            </div>
-            <div className="grid gap-2 relative">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type={passwordType}
-                placeholder="*********"
-                value={details.password}
-                onChange={(e) =>
-                  setDetails({ ...details, password: e.target.value })
-                }
-              />
+    <div>
+      <div className="mb-6">
+        <h2 className="text-2xl font-black tracking-tight">Welcome back</h2>
+        <p className="mt-1 text-sm font-medium text-white/60">
+          Enter your credentials to jump back in.
+        </p>
+      </div>
+
+      <form onSubmit={handleLogin} className="grid gap-4">
+        <div className="grid gap-2">
+          <PlayLabel htmlFor="email">Email</PlayLabel>
+          <PlayInput
+            id="email"
+            type="email"
+            placeholder="name@example.com"
+            value={details.email}
+            onChange={(e) => setDetails({ ...details, email: e.target.value })}
+          />
+        </div>
+
+        <div className="grid gap-2">
+          <PlayLabel htmlFor="password">Password</PlayLabel>
+          <div className="relative">
+            <PlayInput
+              id="password"
+              type={passwordType}
+              placeholder="*********"
+              className="pr-11"
+              value={details.password}
+              onChange={(e) =>
+                setDetails({ ...details, password: e.target.value })
+              }
+            />
+            <button
+              type="button"
+              aria-label={passwordType === "password" ? "Show password" : "Hide password"}
+              onClick={() =>
+                setPasswordType(passwordType === "password" ? "text" : "password")
+              }
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 transition-colors hover:text-white"
+            >
               {passwordType === "password" ? (
-                <EyeOff
-                  className="absolute right-3 top-7 cursor-pointer"
-                  onClick={() => setPasswordType("text")}
-                />
+                <EyeOff className="size-5" />
               ) : (
-                <Eye
-                  className="absolute right-3 top-7 cursor-pointer"
-                  onClick={() => setPasswordType("password")}
-                />
+                <Eye className="size-5" />
               )}
-            </div>
+            </button>
           </div>
-        </CardContent>
-        <CardFooter>
-          <Button
-            className="w-full bg-white text-black hover:scale-105 hover:bg-white hover:text-black cursor-pointer mt-4 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-            type="submit"
-            disabled={loading}
-          >
-            {loading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Signing In...
-              </>
-            ) : (
-              "Sign In"
-            )}
-          </Button>
-        </CardFooter>
+        </div>
+
+        <PlayButton
+          type="submit"
+          disabled={loading}
+          fill={A.lime}
+          shadow={A.coral}
+          className="mt-2 w-full"
+        >
+          {loading ? (
+            <>
+              <Loader2 className="size-4 animate-spin" />
+              Signing In...
+            </>
+          ) : (
+            <>
+              Sign In <ArrowRight strokeWidth={3} className="size-4" />
+            </>
+          )}
+        </PlayButton>
       </form>
-    </Card>
+    </div>
   );
 }

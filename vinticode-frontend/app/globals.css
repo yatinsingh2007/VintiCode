@@ -287,6 +287,228 @@
 }
 
 /*
+  ── Premium surface & motion primitives ──────────────────────────
+  Reusable, token-driven building blocks for the marketing/landing
+  surfaces and any "hero" section across the app. Everything derives
+  from the design tokens above via color-mix, so both themes stay
+  correct and nothing hardcodes a hex. Decorative only — the
+  reduce-motion block below neutralises the animations.
+*/
+@layer utilities {
+  /* Ambient aurora glow — drop behind a hero or section header.
+     Position/size it with width/height + absolute placement. Tint it
+     by setting --glow-color (any token); defaults to the brand primary
+     so existing usages keep their look. */
+  .glow-ambient {
+    background: radial-gradient(
+      closest-side,
+      color-mix(in oklch, var(--glow-color, var(--primary)) 40%, transparent) 0%,
+      color-mix(in oklch, var(--glow-color, var(--primary)) 12%, transparent) 45%,
+      transparent 100%
+    );
+  }
+
+  /* Aurora ribbon — a wide, heavily-blurred, multi-colour band that
+     drifts horizontally. The recognisable "northern lights" hero look
+     (React Bits / Aceternity style), rebuilt on brand tokens. Place it
+     absolutely, give it height, and mask it so it fades downward. */
+  .aurora-band {
+    background-image: linear-gradient(
+      100deg,
+      transparent 0%,
+      color-mix(in oklch, var(--primary) 30%, transparent) 24%,
+      color-mix(in oklch, var(--foreground) 9%, transparent) 50%,
+      color-mix(in oklch, var(--primary) 26%, transparent) 76%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    filter: blur(70px);
+    will-change: background-position;
+  }
+
+  /* Fine film-grain texture. Overlay full-bleed at low opacity to kill
+     banding in the aurora gradients and add a tactile, premium finish. */
+  .bg-noise {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+  }
+
+  /* Hairline grid + dotted-grid overlays. Pair with .mask-fade to
+     dissolve the edges so the pattern never meets a hard border. */
+  .bg-grid {
+    background-image:
+      linear-gradient(to right, var(--border) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--border) 1px, transparent 1px);
+    background-size: 64px 64px;
+  }
+  .bg-dots {
+    background-image: radial-gradient(
+      color-mix(in oklch, var(--border-strong) 90%, transparent) 1px,
+      transparent 1px
+    );
+    background-size: 22px 22px;
+  }
+  .mask-fade {
+    -webkit-mask-image: radial-gradient(closest-side, #000 0%, transparent 100%);
+    mask-image: radial-gradient(closest-side, #000 0%, transparent 100%);
+  }
+
+  /* Frosted surface for floating navbars, dialogs, elevated cards. */
+  .glass {
+    background: color-mix(in oklch, var(--card) 68%, transparent);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    backdrop-filter: blur(14px) saturate(140%);
+  }
+
+  /* Headline treatments: a soft vertical fade and a brand-tinted run. */
+  .text-fade {
+    background: linear-gradient(
+      180deg,
+      var(--foreground) 20%,
+      color-mix(in oklch, var(--foreground) 58%, transparent) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .text-gradient-brand {
+    background: linear-gradient(
+      100deg,
+      var(--primary-fg) 0%,
+      color-mix(in oklch, var(--primary-fg) 55%, var(--foreground)) 52%,
+      var(--primary-fg) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Hairline gradient border via mask compositing — crisper than a
+     plain border for "glowing edge" cards. Layer under content. */
+  .ring-hairline {
+    position: relative;
+  }
+  .ring-hairline::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      160deg,
+      color-mix(in oklch, var(--foreground) 14%, transparent),
+      transparent 40%
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+}
+
+/* Staggered entrance + idle float for hero compositions. Elements
+   opt in with .animate-fade-up and stagger via inline animationDelay. */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.75; }
+  50%      { opacity: 1; }
+}
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+/* Slow, organic drift for the aurora blobs — each blob uses a different
+   one so the mesh never repeats a recognisable pattern. */
+@keyframes drift-a {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50%      { transform: translate3d(6%, 4%, 0) scale(1.12); }
+}
+@keyframes drift-b {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1.05); }
+  50%      { transform: translate3d(-7%, 3%, 0) scale(0.95); }
+}
+@keyframes drift-c {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(0.95); }
+  50%      { transform: translate3d(5%, -5%, 0) scale(1.1); }
+}
+@keyframes aurora-shift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.animate-fade-up {
+  opacity: 0;
+  animation: fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.animate-float-slow { animation: float-slow 6s ease-in-out infinite; }
+.animate-glow-pulse { animation: glow-pulse 5s ease-in-out infinite; }
+.animate-marquee { animation: marquee 32s linear infinite; }
+.marquee-pause:hover .animate-marquee { animation-play-state: paused; }
+.animate-drift-a { animation: drift-a 24s ease-in-out infinite; }
+.animate-drift-b { animation: drift-b 30s ease-in-out infinite; }
+.animate-drift-c { animation: drift-c 27s ease-in-out infinite; }
+.animate-aurora { animation: aurora-shift 16s ease-in-out infinite; }
+
+/*
+  ── Playground: neo-brutalist theme tokens & utilities ───────────
+  A bold, flat-colour language for the landing. Solid accents + hard
+  offset shadows read as intentional and playful — the opposite of the
+  smooth AI-gradient look. Spring motion is driven by Motion (framer)
+  in the components; these are the static building blocks.
+*/
+:root {
+  --pg-lime: #b8f230;
+  --pg-coral: #ff6a5b;
+  --pg-cyan: #34e0e6;
+  --pg-amber: #ffc24b;
+  --pg-indigo: #7c86ff;
+  --pg-ink: #0a0a0d;
+  --pg-surface: #141419;
+  --pg-line: rgba(255, 255, 255, 0.9);
+}
+
+@layer utilities {
+  /* Hard "sticker" offset shadow in an accent colour. Set --pg-shadow. */
+  .pg-shadow {
+    box-shadow: 6px 6px 0 0 var(--pg-shadow, var(--pg-lime));
+  }
+  .pg-shadow-lg {
+    box-shadow: 10px 10px 0 0 var(--pg-shadow, var(--pg-lime));
+  }
+  /* Outlined kinetic type — a brutalist headline accent. */
+  .text-stroke {
+    -webkit-text-stroke: 2px var(--foreground);
+    color: transparent;
+  }
+  /* Chunky dotted play-surface, denser and bolder than .bg-dots. */
+  .bg-grid-bold {
+    background-image:
+      linear-gradient(to right, rgba(255, 255, 255, 0.05) 2px, transparent 2px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 2px, transparent 2px);
+    background-size: 56px 56px;
+  }
+}
+
+/* Idle sticker wobble for scattered chips. */
+@keyframes wiggle {
+  0%, 100% { transform: rotate(var(--wiggle-from, -6deg)); }
+  50%      { transform: rotate(var(--wiggle-to, 6deg)); }
+}
+.animate-wiggle { animation: wiggle 3.5s ease-in-out infinite; }
+
+/*
   Respect the OS "reduce motion" setting. The app leans on GSAP/WebGL
   ray effects, meteors, confetti and hover-lift transitions — all of
   which can trigger vestibular discomfort and none of which carry

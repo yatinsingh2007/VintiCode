@@ -1,22 +1,11 @@
 "use client";
 
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { ShineBorder } from "@/components/magicui/shine-border";
-import { EyeOff, Eye, Loader2 } from "lucide-react";
+import { EyeOff, Eye, Loader2, ArrowRight } from "lucide-react";
 import React, { useState } from "react";
 import api from "@/lib/axios";
 import toast from "react-hot-toast";
 import { isAxiosError } from "axios";
+import { PlayButton, PlayInput, PlayLabel, A } from "@/components/playground";
 
 interface User {
   name: string;
@@ -67,125 +56,117 @@ export default function SignupCard() {
   };
 
   return (
-    <Card
-      className="relative overflow-hidden max-w-[350px] w-full border-2 border-black bg-black text-white"
-      style={{ width: "60vw" }}
-    >
-      <ShineBorder shineColor={["#A07CFE", "#FE8FB5", "#FFBE7B"]} />
+    <div>
+      <div className="mb-6">
+        <h2 className="text-2xl font-black tracking-tight">Create your account</h2>
+        <p className="mt-1 text-sm font-medium text-white/60">
+          Start building real intuition today.
+        </p>
+      </div>
 
-      <CardHeader>
-        <CardTitle>Register</CardTitle>
-        <CardDescription className="text-gray-200">
-          Create a new account to get started
-        </CardDescription>
-      </CardHeader>
+      <form onSubmit={handleSignup} className="grid gap-4">
+        {/* Full Name */}
+        <div className="grid gap-2">
+          <PlayLabel htmlFor="fullname">Full Name</PlayLabel>
+          <PlayInput
+            id="fullname"
+            type="text"
+            placeholder="John Doe"
+            required
+            value={userDetails.name}
+            onChange={(e) =>
+              setUserDetails({ ...userDetails, name: e.target.value })
+            }
+          />
+        </div>
 
-      <form onSubmit={handleSignup}>
-        <CardContent>
-          <div className="grid gap-4">
-            {/* Full Name */}
-            <div className="grid gap-2">
-              <Label htmlFor="fullname">Full Name</Label>
-              <Input
-                id="fullname"
-                type="text"
-                placeholder="John Doe"
-                required
-                value={userDetails.name}
-                onChange={(e) =>
-                  setUserDetails({ ...userDetails, name: e.target.value })
-                }
-              />
-            </div>
+        {/* Email */}
+        <div className="grid gap-2">
+          <PlayLabel htmlFor="email">Email</PlayLabel>
+          <PlayInput
+            id="email"
+            type="email"
+            placeholder="name@example.com"
+            required
+            value={userDetails.email}
+            onChange={(e) =>
+              setUserDetails({ ...userDetails, email: e.target.value })
+            }
+          />
+        </div>
 
-            {/* Email */}
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="name@example.com"
-                required
-                value={userDetails.email}
-                onChange={(e) =>
-                  setUserDetails({ ...userDetails, email: e.target.value })
-                }
-              />
-            </div>
-
-            {/* Password */}
-            <div className="grid gap-2 relative">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type={passwordType}
-                placeholder="********"
-                required
-                value={userDetails.password}
-                onChange={(e) =>
-                  setUserDetails({ ...userDetails, password: e.target.value })
-                }
-              />
+        {/* Password */}
+        <div className="grid gap-2">
+          <PlayLabel htmlFor="password">Password</PlayLabel>
+          <div className="relative">
+            <PlayInput
+              id="password"
+              type={passwordType}
+              placeholder="********"
+              required
+              className="pr-11"
+              value={userDetails.password}
+              onChange={(e) =>
+                setUserDetails({ ...userDetails, password: e.target.value })
+              }
+            />
+            <button
+              type="button"
+              aria-label={passwordType === "password" ? "Show password" : "Hide password"}
+              onClick={() =>
+                setPasswordType(passwordType === "password" ? "text" : "password")
+              }
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 transition-colors hover:text-white"
+            >
               {passwordType === "password" ? (
-                <EyeOff
-                  className="absolute right-3 top-7 cursor-pointer"
-                  onClick={() => setPasswordType("text")}
-                />
+                <EyeOff className="size-5" />
               ) : (
-                <Eye
-                  className="absolute right-3 top-7 cursor-pointer"
-                  onClick={() => setPasswordType("password")}
-                />
+                <Eye className="size-5" />
               )}
-            </div>
-
-            {/* Confirm Password */}
-            <div className="grid gap-2 relative">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
-              <Input
-                id="confirmPassword"
-                type={passwordType}
-                placeholder="********"
-                required
-                value={userDetails.confirmPassword}
-                onChange={(e) =>
-                  setUserDetails({
-                    ...userDetails,
-                    confirmPassword: e.target.value,
-                  })
-                }
-              />
-              {passwordType === "password" ? (
-                <EyeOff
-                  className="absolute right-3 top-7 cursor-pointer"
-                  onClick={() => setPasswordType("password")}
-                />
-              ) : (
-                <Eye
-                  className="absolute right-3 top-7 cursor-pointer"
-                  onClick={() => setPasswordType("password")}
-                />
-              )}
-            </div>
+            </button>
           </div>
-        </CardContent>
-        <CardFooter>
-          <Button
-            className="w-full bg-white text-black hover:bg-white hover:text-black hover:scale-105 cursor-pointer mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
-            type="submit"
-            disabled={loading}
-          >
-            {loading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Creating Account...
-              </>
-            ) : (
-              "Create Account"
-            )}
-          </Button>
-        </CardFooter>
+        </div>
+
+        {/* Confirm Password */}
+        <div className="grid gap-2">
+          <PlayLabel htmlFor="confirmPassword">Confirm Password</PlayLabel>
+          <div className="relative">
+            <PlayInput
+              id="confirmPassword"
+              type={passwordType}
+              placeholder="********"
+              required
+              className="pr-11"
+              value={userDetails.confirmPassword}
+              onChange={(e) =>
+                setUserDetails({
+                  ...userDetails,
+                  confirmPassword: e.target.value,
+                })
+              }
+            />
+          </div>
+        </div>
+
+        <PlayButton
+          type="submit"
+          disabled={loading}
+          fill={A.lime}
+          shadow={A.coral}
+          className="mt-2 w-full"
+        >
+          {loading ? (
+            <>
+              <Loader2 className="size-4 animate-spin" />
+              Creating Account...
+            </>
+          ) : (
+            <>
+              Create Account <ArrowRight strokeWidth={3} className="size-4" />
+            </>
+          )}
+        </PlayButton>
       </form>
-    </Card>
+    </div>
   );
 }
