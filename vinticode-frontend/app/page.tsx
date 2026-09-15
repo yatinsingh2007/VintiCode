@@ -26,6 +26,7 @@ import {
   GripHorizontal,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { LogoMark } from "@/components/playground";
 import api from "@/lib/axios";
 import toast from "react-hot-toast";
 
@@ -331,11 +332,9 @@ export default function LandingPage() {
               <motion.span
                 whileHover={{ rotate: -12, scale: 1.1 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                aria-hidden
-                className="grid h-7 w-7 place-items-center rounded-lg border-[3px] border-black text-sm font-black text-black"
-                style={{ background: A.lime }}
+                className="inline-flex"
               >
-                V
+                <LogoMark className="size-8" />
               </motion.span>
               <span className="text-lg font-extrabold tracking-tight">VintiCode</span>
             </Link>
@@ -630,13 +629,7 @@ export default function LandingPage() {
             <div className="flex flex-col gap-10 md:flex-row md:justify-between">
               <div className="max-w-xs">
                 <Link href="/" className="flex items-center gap-2.5">
-                  <span
-                    aria-hidden
-                    className="grid h-7 w-7 place-items-center rounded-lg border-[3px] border-black text-sm font-black text-black"
-                    style={{ background: A.lime }}
-                  >
-                    V
-                  </span>
+                  <LogoMark className="size-8" />
                   <span className="text-lg font-extrabold tracking-tight">VintiCode</span>
                 </Link>
                 <p className="mt-4 text-sm font-medium leading-relaxed text-white/60">

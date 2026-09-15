@@ -1,0 +1,8 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="VintiCode">
+  <!-- hard offset "sticker" shadow -->
+  <rect x="12" y="15" width="44" height="44" rx="13" fill="#ff6a5b"/>
+  <!-- main tile -->
+  <rect x="6" y="6" width="44" height="44" rx="13" fill="#b8f230" stroke="#000000" stroke-width="4"/>
+  <!-- bold geometric V -->
+  <path d="M17 19 L28 42 L39 19" stroke="#000000" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

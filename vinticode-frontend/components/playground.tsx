@@ -85,6 +85,25 @@ export function fireConfetti(opts?: confetti.Options) {
   });
 }
 
+/* ── Brand mark ──────────────────────────────────────────────────
+   Chunky lime squircle, thick black border, coral hard-offset shadow,
+   and a bold geometric "V". Scales with the `className` size. */
+export function LogoMark({ className = "size-8" }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 40 40"
+      className={cn("shrink-0", className)}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <rect x="7.5" y="9.5" width="26" height="26" rx="8" fill="#ff6a5b" />
+      <rect x="4" y="4" width="26" height="26" rx="8" fill="#b8f230" stroke="#000" strokeWidth="2.5" />
+      <path d="M11 12 L17 25 L23 12" stroke="#000" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 /* ── Screen shell: forced dark, play-grid background, reduced-motion ── */
 export function PlayScreen({
   children,

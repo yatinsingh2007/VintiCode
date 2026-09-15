@@ -6,7 +6,7 @@ import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
-import { PlayScreen, PlayCard, Sticker, A } from "@/components/playground";
+import { PlayScreen, PlayCard, Sticker, LogoMark, A } from "@/components/playground";
 
 const tabs = [
   { id: "signup", label: "Sign Up" },
@@ -48,13 +48,7 @@ export default function AuthPage(): React.ReactNode {
       >
         {/* brand */}
         <div className="mb-6 flex items-center justify-center gap-2.5">
-          <span
-            aria-hidden
-            className="grid h-8 w-8 place-items-center rounded-lg border-[3px] border-black text-base font-black text-black"
-            style={{ background: A.lime }}
-          >
-            V
-          </span>
+          <LogoMark className="size-9" />
           <span className="text-xl font-extrabold tracking-tight">VintiCode</span>
         </div>
 

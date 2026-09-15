@@ -1,0 +1,8 @@
+<svg width="248" height="64" viewBox="0 0 248 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="VintiCode">
+  <!-- mark -->
+  <rect x="10" y="16" width="40" height="40" rx="12" fill="#ff6a5b"/>
+  <rect x="5" y="8" width="40" height="40" rx="12" fill="#b8f230" stroke="#000000" stroke-width="3.5"/>
+  <path d="M15 20 L25 40 L35 20" stroke="#000000" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- wordmark (white — for dark surfaces) -->
+  <text x="64" y="42" font-family="'Geist','Plus Jakarta Sans','Inter',system-ui,sans-serif" font-size="30" font-weight="800" letter-spacing="-1.2" fill="#ffffff">Vinti<tspan fill="#b8f230">Code</tspan></text>
+</svg>
