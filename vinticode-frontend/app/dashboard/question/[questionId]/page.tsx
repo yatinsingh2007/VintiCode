@@ -3,9 +3,7 @@
 import Editor, { OnChange } from "@monaco-editor/react";
 import { useParams, useRouter } from "next/navigation";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
-import { useEffect, useState, useContext } from "react";
-import { ThemeContext } from "@/context/ThemeContext";
-import { Skeleton } from "@/components/ui/skeleton";
+import { useEffect, useState } from "react";
 import api from "@/lib/axios";
 import {
   Select,
@@ -14,13 +12,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { Badge, difficultyVariant } from "@/components/ui/badge";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { ArrowLeft, CheckCircle2, Play, Send, Terminal, AlertCircle, Save } from "lucide-react";
 import { Confetti } from "@/components/magicui/confetti";
+import { PlayButton, PlayCard, A } from "@/components/playground";
 
 interface submissionReportItem {
   verdict: string;
@@ -75,11 +71,22 @@ const languages: languageDetails[] = [
   { language: "javascript", id: 63 },
 ];
 
+function diffColor(difficulty?: string) {
+  switch (difficulty?.toLowerCase()) {
+    case "easy":
+      return A.lime;
+    case "medium":
+      return A.amber;
+    case "hard":
+      return A.coral;
+    default:
+      return A.cyan;
+  }
+}
+
 export default function Dashboard() {
   const { questionId } = useParams();
   const router = useRouter();
-
-  const [submissionOutput, setSubmissionOutput] = useState<string[]>([]);
 
   const [testcaseStatus, setTestcaseStatus] = useState<
     ("pending" | "loading" | "accepted" | "failed")[]
@@ -168,8 +175,6 @@ export default function Dashboard() {
   const [showConfetti, setShowConfetti] = useState<boolean>(false);
   const [showBackDialog, setShowBackDialog] = useState<boolean>(false);
   const [saveLoader, setSaveLoader] = useState<boolean>(false);
-  // Only `theme` is needed now — toggling moved to the shared ThemeToggle.
-  const { theme } = useContext(ThemeContext);
 
   const handleSavePlayground = async (): Promise<boolean> => {
     setSaveLoader(true);
@@ -392,8 +397,6 @@ export default function Dashboard() {
     }
   };
 
-
-
   const handleClearOutput = () => {
     setOutput({
       stdout: "",
@@ -407,186 +410,180 @@ export default function Dashboard() {
     });
   };
 
+  const btnBusy = "h-3 w-3 animate-spin rounded-full border-2 border-black/50 border-t-transparent";
+
   return (
     <>
       <Confetti trigger={showConfetti} onComplete={() => setShowConfetti(false)} />
-    <PanelGroup direction="horizontal" className="fixed inset-0 h-dvh w-screen bg-background text-foreground overflow-hidden z-50 font-sans selection:bg-primary-subtle">
-      <Panel defaultSize={40} minSize={25} className="flex flex-col border-r border-border bg-background/50 backdrop-blur-xl">
-        <div className="flex-none h-14 flex items-center gap-4 px-6 border-b border-border bg-muted/20 backdrop-blur-md">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-9 w-9 rounded-xl hover:bg-accent text-muted-foreground hover:text-foreground transition-all duration-300 active:scale-95"
-            onClick={() => setShowBackDialog(true)}
-          >
-            <ArrowLeft className="h-4.5 w-4.5" />
-          </Button>
+      <PanelGroup
+        direction="horizontal"
+        className="dark fixed inset-0 z-50 h-dvh w-screen overflow-hidden bg-[#0a0a0d] font-sans text-white"
+      >
+        {/* ── Problem panel ─────────────────────────────────────── */}
+        <Panel defaultSize={40} minSize={25} className="flex flex-col border-r-[3px] border-black bg-[#0d0d11]">
+          <div className="flex h-14 flex-none items-center gap-3 border-b-[3px] border-black bg-[#141419] px-4">
+            <button
+              onClick={() => setShowBackDialog(true)}
+              aria-label="Back"
+              className="grid size-9 place-items-center rounded-xl border-[3px] border-black bg-[#0d0d11] text-white transition-transform active:scale-95 hover:-translate-x-0.5 hover:-translate-y-0.5"
+            >
+              <ArrowLeft className="size-4" strokeWidth={2.5} />
+            </button>
 
-          <div className="flex flex-col gap-0.5 overflow-hidden">
-            <div className="flex items-center gap-3">
-              <h1 className="truncate text-sm font-semibold tracking-tight text-foreground/90">
+            <div className="flex items-center gap-3 overflow-hidden">
+              <h1 className="truncate text-sm font-extrabold tracking-tight">
                 {questionData.title || "Loading Question..."}
               </h1>
               {questionData.done && (
-                <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-success-subtle border border-success/20 text-[10px] font-bold text-success-fg uppercase tracking-wider">
-                  <CheckCircle2 className="h-3 w-3" />
-                  <span>Solved</span>
-                </div>
+                <span
+                  className="inline-flex shrink-0 items-center gap-1 rounded-md border-2 border-black px-1.5 py-0.5 font-mono text-[0.6rem] font-bold uppercase text-black"
+                  style={{ background: A.lime }}
+                >
+                  <CheckCircle2 className="size-3" strokeWidth={3} />
+                  Solved
+                </span>
               )}
             </div>
           </div>
-        </div>
 
-        <div className="flex-1 overflow-y-auto p-8 scrollbar-thin scrollbar-thumb-muted-foreground/10 scrollbar-track-transparent">
-          {questionData.title ? (
-            <div className="space-y-10 max-w-3xl mx-auto pb-12">
-              <div className="flex items-center gap-4">
-                {/* Third hand-rolled difficulty pill in the codebase — each
-                    with different colours, radius and casing. Now the shared
-                    Badge, which is also case-insensitive (this one only
-                    matched "Easy"/"Medium", so a lowercase value from the API
-                    silently fell through to the "hard" red styling). */}
-                <Badge variant={difficultyVariant(questionData.difficulty)}>
-                  {questionData.difficulty}
-                </Badge>
-                <span className="text-[11px] text-muted-foreground font-medium uppercase tracking-widest">
-                  Memory Limit: 256MB
-                </span>
-              </div>
-
-              <div className="space-y-4">
-                <h2 className="text-xl font-bold tracking-tight text-foreground">Problem Statement</h2>
-                <div className="prose dark:prose-invert prose-sm max-w-none prose-p:text-muted-foreground prose-p:leading-relaxed prose-headings:text-foreground prose-pre:bg-muted/50 prose-pre:border prose-pre:border-border prose-pre:rounded-xl">
-                  <p className="text-[15px] leading-relaxed">{questionData.description}</p>
+          <div className="flex-1 overflow-y-auto p-8">
+            {questionData.title ? (
+              <div className="mx-auto max-w-3xl space-y-10 pb-12">
+                <div className="flex items-center gap-4">
+                  <span
+                    className="inline-flex items-center rounded-md border-2 border-black px-2.5 py-1 font-mono text-xs font-bold uppercase text-black"
+                    style={{ background: diffColor(questionData.difficulty) }}
+                  >
+                    {questionData.difficulty}
+                  </span>
+                  <span className="text-[11px] font-bold uppercase tracking-widest text-white/40">
+                    Memory Limit: 256MB
+                  </span>
                 </div>
-              </div>
 
-              <div className="grid grid-cols-1 gap-8">
-                <div className="space-y-3">
-                  <h3 className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Input Format</h3>
-                  <div className="p-5 rounded-xl bg-muted/30 text-[13px] text-foreground/80 font-mono leading-relaxed border border-border hover:border-primary/30 transition-colors">
-                    {questionData.input_format}
+                <div className="space-y-4">
+                  <h2 className="text-xl font-black tracking-tight">Problem Statement</h2>
+                  <p className="text-[15px] font-medium leading-relaxed text-white/70">
+                    {questionData.description}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 gap-8">
+                  <div className="space-y-3">
+                    <h3 className="text-[11px] font-bold uppercase tracking-widest text-white/50">Input Format</h3>
+                    <div className="rounded-xl border-[3px] border-black bg-[#141419] p-5 font-mono text-[13px] leading-relaxed text-white/80">
+                      {questionData.input_format}
+                    </div>
                   </div>
-                </div>
-                <div className="space-y-3">
-                  <h3 className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Output Format</h3>
-                  <div className="p-5 rounded-xl bg-muted/30 text-[13px] text-foreground/80 font-mono leading-relaxed border border-border hover:border-primary/30 transition-colors">
-                    {questionData.output_format}
+                  <div className="space-y-3">
+                    <h3 className="text-[11px] font-bold uppercase tracking-widest text-white/50">Output Format</h3>
+                    <div className="rounded-xl border-[3px] border-black bg-[#141419] p-5 font-mono text-[13px] leading-relaxed text-white/80">
+                      {questionData.output_format}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="space-y-8">
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Sample Input</h3>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-7 px-3 text-[10px] uppercase font-bold tracking-widest hover:bg-muted text-muted-foreground hover:text-foreground transition-all"
-                      onClick={() => {
-                        navigator.clipboard.writeText(questionData.sample_input || "");
-                        toast.success("Copied Input");
-                      }}
-                    >
-                      Copy
-                    </Button>
-                  </div>
-                  <div className="p-5 rounded-xl bg-muted/20 text-sm text-foreground/80 font-mono border border-border shadow-inner">
-                    <pre className="whitespace-pre-wrap leading-relaxed">{questionData.sample_input}</pre>
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Sample Output</h3>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-7 px-3 text-[10px] uppercase font-bold tracking-widest hover:bg-muted text-muted-foreground hover:text-foreground transition-all"
-                      onClick={() => {
-                        navigator.clipboard.writeText(questionData.sample_output || "");
-                        toast.success("Copied Output");
-                      }}
-                    >
-                      Copy
-                    </Button>
-                  </div>
-                  <div className="p-5 rounded-xl bg-muted/20 text-sm text-foreground/80 font-mono border border-border shadow-inner">
-                    <pre className="whitespace-pre-wrap leading-relaxed">{questionData.sample_output}</pre>
-                  </div>
-                </div>
-              </div>
-
-              {questionData.test_cases.length > 0 && (
-                <div className="pt-10 border-t border-border">
-                  <h3 className="text-sm font-semibold text-foreground/90 uppercase tracking-widest mb-6 px-1">Verification Status</h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {questionData.test_cases.map((testCase, index) => {
-                      const status = testcaseStatus[index];
-                      return (
-                        <div
-                          key={index}
-                          className="flex items-center justify-between p-4 rounded-xl bg-muted/20 border border-border hover:border-primary/30 hover:bg-muted/30 transition-all duration-300 group"
+                <div className="space-y-8">
+                  {[
+                    { label: "Sample Input", value: questionData.sample_input, color: A.cyan },
+                    { label: "Sample Output", value: questionData.sample_output, color: A.lime },
+                  ].map((block) => (
+                    <div key={block.label} className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-[11px] font-bold uppercase tracking-widest text-white/50">{block.label}</h3>
+                        <button
+                          onClick={() => {
+                            navigator.clipboard.writeText(block.value || "");
+                            toast.success(`Copied ${block.label.split(" ")[1]}`);
+                          }}
+                          className="rounded-md border-2 border-black px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-black transition-transform active:scale-95"
+                          style={{ background: block.color }}
                         >
-                          <div className="flex flex-col gap-1">
-                            <span className="text-[10px] font-bold text-muted-foreground group-hover:text-foreground/60 uppercase tracking-widest transition-colors">Test Case</span>
-                            <span className="text-sm font-semibold text-foreground/80">Case #0{index + 1}</span>
-                          </div>
-                          <div className="flex items-center">
-                            {status === "pending" && (
-                              <span className="text-[10px] text-muted-foreground font-bold tracking-widest uppercase">Idle</span>
-                            )}
-                            {status === "loading" && (
-                              <div className="flex items-center gap-2 text-primary-fg">
-                                <span className="text-[10px] font-bold uppercase tracking-widest animate-pulse">Running</span>
-                                <span className="h-3 w-3 animate-spin rounded-full border border-primary border-t-transparent"></span>
-                              </div>
-                            )}
-                            {status === "accepted" && (
-                              <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-success-subtle border border-success/20">
-                                <span className="text-[10px] font-bold text-success-fg uppercase tracking-widest">Passed</span>
-                                <CheckCircle2 className="h-3.5 w-3.5 text-success-fg" />
-                              </div>
-                            )}
-                            {status === "failed" && (
-                              <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-destructive-subtle border border-destructive/20">
-                                <span className="text-[10px] font-bold text-destructive-fg uppercase tracking-widest">Failed</span>
-                                <AlertCircle className="h-3.5 w-3.5 text-destructive-fg" />
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
+                          Copy
+                        </button>
+                      </div>
+                      <div className="rounded-xl border-[3px] border-black bg-[#141419] p-5 font-mono text-sm text-white/80">
+                        <pre className="whitespace-pre-wrap leading-relaxed">{block.value}</pre>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              )}
-            </div>
-          ) : (
-            <div className="space-y-8 max-w-3xl mx-auto mt-10">
-              <Skeleton className="h-6 w-20 bg-muted rounded-full" />
-              <Skeleton className="h-10 w-3/4 bg-muted rounded-xl" />
-              <div className="space-y-4 pt-6">
-                <Skeleton className="h-4 w-full bg-muted rounded-md" />
-                <Skeleton className="h-4 w-full bg-muted rounded-md" />
-                <Skeleton className="h-4 w-2/3 bg-muted rounded-md" />
+
+                {questionData.test_cases.length > 0 && (
+                  <div className="border-t-[3px] border-black pt-10">
+                    <h3 className="mb-6 px-1 text-sm font-black uppercase tracking-widest">Verification Status</h3>
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      {questionData.test_cases.map((testCase, index) => {
+                        const status = testcaseStatus[index];
+                        return (
+                          <div
+                            key={index}
+                            className="flex items-center justify-between rounded-xl border-[3px] border-black bg-[#141419] p-4"
+                          >
+                            <div className="flex flex-col gap-1">
+                              <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">Test Case</span>
+                              <span className="text-sm font-extrabold">Case #0{index + 1}</span>
+                            </div>
+                            <div className="flex items-center">
+                              {status === "pending" && (
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">Idle</span>
+                              )}
+                              {status === "loading" && (
+                                <div className="flex items-center gap-2 text-[var(--pg-cyan)]">
+                                  <span className="animate-pulse text-[10px] font-bold uppercase tracking-widest">Running</span>
+                                  <span className="size-3 animate-spin rounded-full border-2 border-[var(--pg-cyan)] border-t-transparent" />
+                                </div>
+                              )}
+                              {status === "accepted" && (
+                                <span
+                                  className="inline-flex items-center gap-1.5 rounded-md border-2 border-black px-2 py-0.5 text-[10px] font-bold uppercase text-black"
+                                  style={{ background: A.lime }}
+                                >
+                                  Passed
+                                  <CheckCircle2 className="size-3.5" strokeWidth={3} />
+                                </span>
+                              )}
+                              {status === "failed" && (
+                                <span
+                                  className="inline-flex items-center gap-1.5 rounded-md border-2 border-black px-2 py-0.5 text-[10px] font-bold uppercase text-black"
+                                  style={{ background: A.coral }}
+                                >
+                                  Failed
+                                  <AlertCircle className="size-3.5" strokeWidth={3} />
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
-              <Skeleton className="h-48 w-full bg-muted rounded-2xl" />
-            </div>
-          )}
-        </div>
-      </Panel>
+            ) : (
+              <div className="mx-auto mt-10 max-w-3xl space-y-8">
+                <div className="h-6 w-20 animate-pulse rounded-lg bg-white/10" />
+                <div className="h-10 w-3/4 animate-pulse rounded-xl bg-white/10" />
+                <div className="space-y-4 pt-6">
+                  <div className="h-4 w-full animate-pulse rounded bg-white/10" />
+                  <div className="h-4 w-full animate-pulse rounded bg-white/10" />
+                  <div className="h-4 w-2/3 animate-pulse rounded bg-white/10" />
+                </div>
+                <div className="h-48 w-full animate-pulse rounded-2xl bg-white/10" />
+              </div>
+            )}
+          </div>
+        </Panel>
 
-      <PanelResizeHandle className="w-1.5 flex items-center justify-center group bg-border/20 hover:bg-primary transition-all duration-300 relative z-50">
-        <div className="h-8 w-1 rounded-full bg-border group-hover:bg-primary transition-colors" />
-      </PanelResizeHandle>
+        <PanelResizeHandle className="group relative z-50 flex w-1.5 items-center justify-center bg-black transition-colors hover:bg-[var(--pg-lime)]">
+          <div className="h-8 w-1 rounded-full bg-white/20 transition-colors group-hover:bg-black" />
+        </PanelResizeHandle>
 
-      <Panel defaultSize={60}>
-        <PanelGroup direction="vertical">
-          <Panel defaultSize={65} minSize={30} className="flex flex-col bg-background">
-            <div className="flex-none h-14 flex items-center justify-between px-6 border-b border-border bg-muted/20 backdrop-blur-md">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-1.5 bg-muted/40 p-1 rounded-xl border border-border">
+        <Panel defaultSize={60}>
+          <PanelGroup direction="vertical">
+            <Panel defaultSize={65} minSize={30} className="flex flex-col bg-[#0a0a0d]">
+              <div className="flex h-14 flex-none items-center justify-between border-b-[3px] border-black bg-[#141419] px-4">
+                <div className="flex items-center gap-1.5 rounded-xl border-[3px] border-black bg-[#0d0d11] p-1">
                   <Select
                     onValueChange={(value) => {
                       const selected = languages.find((lang) => lang.language === value);
@@ -594,294 +591,266 @@ export default function Dashboard() {
                     }}
                     value={language.language}
                   >
-                    <SelectTrigger className="h-8 w-[140px] border-none bg-transparent hover:bg-muted text-[11px] font-bold uppercase tracking-widest text-foreground/70 focus:ring-0 rounded-lg transition-all">
+                    <SelectTrigger className="h-8 w-[130px] rounded-lg border-none bg-transparent text-[11px] font-bold uppercase tracking-widest text-white/80 focus:ring-0">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="border-border bg-popover text-popover-foreground backdrop-blur-xl">
+                    <SelectContent className="border-[3px] border-black bg-[#141419]">
                       {languages.map((lang) => (
-                        <SelectItem key={lang.id} value={lang.language} className="text-[11px] font-bold uppercase tracking-widest hover:bg-primary/10 focus:bg-primary/20 cursor-pointer">
+                        <SelectItem key={lang.id} value={lang.language} className="text-[11px] font-bold uppercase tracking-widest">
                           {lang.language}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
 
-                  <div className="w-[1px] h-4 bg-border mx-1" />
+                  <div className="mx-1 h-4 w-px bg-white/15" />
 
                   <Select
                     onValueChange={(value) => setFontSize(parseInt(value))}
                     value={fontSize.toString()}
                   >
-                    <SelectTrigger className="h-8 w-[80px] border-none bg-transparent hover:bg-muted text-[11px] font-bold uppercase tracking-widest text-foreground/70 focus:ring-0 rounded-lg transition-all">
+                    <SelectTrigger className="h-8 w-[74px] rounded-lg border-none bg-transparent text-[11px] font-bold uppercase tracking-widest text-white/80 focus:ring-0">
                       <SelectValue placeholder="Size" />
                     </SelectTrigger>
-                    <SelectContent className="border-border bg-popover text-popover-foreground backdrop-blur-xl">
+                    <SelectContent className="border-[3px] border-black bg-[#141419]">
                       {[12, 14, 16, 18, 20, 22, 24].map((size) => (
-                        <SelectItem key={size} value={size.toString()} className="text-[11px] font-bold tracking-widest hover:bg-primary/10 focus:bg-primary/20 cursor-pointer">
+                        <SelectItem key={size} value={size.toString()} className="text-[11px] font-bold tracking-widest">
                           {size}px
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
+
+                <div className="flex items-center gap-2">
+                  <PlayButton
+                    onClick={handleSavePlayground}
+                    disabled={saveLoader}
+                    aria-busy={saveLoader}
+                    fill="#0d0d11"
+                    shadow={A.amber}
+                    text="#ffffff"
+                    className="!px-3 !py-1.5 text-xs"
+                  >
+                    {saveLoader ? <span aria-hidden className={btnBusy} /> : <Save className="size-3.5" strokeWidth={2.5} />}
+                    Save
+                  </PlayButton>
+
+                  <PlayButton
+                    onClick={handleRun}
+                    disabled={rloader}
+                    aria-busy={rloader}
+                    fill="#0d0d11"
+                    shadow={A.cyan}
+                    text="#ffffff"
+                    className="!px-3 !py-1.5 text-xs"
+                  >
+                    {rloader ? <span aria-hidden className={btnBusy} /> : <Play className="size-3.5" strokeWidth={2.5} />}
+                    {rloader ? "Running…" : "Run"}
+                  </PlayButton>
+
+                  <PlayButton
+                    onClick={handleSubmit}
+                    disabled={sloader}
+                    aria-busy={sloader}
+                    fill={A.lime}
+                    shadow={A.coral}
+                    className="!px-3 !py-1.5 text-xs"
+                  >
+                    {sloader ? <span aria-hidden className={btnBusy} /> : <Send className="size-3.5" strokeWidth={2.5} />}
+                    {sloader ? "Submitting…" : "Submit"}
+                  </PlayButton>
+                </div>
               </div>
 
-              <div className="flex items-center gap-2">
-                <ThemeToggle size="icon-sm" />
-
-                <Button
-                  onClick={handleSavePlayground}
-                  disabled={saveLoader}
-                  aria-busy={saveLoader}
-                  variant="ghost"
-                  size="sm"
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  {saveLoader ? (
-                    <span aria-hidden="true" className="h-3 w-3 animate-spin rounded-full border border-current/40 border-t-transparent" />
-                  ) : (
-                    <Save className="h-3.5 w-3.5" aria-hidden="true" />
-                  )}
-                  Save
-                </Button>
-
-                <Button
-                  onClick={handleRun}
-                  disabled={rloader}
-                  aria-busy={rloader}
-                  variant="outline"
-                  size="sm"
-                >
-                  {rloader ? (
-                    <>
-                      <span
-                        aria-hidden="true"
-                        className="h-3 w-3 animate-spin rounded-full border border-current/40 border-t-transparent"
-                      />
-                      Running…
-                    </>
-                  ) : (
-                    <>
-                      <Play className="h-3.5 w-3.5" aria-hidden="true" />
-                      Run
-                    </>
-                  )}
-                </Button>
-
-                <Button
-                  onClick={handleSubmit}
-                  disabled={sloader}
-                  aria-busy={sloader}
-                  size="sm"
-                >
-                  {sloader ? (
-                    <>
-                      <span
-                        aria-hidden="true"
-                        className="h-3 w-3 animate-spin rounded-full border border-current/40 border-t-transparent"
-                      />
-                      Submitting…
-                    </>
-                  ) : (
-                    <>
-                      <Send className="h-3.5 w-3.5" aria-hidden="true" />
-                      Submit
-                    </>
-                  )}
-                </Button>
+              <div className="relative flex-1 border-t-[3px] border-black bg-[#0a0a0d]">
+                <Editor
+                  height="100%"
+                  language={language.language}
+                  theme="vs-dark"
+                  value={code}
+                  onChange={handleCodeChange}
+                  options={{
+                    fontSize,
+                    minimap: { enabled: false },
+                    scrollBeyondLastLine: false,
+                    padding: { top: 24, bottom: 24 },
+                    fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
+                    cursorBlinking: "smooth",
+                    cursorSmoothCaretAnimation: "on",
+                    lineNumbers: "on",
+                    renderLineHighlight: "all",
+                    scrollbar: {
+                      vertical: "visible",
+                      horizontal: "visible",
+                      useShadows: false,
+                      verticalScrollbarSize: 10,
+                      horizontalScrollbarSize: 10,
+                    },
+                  }}
+                />
               </div>
-            </div>
+            </Panel>
 
-            <div className="flex-1 relative bg-background border-t border-border">
-              <Editor
-                height="100%"
-                language={language.language}
-                theme={theme === "dark" ? "vs-dark" : "light"}
-                value={code}
-                onChange={handleCodeChange}
-                options={{
-                  fontSize,
-                  minimap: { enabled: false },
-                  scrollBeyondLastLine: false,
-                  padding: { top: 24, bottom: 24 },
-                  fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
-                  cursorBlinking: "smooth",
-                  cursorSmoothCaretAnimation: "on",
-                  lineNumbers: "on",
-                  renderLineHighlight: "all",
-                  scrollbar: {
-                    vertical: "visible",
-                    horizontal: "visible",
-                    useShadows: false,
-                    verticalScrollbarSize: 10,
-                    horizontalScrollbarSize: 10,
-                  },
-                }}
-              />
-            </div>
-          </Panel>
+            <PanelResizeHandle className="group relative z-50 flex h-1.5 items-center justify-center bg-black transition-colors hover:bg-[var(--pg-lime)]">
+              <div className="h-1 w-8 rounded-full bg-white/20 transition-colors group-hover:bg-black" />
+            </PanelResizeHandle>
 
-          <PanelResizeHandle className="h-1.5 flex items-center justify-center group bg-border/20 hover:bg-primary transition-all duration-300 relative z-50">
-            <div className="w-8 h-1 rounded-full bg-border group-hover:bg-primary transition-colors" />
-          </PanelResizeHandle>
+            <Panel defaultSize={35} minSize={20} className="flex flex-col bg-[#0a0a0d]">
+              <div className="flex h-12 flex-none items-center justify-between border-b-[3px] border-black bg-[#141419] px-4">
+                <div className="flex items-center gap-6">
+                  <div className="flex items-center gap-2 text-[var(--pg-cyan)]">
+                    <Terminal className="size-4" strokeWidth={2.5} />
+                    <span className="text-[11px] font-bold uppercase tracking-widest">Console</span>
+                  </div>
 
-          <Panel defaultSize={35} minSize={20} className="flex flex-col bg-background">
-            <div className="flex-none h-12 flex items-center justify-between px-6 border-b border-border bg-muted/20 backdrop-blur-md">
-              <div className="flex items-center gap-6">
-                <div className="flex items-center gap-2 text-primary-fg">
-                  <Terminal className="h-4 w-4" />
-                  <span className="text-[11px] font-bold uppercase tracking-widest">Execution Console</span>
+                  {output?.status?.id !== 0 && (
+                    <div className="flex items-center gap-4 border-l-[3px] border-black pl-6">
+                      <div className="flex flex-col">
+                        <span className="text-[8px] font-bold uppercase tracking-tighter text-white/40">Status</span>
+                        <span
+                          className="text-[10px] font-bold uppercase tracking-wider"
+                          style={{
+                            color:
+                              output?.status?.id === 3 ? A.lime :
+                              output?.status?.id === 4 ? A.coral :
+                              output?.status?.id === 5 ? A.amber : A.cyan,
+                          }}
+                        >
+                          {output?.status?.description}
+                        </span>
+                      </div>
+
+                      {output.time && (
+                        <div className="flex flex-col">
+                          <span className="text-[8px] font-bold uppercase tracking-tighter text-white/40">Time</span>
+                          <span className="text-[10px] font-bold tabular-nums tracking-wider text-white/70">{output.time}s</span>
+                        </div>
+                      )}
+
+                      {output.memory && (
+                        <div className="flex flex-col">
+                          <span className="text-[8px] font-bold uppercase tracking-tighter text-white/40">Memory</span>
+                          <span className="text-[10px] font-bold tabular-nums tracking-wider text-white/70">{(output.memory / 1024).toFixed(1)}MB</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
 
-                {output?.status?.id !== 0 && (
-                  <div className="flex items-center gap-4 border-l border-border pl-6 animate-in fade-in slide-in-from-left-4 duration-500">
-                    <div className="flex flex-col">
-                      <span className="text-[8px] font-bold text-muted-foreground uppercase tracking-tighter">Status</span>
-                      <span className={`text-[10px] font-bold uppercase tracking-wider ${output?.status?.id === 3 ? "text-success-fg" :
-                        output?.status?.id === 4 ? "text-destructive-fg" :
-                          output?.status?.id === 5 ? "text-warning-fg" :
-                            "text-primary-fg"
-                        }`}>
-                        {output?.status?.description}
-                      </span>
-                    </div>
-
-                    {output.time && (
-                      <div className="flex flex-col">
-                        <span className="text-[8px] font-bold text-muted-foreground uppercase tracking-tighter">Time</span>
-                        <span className="text-[10px] font-bold text-muted-foreground/80 tabular-nums lowercase tracking-wider">{output.time}s</span>
-                      </div>
-                    )}
-
-                    {output.memory && (
-                      <div className="flex flex-col">
-                        <span className="text-[8px] font-bold text-muted-foreground uppercase tracking-tighter">Memory</span>
-                        <span className="text-[10px] font-bold text-muted-foreground/80 tabular-nums lowercase tracking-wider">{(output.memory / 1024).toFixed(1)}MB</span>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
+                <button
                   onClick={handleClearOutput}
-                  className="h-7 px-3 text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground hover:bg-muted transition-all"
+                  className="rounded-lg border-2 border-black bg-[#0d0d11] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white/70 transition-colors hover:text-white"
                 >
                   Clear
-                </Button>
+                </button>
               </div>
-            </div>
 
-            <div className="flex-1 p-0 overflow-hidden flex bg-background">
-              <div className="flex-1 flex flex-col min-w-0">
-                <div className="flex-1 overflow-auto p-6 scrollbar-thin scrollbar-thumb-muted-foreground/10 scrollbar-track-transparent">
-                  <div className="max-w-4xl">
-                    {output.stderr ? (
-                      <div className="space-y-4">
-                        <div className="flex items-center gap-2 text-destructive-fg">
-                          <AlertCircle className="h-3.5 w-3.5" />
-                          <span className="text-[10px] font-bold uppercase tracking-widest">Runtime Error</span>
-                        </div>
-                        <pre className="text-[13px] font-mono text-destructive-fg whitespace-pre-wrap break-all leading-relaxed p-4 rounded-xl bg-destructive-subtle border border-destructive/20">
-                          {output.stderr}
-                        </pre>
-                      </div>
-                    ) : output.compile_output ? (
-                      <div className="space-y-4">
-                        <div className="flex items-center gap-2 text-warning-fg">
-                          <AlertCircle className="h-3.5 w-3.5" />
-                          <span className="text-[10px] font-bold uppercase tracking-widest">Compilation Error</span>
-                        </div>
-                        <pre className="text-[13px] font-mono text-warning-fg whitespace-pre-wrap break-all leading-relaxed p-4 rounded-xl bg-warning-subtle border border-warning/20">
-                          {output.compile_output}
-                        </pre>
-                      </div>
-                    ) : (
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Standard Output</span>
-                        </div>
-                        {output.stdout ? (
-                          <pre className="text-[14px] font-mono text-foreground/90 whitespace-pre-wrap break-all leading-relaxed selection:bg-primary-subtle">
-                            {output.stdout}
-                          </pre>
-                        ) : (
-                          <div className="flex flex-col items-center justify-center py-12 opacity-30 pointer-events-none">
-                            <Terminal className="h-10 w-10 mb-3 text-muted-foreground" />
-                            <p className="text-xs font-medium tracking-widest uppercase">Console Ready</p>
+              <div className="flex flex-1 overflow-hidden bg-[#0a0a0d]">
+                <div className="flex min-w-0 flex-1 flex-col">
+                  <div className="flex-1 overflow-auto p-6">
+                    <div className="max-w-4xl">
+                      {output.stderr ? (
+                        <div className="space-y-4">
+                          <div className="flex items-center gap-2 text-[var(--pg-coral)]">
+                            <AlertCircle className="size-3.5" strokeWidth={3} />
+                            <span className="text-[10px] font-bold uppercase tracking-widest">Runtime Error</span>
                           </div>
-                        )}
-                      </div>
-                    )}
+                          <pre className="whitespace-pre-wrap break-all rounded-xl border-[3px] border-black bg-[#141419] p-4 font-mono text-[13px] leading-relaxed text-[var(--pg-coral)]">
+                            {output.stderr}
+                          </pre>
+                        </div>
+                      ) : output.compile_output ? (
+                        <div className="space-y-4">
+                          <div className="flex items-center gap-2 text-[var(--pg-amber)]">
+                            <AlertCircle className="size-3.5" strokeWidth={3} />
+                            <span className="text-[10px] font-bold uppercase tracking-widest">Compilation Error</span>
+                          </div>
+                          <pre className="whitespace-pre-wrap break-all rounded-xl border-[3px] border-black bg-[#141419] p-4 font-mono text-[13px] leading-relaxed text-[var(--pg-amber)]">
+                            {output.compile_output}
+                          </pre>
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-white/50">Standard Output</span>
+                          {output.stdout ? (
+                            <pre className="whitespace-pre-wrap break-all font-mono text-[14px] leading-relaxed text-white/90">
+                              {output.stdout}
+                            </pre>
+                          ) : (
+                            <div className="pointer-events-none flex flex-col items-center justify-center py-12 opacity-30">
+                              <Terminal className="mb-3 size-10 text-white/40" />
+                              <p className="text-xs font-bold uppercase tracking-widest">Console Ready</p>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="w-[320px] flex flex-col border-l border-border bg-muted/10 backdrop-blur-sm">
-                <div className="flex-none h-10 flex items-center px-5 border-b border-border bg-muted/20">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Test Input</span>
-                </div>
-                <div className="flex-1 relative group">
-                  <textarea
-                    value={customInput}
-                    onChange={(e) => setCustomInput(e.target.value)}
-                    className="absolute inset-0 w-full h-full bg-transparent p-6 text-[13px] font-mono text-foreground/80 resize-none focus:outline-none placeholder:text-muted-foreground/40 scrollbar-thin scrollbar-thumb-muted-foreground/10 transition-all focus:bg-muted/10"
-                    placeholder="Enter process input..."
-                    spellCheck={false}
-                  />
-                  <div className="absolute bottom-4 right-4 text-[9px] font-bold text-muted-foreground group-focus-within:text-primary-fg transition-colors uppercase tracking-tighter">
-                    Editable Stdin
+                <div className="flex w-[320px] flex-col border-l-[3px] border-black bg-[#0d0d11]">
+                  <div className="flex h-10 flex-none items-center border-b-[3px] border-black bg-[#141419] px-5">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-white/50">Test Input</span>
+                  </div>
+                  <div className="group relative flex-1">
+                    <textarea
+                      value={customInput}
+                      onChange={(e) => setCustomInput(e.target.value)}
+                      className="absolute inset-0 h-full w-full resize-none bg-transparent p-6 font-mono text-[13px] text-white/80 placeholder:text-white/30 focus:outline-none"
+                      placeholder="Enter process input..."
+                      spellCheck={false}
+                    />
+                    <div className="absolute bottom-4 right-4 text-[9px] font-bold uppercase tracking-tighter text-white/40 transition-colors group-focus-within:text-[var(--pg-cyan)]">
+                      Editable Stdin
+                    </div>
                   </div>
                 </div>
               </div>
+            </Panel>
+          </PanelGroup>
+        </Panel>
+      </PanelGroup>
+
+      {/* Back-navigation warning dialog */}
+      {showBackDialog && (
+        <div className="dark fixed inset-0 z-[100] flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => setShowBackDialog(false)}
+          />
+          <PlayCard color={A.coral} offset={10} className="relative z-10 mx-4 w-full max-w-sm space-y-4 p-6">
+            <div className="space-y-1.5">
+              <h2 className="text-lg font-black tracking-tight text-white">Leave without saving?</h2>
+              <p className="text-sm font-medium leading-relaxed text-white/60">
+                Your current code hasn&apos;t been saved to the playground. Save it so it&apos;s restored the next time you open this question.
+              </p>
             </div>
-          </Panel>
-        </PanelGroup>
-      </Panel>
-    </PanelGroup>
-
-    {/* Back-navigation warning dialog */}
-    {showBackDialog && (
-      <div className="fixed inset-0 z-[100] flex items-center justify-center">
-        <div
-          className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-          onClick={() => setShowBackDialog(false)}
-        />
-        <div className="relative z-10 w-full max-w-sm mx-4 rounded-2xl border border-border bg-card shadow-2xl p-6 space-y-4">
-          <div className="space-y-1.5">
-            <h2 className="text-base font-semibold text-foreground">Leave without saving?</h2>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Your current code hasn't been saved to the playground. Save it so it's restored the next time you open this question.
-            </p>
-          </div>
-          <div className="flex items-center justify-end gap-2 pt-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleLeaveWithoutSaving}
-            >
-              Leave
-            </Button>
-            <Button
-              size="sm"
-              onClick={handleSaveAndLeave}
-              disabled={saveLoader}
-              aria-busy={saveLoader}
-            >
-              {saveLoader ? (
-                <span aria-hidden="true" className="h-3 w-3 animate-spin rounded-full border border-current/40 border-t-transparent" />
-              ) : (
-                <Save className="h-3.5 w-3.5" aria-hidden="true" />
-              )}
-              Save & Leave
-            </Button>
-          </div>
+            <div className="flex items-center justify-end gap-2 pt-1">
+              <PlayButton
+                onClick={handleLeaveWithoutSaving}
+                fill="#0d0d11"
+                shadow={A.cyan}
+                text="#ffffff"
+                className="!px-4 !py-2 text-sm"
+              >
+                Leave
+              </PlayButton>
+              <PlayButton
+                onClick={handleSaveAndLeave}
+                disabled={saveLoader}
+                aria-busy={saveLoader}
+                fill={A.lime}
+                shadow={A.coral}
+                className="!px-4 !py-2 text-sm"
+              >
+                {saveLoader ? <span aria-hidden className={btnBusy} /> : <Save className="size-3.5" strokeWidth={2.5} />}
+                Save &amp; Leave
+              </PlayButton>
+            </div>
+          </PlayCard>
         </div>
-      </div>
-    )}
+      )}
     </>
   );
 }

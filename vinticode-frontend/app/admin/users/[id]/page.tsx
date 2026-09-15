@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import adminApi from "@/lib/adminApi";
 import Link from "next/link";
 import { ChevronLeft, Loader2, CheckCircle2, XCircle } from "lucide-react";
+import { PlayCard, A } from "@/components/playground";
 
 interface Submission {
   id: string;
@@ -23,18 +24,14 @@ interface UserDetail {
 }
 
 function statusBadge(status: string) {
-  const base = "flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium";
-  if (status === "accepted")
-    return (
-      <span className={`${base} bg-success-subtle text-success-fg`}>
-        <CheckCircle2 className="w-3 h-3" />
-        Accepted
-      </span>
-    );
+  const accepted = status === "accepted";
   return (
-    <span className={`${base} bg-destructive-subtle text-destructive-fg`}>
-      <XCircle className="w-3 h-3" />
-      Rejected
+    <span
+      className="inline-flex items-center gap-1 rounded-md border-2 border-black px-2 py-0.5 font-mono text-xs font-bold uppercase text-black"
+      style={{ background: accepted ? A.lime : A.coral }}
+    >
+      {accepted ? <CheckCircle2 className="size-3" strokeWidth={3} /> : <XCircle className="size-3" strokeWidth={3} />}
+      {accepted ? "Accepted" : "Rejected"}
     </span>
   );
 }
@@ -56,93 +53,86 @@ export default function UserDetailPage() {
   if (loading)
     return (
       <div className="flex items-center justify-center py-24">
-        <Loader2 className="w-8 h-8 animate-spin text-foreground" />
+        <Loader2 className="size-8 animate-spin text-white" />
       </div>
     );
 
   if (!user)
     return (
-      <div className="text-center py-20 text-muted-foreground">User not found.</div>
+      <div className="py-20 text-center font-medium text-white/50">User not found.</div>
     );
 
-  const accepted = user.solvedQuestions.filter(
-    (s) => s.status === "accepted"
-  ).length;
-  const rejected = user.solvedQuestions.filter(
-    (s) => s.status === "rejected"
-  ).length;
+  const accepted = user.solvedQuestions.filter((s) => s.status === "accepted").length;
+  const rejected = user.solvedQuestions.filter((s) => s.status === "rejected").length;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="mx-auto max-w-4xl space-y-6">
       <Link
         href="/admin/users"
-        className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground text-sm transition-colors"
+        className="flex w-fit items-center gap-1.5 text-sm font-bold text-white/60 transition-colors hover:text-white"
       >
-        <ChevronLeft className="w-4 h-4" />
+        <ChevronLeft className="size-4" strokeWidth={2.5} />
         Back to Users
       </Link>
 
       {/* Profile card */}
-      <div className="bg-card border border-border rounded-xl p-6 flex items-center gap-5">
-        <div className="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center shrink-0">
-          <span className="text-primary-foreground text-xl font-bold">
-            {user.name.charAt(0).toUpperCase()}
-          </span>
+      <PlayCard color={A.cyan} offset={8} className="flex items-center gap-5 p-6">
+        <div
+          className="grid size-14 shrink-0 place-items-center rounded-2xl border-[3px] border-black text-black"
+          style={{ background: A.lime }}
+        >
+          <span className="text-xl font-black">{user.name.charAt(0).toUpperCase()}</span>
         </div>
-        <div className="flex-1 min-w-0">
-          <h1 className="text-foreground text-xl font-bold">{user.name}</h1>
-          <p className="text-muted-foreground text-sm">{user.email}</p>
-          <p className="text-muted-foreground text-xs mt-1">
+        <div className="min-w-0 flex-1">
+          <h1 className="text-xl font-extrabold text-white">{user.name}</h1>
+          <p className="text-sm font-medium text-white/55">{user.email}</p>
+          <p className="mt-1 text-xs font-medium text-white/40">
             Joined {new Date(user.createdAt).toLocaleDateString()}
           </p>
         </div>
-        <div className="flex gap-6 text-center shrink-0">
+        <div className="flex shrink-0 gap-6 text-center">
           <div>
-            <p className="text-2xl font-bold text-success-fg">{accepted}</p>
-            <p className="text-muted-foreground text-xs">Accepted</p>
+            <p className="text-2xl font-black text-[var(--pg-lime)]">{accepted}</p>
+            <p className="text-xs font-medium text-white/50">Accepted</p>
           </div>
           <div>
-            <p className="text-2xl font-bold text-destructive-fg">{rejected}</p>
-            <p className="text-muted-foreground text-xs">Rejected</p>
+            <p className="text-2xl font-black text-[var(--pg-coral)]">{rejected}</p>
+            <p className="text-xs font-medium text-white/50">Rejected</p>
           </div>
           <div>
-            <p className="text-2xl font-bold text-foreground">
-              {user.solvedQuestions.length}
-            </p>
-            <p className="text-muted-foreground text-xs">Total</p>
+            <p className="text-2xl font-black text-white">{user.solvedQuestions.length}</p>
+            <p className="text-xs font-medium text-white/50">Total</p>
           </div>
         </div>
-      </div>
+      </PlayCard>
 
       {/* Submissions table */}
-      <div className="bg-card border border-border rounded-xl overflow-hidden">
-        <div className="px-5 py-4 border-b border-border">
-          <h2 className="text-foreground font-semibold text-sm">
-            Submission History
-          </h2>
+      <div className="overflow-hidden rounded-2xl border-[3px] border-black bg-[#141419]">
+        <div className="border-b-[3px] border-black px-5 py-4">
+          <h2 className="text-sm font-extrabold text-white">Submission History</h2>
         </div>
-        <div className="divide-y divide-border">
+        <div className="divide-y-[3px] divide-black/40">
           {user.solvedQuestions.length === 0 ? (
-            <p className="text-muted-foreground text-sm text-center py-10">
+            <p className="py-10 text-center text-sm font-medium text-white/50">
               No submissions yet.
             </p>
           ) : (
             user.solvedQuestions.map((s) => (
               <div
                 key={s.id}
-                className="flex items-center gap-4 px-5 py-3 hover:bg-accent transition-colors"
+                className="flex items-center gap-4 px-5 py-3 transition-colors hover:bg-white/5"
               >
-                <div className="flex-1 min-w-0">
-                  <p className="text-foreground text-sm font-medium truncate">
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-bold text-white">
                     {s.question?.title ?? "—"}
                   </p>
-                  <p className="text-muted-foreground text-xs">
+                  <p className="text-xs font-medium text-white/50">
                     Language ID: {s.languageId}
                   </p>
                 </div>
-                <div className="flex items-center gap-3 shrink-0">
+                <div className="flex shrink-0 items-center gap-3">
                   {statusBadge(s.status)}
-                  <span className="text-muted-foreground text-xs">
+                  <span className="text-xs font-medium text-white/50">
                     {new Date(s.createdAt).toLocaleDateString()}
                   </span>
                 </div>

@@ -4,19 +4,19 @@ import { useState, useEffect } from "react";
 import adminApi from "@/lib/adminApi";
 import TableSkeleton from "@/components/admin/TableSkeleton";
 import { toast } from "react-hot-toast";
-import { Button } from "@/components/ui/button";
 import { EmptyState, ErrorState } from "@/components/ui/states";
-import { 
-  Copy, 
-  Check, 
-  X, 
-  Search, 
-  Filter, 
-  CheckCircle2, 
-  XCircle, 
-  FileCode2, 
-  ChevronLeft, 
-  ChevronRight 
+import { PlayButton, A } from "@/components/playground";
+import {
+  Copy,
+  Check,
+  X,
+  Search,
+  Filter,
+  CheckCircle2,
+  XCircle,
+  FileCode2,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 // Judge0 language names
@@ -52,19 +52,14 @@ interface Pagination {
 }
 
 function statusBadge(status: string) {
-  const base =
-    "flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border";
-  if (status === "accepted")
-    return (
-      <span className={`${base} bg-success-subtle text-success-fg border-success/20`}>
-        <CheckCircle2 className="w-3 h-3" />
-        Accepted
-      </span>
-    );
+  const accepted = status === "accepted";
   return (
-    <span className={`${base} bg-destructive-subtle text-destructive-fg border-destructive/20`}>
-      <XCircle className="w-3 h-3" />
-      Rejected
+    <span
+      className="inline-flex items-center gap-1.5 rounded-md border-2 border-black px-2.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-black"
+      style={{ background: accepted ? A.lime : A.coral }}
+    >
+      {accepted ? <CheckCircle2 className="size-3" strokeWidth={3} /> : <XCircle className="size-3" strokeWidth={3} />}
+      {accepted ? "Accepted" : "Rejected"}
     </span>
   );
 }
@@ -78,15 +73,10 @@ export default function AdminSubmissionsPage() {
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
 
-  // Submission detail modal
   const [selected, setSelected] = useState<Submission | null>(null);
   const [error, setError] = useState(false);
 
-  const fetchSubmissions = async (
-    p = page,
-    q = search,
-    s = filterStatus
-  ) => {
+  const fetchSubmissions = async (p = page, q = search, s = filterStatus) => {
     setLoading(true);
     setError(false);
     try {
@@ -96,9 +86,6 @@ export default function AdminSubmissionsPage() {
       setSubmissions(res.data.submissions ?? []);
       setPagination(res.data.pagination);
     } catch {
-      // try/finally with no catch meant a failed request rejected silently
-      // and left the previous (or empty) list on screen — a network error
-      // was indistinguishable from "no submissions match".
       setError(true);
       setSubmissions([]);
     } finally {
@@ -111,8 +98,6 @@ export default function AdminSubmissionsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
 
-  // Escape closes the code viewer. Click-outside was the only way out,
-  // which leaves keyboard users stuck in the dialog.
   useEffect(() => {
     if (!selected) return;
     const onKey = (e: KeyboardEvent) => {
@@ -122,7 +107,6 @@ export default function AdminSubmissionsPage() {
     return () => window.removeEventListener("keydown", onKey);
   }, [selected]);
 
-  // Prevent the page behind the modal scrolling under it.
   useEffect(() => {
     document.body.style.overflow = selected ? "hidden" : "";
     return () => {
@@ -139,17 +123,16 @@ export default function AdminSubmissionsPage() {
   const handleCopy = (code: string) => {
     navigator.clipboard.writeText(code);
     setCopied(true);
-    // Theming now lives once in layout.tsx so toasts follow the theme.
     toast.success("Code copied to clipboard");
     setTimeout(() => setCopied(false), 2000);
   };
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
+    <div className="mx-auto max-w-7xl space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Submissions</h1>
-        <p className="text-muted-foreground text-sm mt-1">
+        <h1 className="text-3xl font-black tracking-tighter text-white">Submissions</h1>
+        <p className="mt-1 text-sm font-medium text-white/55">
           Monitor code quality and platform activity
         </p>
       </div>
@@ -157,41 +140,39 @@ export default function AdminSubmissionsPage() {
       {/* Filters */}
       <form
         onSubmit={handleSearch}
-        className="flex flex-wrap gap-3 bg-card border border-border rounded-xl p-3 shadow-sm"
+        className="flex flex-wrap gap-3 rounded-2xl border-[3px] border-black bg-[#141419] p-3"
       >
-        <div className="flex-1 min-w-48 flex items-center gap-2">
-          <Search className="w-4 h-4 text-muted-foreground shrink-0" />
+        <div className="flex min-w-48 flex-1 items-center gap-2">
+          <Search className="size-4 shrink-0 text-white/40" />
           <input
             type="text"
             aria-label="Search submissions by user or question"
             placeholder="Search by user or question…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="flex-1 bg-transparent text-foreground text-sm placeholder:text-muted-foreground outline-none"
+            className="flex-1 bg-transparent text-sm font-medium text-white placeholder:text-white/30 outline-none"
           />
         </div>
         <div className="flex items-center gap-2">
-          <Filter className="w-4 h-4 text-muted-foreground" aria-hidden="true" />
+          <Filter className="size-4 text-white/40" aria-hidden="true" />
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
             aria-label="Filter by status"
-            className="cursor-pointer bg-card border border-border text-foreground text-sm rounded-lg px-3 py-1.5 outline-none transition-colors hover:border-border-strong focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+            className="cursor-pointer rounded-lg border-[3px] border-black bg-[#0d0d11] px-3 py-1.5 text-sm font-semibold text-white outline-none"
           >
             <option value="">All Statuses</option>
             <option value="accepted">Accepted</option>
             <option value="rejected">Rejected</option>
           </select>
         </div>
-        {/* Was a bare white button that ignored the shared Button styles,
-            so it had no focus ring, no pressed state and its own height. */}
-        <Button type="submit" size="sm">
+        <PlayButton type="submit" fill={A.cyan} shadow="#0d0d11" text="#0a0a0d" className="!px-5 !py-1.5 text-sm">
           Apply
-        </Button>
+        </PlayButton>
       </form>
 
-      {/* Table Section */}
-      <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm">
+      {/* Table */}
+      <div className="overflow-hidden rounded-2xl border-[3px] border-black bg-[#141419]">
         <div className="overflow-x-auto">
           {loading ? (
             <div className="p-1">
@@ -205,15 +186,9 @@ export default function AdminSubmissionsPage() {
               className="rounded-none border-0"
             />
           ) : submissions.length === 0 ? (
-            /* The copy said "Try adjusting your filters" even when no filter
-               was set — telling a first-time admin to adjust nothing. */
             <EmptyState
               icon={FileCode2}
-              title={
-                search || filterStatus
-                  ? "No matching submissions"
-                  : "No submissions yet"
-              }
+              title={search || filterStatus ? "No matching submissions" : "No submissions yet"}
               description={
                 search || filterStatus
                   ? "No submissions match your current search and filters."
@@ -221,9 +196,11 @@ export default function AdminSubmissionsPage() {
               }
               action={
                 search || filterStatus ? (
-                  <Button
-                    variant="outline"
-                    size="sm"
+                  <PlayButton
+                    fill="#0d0d11"
+                    shadow={A.cyan}
+                    text="#ffffff"
+                    className="!px-4 !py-2 text-sm"
                     onClick={() => {
                       setSearch("");
                       setFilterStatus("");
@@ -232,7 +209,7 @@ export default function AdminSubmissionsPage() {
                     }}
                   >
                     Clear filters
-                  </Button>
+                  </PlayButton>
                 ) : undefined
               }
               className="rounded-none border-0 bg-transparent"
@@ -240,58 +217,49 @@ export default function AdminSubmissionsPage() {
           ) : (
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-border text-left bg-muted">
-                  <th className="px-5 py-4 text-muted-foreground font-medium">User</th>
-                  <th className="px-5 py-4 text-muted-foreground font-medium">Question</th>
-                  <th className="px-5 py-4 text-muted-foreground font-medium">Status</th>
-                  <th className="px-5 py-4 text-muted-foreground font-medium text-center">Language</th>
-                  <th className="px-5 py-4 text-muted-foreground font-medium">Date</th>
-                  <th className="px-5 py-4 text-muted-foreground font-medium text-right">View</th>
+                <tr className="border-b-[3px] border-black bg-[#0d0d11] text-left">
+                  <th className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-white/50">User</th>
+                  <th className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-white/50">Question</th>
+                  <th className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-white/50">Status</th>
+                  <th className="px-5 py-4 text-center text-xs font-bold uppercase tracking-wider text-white/50">Language</th>
+                  <th className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-white/50">Date</th>
+                  <th className="px-5 py-4 text-right text-xs font-bold uppercase tracking-wider text-white/50">View</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border">
+              <tbody className="divide-y-[3px] divide-black/40">
                 {submissions.map((s) => (
-                  <tr
-                    key={s.id}
-                    className="group transition-colors hover:bg-accent"
-                  >
+                  <tr key={s.id} className="group transition-colors hover:bg-white/5">
                     <td className="px-5 py-4">
-                      <p className="text-foreground font-medium group-hover:text-foreground transition-colors">
-                        {s.user?.name ?? "—"}
-                      </p>
-                      <p className="text-muted-foreground text-xs">
-                        {s.user?.email ?? ""}
-                      </p>
+                      <p className="font-bold text-white">{s.user?.name ?? "—"}</p>
+                      <p className="text-xs font-medium text-white/50">{s.user?.email ?? ""}</p>
                     </td>
                     <td className="px-5 py-4">
-                      <p className="text-foreground max-w-xs truncate font-medium">
-                        {s.question?.title ?? "—"}
-                      </p>
-                      <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">
+                      <p className="max-w-xs truncate font-bold text-white">{s.question?.title ?? "—"}</p>
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">
                         {s.question?.difficulty ?? ""}
                       </span>
                     </td>
                     <td className="px-5 py-4">{statusBadge(s.status)}</td>
                     <td className="px-5 py-4 text-center">
-                      <span className="px-2 py-1 bg-muted border border-border rounded text-muted-foreground text-[10px] font-mono">
+                      <span className="rounded-md border-2 border-black bg-[#0d0d11] px-2 py-1 font-mono text-[10px] font-bold text-white/70">
                         {getLang(s.languageId)}
                       </span>
                     </td>
-                    <td className="px-5 py-4 text-muted-foreground text-xs">
+                    <td className="px-5 py-4 text-xs font-medium text-white/50">
                       {new Date(s.createdAt).toLocaleString(undefined, {
-                        month: 'short',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
+                        month: "short",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
                       })}
                     </td>
                     <td className="px-5 py-4 text-right">
                       <button
                         onClick={() => setSelected(s)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted text-foreground hover:text-foreground hover:bg-accent transition-all border border-transparent hover:border-border"
+                        className="inline-flex items-center gap-1.5 rounded-lg border-2 border-black bg-[#0d0d11] px-3 py-1.5 text-white transition-colors hover:bg-[var(--pg-cyan)] hover:text-black"
                       >
-                        <FileCode2 className="w-3.5 h-3.5" />
-                        <span className="text-xs font-medium">Code</span>
+                        <FileCode2 className="size-3.5" strokeWidth={2.5} />
+                        <span className="text-xs font-bold">Code</span>
                       </button>
                     </td>
                   </tr>
@@ -302,27 +270,28 @@ export default function AdminSubmissionsPage() {
         </div>
 
         {pagination && pagination.totalPages > 1 && (
-          <div className="flex items-center justify-between px-5 py-4 border-t border-border bg-muted">
-            <p className="text-muted-foreground text-xs font-medium">
-              Showing <span className="text-foreground">{submissions.length}</span> of <span className="text-foreground">{pagination.total}</span> submissions
+          <div className="flex items-center justify-between border-t-[3px] border-black bg-[#0d0d11] px-5 py-4">
+            <p className="text-xs font-medium text-white/50">
+              Showing <span className="font-bold text-white">{submissions.length}</span> of{" "}
+              <span className="font-bold text-white">{pagination.total}</span> submissions
             </p>
             <div className="flex items-center gap-2">
               <button
                 disabled={page === 1}
                 onClick={() => setPage((p) => p - 1)}
-                className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent disabled:opacity-30 transition-all"
+                className="rounded-lg border-2 border-transparent p-2 text-white/60 transition-all hover:border-black hover:bg-white/5 hover:text-white disabled:opacity-30"
               >
-                <ChevronLeft className="w-4 h-4" />
+                <ChevronLeft className="size-4" strokeWidth={2.5} />
               </button>
-              <span className="text-muted-foreground text-xs font-medium px-2">
+              <span className="px-2 text-xs font-bold text-white/60">
                 Page {page} of {pagination.totalPages}
               </span>
               <button
                 disabled={page === pagination.totalPages}
                 onClick={() => setPage((p) => p + 1)}
-                className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent disabled:opacity-30 transition-all"
+                className="rounded-lg border-2 border-transparent p-2 text-white/60 transition-all hover:border-black hover:bg-white/5 hover:text-white disabled:opacity-30"
               >
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRight className="size-4" strokeWidth={2.5} />
               </button>
             </div>
           </div>
@@ -332,41 +301,37 @@ export default function AdminSubmissionsPage() {
       {/* Code viewer modal */}
       {selected && (
         <div
-          className="fixed inset-0 z-50 bg-foreground/40 flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
           onClick={() => setSelected(null)}
         >
           <div
-            // Announced as a dialog rather than an anonymous div, and
-            // labelled by its own heading. Escape-to-close is wired up in
-            // an effect above — a click-outside-only modal traps keyboard users.
             role="dialog"
             aria-modal="true"
             aria-labelledby="submission-modal-title"
-            className="bg-card border border-border rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden shadow-lg animate-in zoom-in-95 duration-200"
+            className="flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border-[3px] border-black bg-[#141419]"
+            style={{ boxShadow: "12px 12px 0 0 var(--pg-cyan)" }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-6 py-5 border-b border-border bg-muted">
+            <div className="flex items-center justify-between border-b-[3px] border-black bg-[#0d0d11] px-6 py-5">
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-muted border border-border-strong flex items-center justify-center shrink-0">
-                  <FileCode2 className="w-5 h-5 text-foreground" />
+                <div
+                  className="grid size-10 shrink-0 place-items-center rounded-xl border-[3px] border-black text-black"
+                  style={{ background: A.cyan }}
+                >
+                  <FileCode2 className="size-5" strokeWidth={2.5} />
                 </div>
                 <div>
-                  <h3
-                    id="submission-modal-title"
-                    className="text-foreground font-semibold text-lg leading-tight"
-                  >
+                  <h3 id="submission-modal-title" className="text-lg font-extrabold leading-tight text-white">
                     {selected.question?.title}
                   </h3>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="text-muted-foreground text-xs font-medium">
-                      {selected.user?.name}
-                    </span>
-                    <span aria-hidden="true" className="w-1 h-1 rounded-full bg-border-strong" />
-                    <span className="text-foreground text-xs font-mono font-semibold uppercase">
+                  <div className="mt-1 flex items-center gap-2">
+                    <span className="text-xs font-medium text-white/55">{selected.user?.name}</span>
+                    <span aria-hidden="true" className="size-1 rounded-full bg-white/30" />
+                    <span className="font-mono text-xs font-bold uppercase text-white">
                       {getLang(selected.languageId)}
                     </span>
-                    <span aria-hidden="true" className="w-1 h-1 rounded-full bg-border-strong" />
-                    <span className="text-muted-foreground text-xs font-medium">
+                    <span aria-hidden="true" className="size-1 rounded-full bg-white/30" />
+                    <span className="text-xs font-medium text-white/55">
                       {new Date(selected.createdAt).toLocaleString()}
                     </span>
                   </div>
@@ -377,46 +342,40 @@ export default function AdminSubmissionsPage() {
                 <button
                   onClick={() => setSelected(null)}
                   aria-label="Close code viewer"
-                  className="cursor-pointer p-2 text-muted-foreground hover:text-foreground hover:bg-accent rounded-lg transition-colors"
+                  className="cursor-pointer rounded-lg p-2 text-white/50 transition-colors hover:text-white"
                 >
-                  <X className="w-5 h-5" aria-hidden="true" />
+                  <X className="size-5" aria-hidden="true" />
                 </button>
               </div>
             </div>
-            
-            <div className="relative flex-1 overflow-hidden group">
-              {/*
-                Was opacity-0 until group-hover: invisible to keyboard users
-                (who can focus it but see nothing) and unreachable on touch,
-                which has no hover state at all. Now always visible, with
-                hover only strengthening it.
-              */}
+
+            <div className="group relative flex-1 overflow-hidden">
               <button
                 onClick={() => handleCopy(selected.code)}
-                className="absolute top-4 right-4 z-10 flex cursor-pointer items-center gap-2 px-3 py-1.5 bg-card/90 border border-border hover:border-border-strong text-muted-foreground hover:text-foreground rounded-lg backdrop-blur-sm transition-colors text-xs font-medium shadow-sm"
+                className="absolute right-4 top-4 z-10 flex cursor-pointer items-center gap-2 rounded-lg border-2 border-black bg-[#141419] px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-[var(--pg-lime)] hover:text-black"
               >
                 {copied ? (
-                  <Check className="w-3.5 h-3.5 text-success-fg" aria-hidden="true" />
+                  <Check className="size-3.5" strokeWidth={3} aria-hidden="true" />
                 ) : (
-                  <Copy className="w-3.5 h-3.5" aria-hidden="true" />
+                  <Copy className="size-3.5" strokeWidth={2.5} aria-hidden="true" />
                 )}
                 {copied ? "Copied!" : "Copy Code"}
               </button>
 
-              <div className="h-full overflow-auto p-6 bg-elevated font-mono text-sm leading-relaxed text-foreground selection:bg-primary-subtle">
+              <div className="h-full overflow-auto bg-[#0a0a0d] p-6 font-mono text-sm leading-relaxed text-white/90">
                 <pre className="whitespace-pre-wrap break-all">
                   {selected.code || "// No code stored."}
                 </pre>
               </div>
             </div>
-            
-            <div className="px-6 py-4 border-t border-border bg-muted flex items-center justify-end">
-               <button
-                  onClick={() => setSelected(null)}
-                  className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Close
-                </button>
+
+            <div className="flex items-center justify-end border-t-[3px] border-black bg-[#0d0d11] px-6 py-4">
+              <button
+                onClick={() => setSelected(null)}
+                className="rounded-lg px-4 py-2 text-sm font-bold text-white/60 transition-colors hover:text-white"
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>

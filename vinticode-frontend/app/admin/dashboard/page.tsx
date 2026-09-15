@@ -4,8 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import adminApi from "@/lib/adminApi";
 import { Badge, statusVariant, humanize } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState, ErrorState, PageHeader } from "@/components/ui/states";
+import { A } from "@/components/playground";
 import {
   Users,
   BookOpen,
@@ -42,48 +42,37 @@ interface RecentUser {
   createdAt: string;
 }
 
-/*
-  Accents previously stepped bg-white/5 → /10 → /15 → /20 across the six
-  cards. That reads as a meaningless brightness ramp: "Total Users" looked
-  dimmer than "Total Submissions" for no reason, implying a hierarchy that
-  doesn't exist. Now neutral metrics share one neutral treatment and only
-  the outcome metrics (accepted/rejected) carry semantic colour.
-*/
 function StatCard({
   label,
   value,
   icon: Icon,
-  tone = "neutral",
+  color = A.cyan,
   hint,
 }: {
   label: string;
   value: number | string;
   icon: React.ElementType;
-  tone?: "neutral" | "success" | "destructive" | "primary";
+  color?: string;
   hint?: string;
 }) {
-  const tones = {
-    neutral: "bg-muted text-muted-foreground",
-    primary: "bg-primary-subtle text-primary-fg",
-    success: "bg-success-subtle text-success-fg",
-    destructive: "bg-destructive-subtle text-destructive-fg",
-  } as const;
-
   return (
-    <div className="flex items-center gap-4 rounded-xl border border-border bg-card p-5 shadow-xs transition-colors duration-150 hover:border-border-strong">
+    <div
+      className="flex items-center gap-4 rounded-2xl border-[3px] border-black bg-[#141419] p-5"
+      style={{ boxShadow: `5px 5px 0 0 ${color}` }}
+    >
       <div
-        className={`flex size-11 shrink-0 items-center justify-center rounded-xl ${tones[tone]}`}
+        className="grid size-12 shrink-0 place-items-center rounded-xl border-[3px] border-black text-black"
+        style={{ background: color }}
       >
-        <Icon className="size-5" aria-hidden="true" />
+        <Icon className="size-5" strokeWidth={2.5} aria-hidden="true" />
       </div>
       <div className="min-w-0">
-        {/* tabular-nums stops the digits jittering as values update */}
-        <p className="text-2xl font-semibold tabular-nums tracking-tight text-foreground">
+        <p className="text-2xl font-black tabular-nums tracking-tight text-white">
           {typeof value === "number" ? value.toLocaleString() : value}
         </p>
-        <p className="mt-0.5 truncate text-xs text-muted-foreground">
+        <p className="mt-0.5 truncate text-xs font-medium text-white/55">
           {label}
-          {hint && <span className="text-muted-foreground/70"> · {hint}</span>}
+          {hint && <span className="text-white/40"> · {hint}</span>}
         </p>
       </div>
     </div>
@@ -105,7 +94,6 @@ function timeAgo(dateStr: string) {
   });
 }
 
-/** Absolute timestamp for the tooltip — "3d ago" alone isn't auditable. */
 function fullDate(dateStr: string) {
   return new Date(dateStr).toLocaleString(undefined, {
     dateStyle: "medium",
@@ -125,10 +113,10 @@ function Panel({
   children: React.ReactNode;
 }) {
   return (
-    <section className="flex flex-col overflow-hidden rounded-xl border border-border bg-card shadow-xs">
-      <div className="flex items-center gap-2 border-b border-border px-5 py-3.5">
-        <Icon className="size-4 text-muted-foreground" aria-hidden="true" />
-        <h2 className="text-sm font-semibold text-foreground">{title}</h2>
+    <section className="flex flex-col overflow-hidden rounded-2xl border-[3px] border-black bg-[#141419]">
+      <div className="flex items-center gap-2 border-b-[3px] border-black px-5 py-3.5">
+        <Icon className="size-4 text-white/50" strokeWidth={2.5} aria-hidden="true" />
+        <h2 className="text-sm font-extrabold text-white">{title}</h2>
         {action && <div className="ml-auto">{action}</div>}
       </div>
       {children}
@@ -140,17 +128,17 @@ function DashboardSkeleton() {
   return (
     <div className="mx-auto max-w-7xl space-y-8">
       <div className="space-y-2">
-        <Skeleton className="h-7 w-40" />
-        <Skeleton className="h-4 w-64" />
+        <div className="h-8 w-40 animate-pulse rounded bg-white/10" />
+        <div className="h-4 w-64 animate-pulse rounded bg-white/10" />
       </div>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {Array.from({ length: 6 }).map((_, i) => (
-          <Skeleton key={i} className="h-[86px] rounded-xl" />
+          <div key={i} className="h-[86px] animate-pulse rounded-2xl border-[3px] border-black bg-white/10" />
         ))}
       </div>
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-        <Skeleton className="h-80 rounded-xl xl:col-span-2" />
-        <Skeleton className="h-80 rounded-xl" />
+        <div className="h-80 animate-pulse rounded-2xl border-[3px] border-black bg-white/10 xl:col-span-2" />
+        <div className="h-80 animate-pulse rounded-2xl border-[3px] border-black bg-white/10" />
       </div>
     </div>
   );
@@ -172,8 +160,6 @@ export default function AdminDashboardPage() {
       setRecentSubmissions(res.data.recentSubmissions ?? []);
       setRecentUsers(res.data.recentUsers ?? []);
     } catch {
-      // Without this the promise rejection left `loading` true forever and
-      // the screen sat at a spinner with no message and no way to retry.
       setError(true);
     } finally {
       setLoading(false);
@@ -209,26 +195,16 @@ export default function AdminDashboardPage() {
       <PageHeader title="Dashboard" description="Platform overview and recent activity" />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        <StatCard label="Total Users" value={stats?.totalUsers ?? 0} icon={Users} />
-        <StatCard label="Total Questions" value={stats?.totalQuestions ?? 0} icon={BookOpen} />
-        <StatCard label="Total Submissions" value={stats?.totalSubmissions ?? 0} icon={FileCode2} />
-        <StatCard
-          label="Accepted"
-          value={stats?.acceptedSubmissions ?? 0}
-          icon={CheckCircle2}
-          tone="success"
-        />
-        <StatCard
-          label="Rejected"
-          value={stats?.rejectedSubmissions ?? 0}
-          icon={XCircle}
-          tone="destructive"
-        />
+        <StatCard label="Total Users" value={stats?.totalUsers ?? 0} icon={Users} color={A.cyan} />
+        <StatCard label="Total Questions" value={stats?.totalQuestions ?? 0} icon={BookOpen} color={A.indigo} />
+        <StatCard label="Total Submissions" value={stats?.totalSubmissions ?? 0} icon={FileCode2} color={A.amber} />
+        <StatCard label="Accepted" value={stats?.acceptedSubmissions ?? 0} icon={CheckCircle2} color={A.lime} />
+        <StatCard label="Rejected" value={stats?.rejectedSubmissions ?? 0} icon={XCircle} color={A.coral} />
         <StatCard
           label="Acceptance Rate"
           value={`${acceptanceRate}%`}
           icon={TrendingUp}
-          tone="primary"
+          color={A.lime}
           hint={`of ${(stats?.totalSubmissions ?? 0).toLocaleString()}`}
         />
       </div>
@@ -241,7 +217,7 @@ export default function AdminDashboardPage() {
             action={
               <Link
                 href="/admin/submissions"
-                className="rounded text-xs font-medium text-primary-fg transition-colors hover:text-primary hover:underline"
+                className="rounded text-xs font-bold text-[var(--pg-lime)] transition-colors hover:underline"
               >
                 View all
               </Link>
@@ -255,17 +231,17 @@ export default function AdminDashboardPage() {
                 className="rounded-none border-0 bg-transparent"
               />
             ) : (
-              <ul className="divide-y divide-border">
+              <ul className="divide-y-[3px] divide-black/40">
                 {recentSubmissions.map((s) => (
                   <li
                     key={s.id}
-                    className="flex items-center gap-4 px-5 py-3 transition-colors hover:bg-accent/50"
+                    className="flex items-center gap-4 px-5 py-3 transition-colors hover:bg-white/5"
                   >
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-foreground">
+                      <p className="truncate text-sm font-bold text-white">
                         {s.question?.title ?? "—"}
                       </p>
-                      <p className="truncate text-xs text-muted-foreground">
+                      <p className="truncate text-xs font-medium text-white/50">
                         {s.user?.name ?? "Unknown"} · {s.user?.email ?? "—"}
                       </p>
                     </div>
@@ -274,7 +250,7 @@ export default function AdminDashboardPage() {
                       <time
                         dateTime={s.createdAt}
                         title={fullDate(s.createdAt)}
-                        className="hidden w-16 text-right text-xs tabular-nums text-muted-foreground sm:block"
+                        className="hidden w-16 text-right text-xs font-medium tabular-nums text-white/50 sm:block"
                       >
                         {timeAgo(s.createdAt)}
                       </time>
@@ -292,7 +268,7 @@ export default function AdminDashboardPage() {
           action={
             <Link
               href="/admin/users"
-              className="rounded text-xs font-medium text-primary-fg transition-colors hover:text-primary hover:underline"
+              className="rounded text-xs font-bold text-[var(--pg-lime)] transition-colors hover:underline"
             >
               View all
             </Link>
@@ -306,25 +282,28 @@ export default function AdminDashboardPage() {
               className="rounded-none border-0 bg-transparent"
             />
           ) : (
-            <ul className="divide-y divide-border">
+            <ul className="divide-y-[3px] divide-black/40">
               {recentUsers.map((u) => (
                 <li
                   key={u.id}
-                  className="flex items-center gap-3 px-5 py-3 transition-colors hover:bg-accent/50"
+                  className="flex items-center gap-3 px-5 py-3 transition-colors hover:bg-white/5"
                 >
-                  <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary-subtle">
-                    <span className="text-xs font-semibold text-primary-fg">
+                  <div
+                    className="grid size-8 shrink-0 place-items-center rounded-full border-2 border-black text-black"
+                    style={{ background: A.cyan }}
+                  >
+                    <span className="text-xs font-black">
                       {u.name?.charAt(0).toUpperCase() ?? "?"}
                     </span>
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-foreground">{u.name}</p>
-                    <p className="truncate text-xs text-muted-foreground">{u.email}</p>
+                    <p className="truncate text-sm font-bold text-white">{u.name}</p>
+                    <p className="truncate text-xs font-medium text-white/50">{u.email}</p>
                   </div>
                   <time
                     dateTime={u.createdAt}
                     title={fullDate(u.createdAt)}
-                    className="shrink-0 text-xs tabular-nums text-muted-foreground"
+                    className="shrink-0 text-xs font-medium tabular-nums text-white/50"
                   >
                     {timeAgo(u.createdAt)}
                   </time>

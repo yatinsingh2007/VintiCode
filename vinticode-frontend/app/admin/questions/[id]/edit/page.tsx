@@ -47,23 +47,23 @@ export default function EditQuestionPage() {
       <div className="flex items-center gap-3">
         <Link
           href="/admin/questions"
-          className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground text-sm transition-colors"
+          className="flex w-fit items-center gap-1.5 text-sm font-bold text-white/60 transition-colors hover:text-white"
         >
-          <ChevronLeft className="w-4 h-4" />
+          <ChevronLeft className="size-4" strokeWidth={2.5} />
           Back to Questions
         </Link>
       </div>
 
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Edit Question</h1>
-        <p className="text-muted-foreground text-sm mt-1">
+        <h1 className="text-3xl font-black tracking-tighter text-white">Edit Question</h1>
+        <p className="mt-1 text-sm font-medium text-white/55">
           Update the question details and test cases below.
         </p>
       </div>
 
       {fetchLoading ? (
         <div className="flex items-center justify-center py-20">
-          <Loader2 className="w-8 h-8 animate-spin text-foreground" />
+          <Loader2 className="size-8 animate-spin text-white" />
         </div>
       ) : initialData ? (
         <QuestionForm
@@ -74,7 +74,10 @@ export default function EditQuestionPage() {
           error={error}
         />
       ) : (
-        <div className="bg-destructive-subtle border border-destructive/20 text-destructive-fg rounded-xl px-5 py-4 text-sm">
+        <div
+          className="rounded-2xl border-[3px] border-black bg-[#141419] px-5 py-4 text-sm font-semibold text-[var(--pg-coral)]"
+          style={{ boxShadow: "6px 6px 0 0 var(--pg-coral)" }}
+        >
           {error || "Could not load question."}
         </div>
       )}

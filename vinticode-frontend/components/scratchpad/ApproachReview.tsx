@@ -9,7 +9,7 @@ import {
   AlertCircle,
   RotateCcw,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { PlayButton, A } from "@/components/playground";
 import type { ApproachReviewResult } from "@/lib/scratchpadApi";
 
 interface ApproachReviewProps {
@@ -26,8 +26,11 @@ interface ReviewErrorProps {
 
 function SuggestionItem({ text }: { text: string }) {
   return (
-    <li className="flex items-start gap-2.5 text-sm text-muted-foreground">
-      <span className="mt-[3px] h-1.5 w-1.5 shrink-0 rounded-full bg-primary/50" />
+    <li className="flex items-start gap-2.5 text-sm font-medium text-white/70">
+      <span
+        className="mt-[6px] size-2 shrink-0 rounded-full border border-black"
+        style={{ background: A.cyan }}
+      />
       {text}
     </li>
   );
@@ -44,16 +47,12 @@ export function ApproachReview({
     ? {
         icon: CheckCircle2,
         label: "Ready to Start Coding",
-        badgeClass:
-          "text-success-fg bg-success-subtle ring-success/20",
-        iconClass: "text-success-fg",
+        color: A.lime,
       }
     : {
         icon: Lightbulb,
         label: "Consider Thinking a Bit More",
-        badgeClass:
-          "text-warning-fg bg-warning-subtle ring-warning/20",
-        iconClass: "text-warning-fg",
+        color: A.amber,
       };
 
   const Icon = statusConfig.icon;
@@ -63,28 +62,30 @@ export function ApproachReview({
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, ease: "easeOut" }}
-      className="overflow-hidden rounded-2xl border border-border bg-card/50 backdrop-blur-sm"
+      className="overflow-hidden rounded-2xl border-[3px] border-black bg-[#141419]"
+      style={{ boxShadow: `8px 8px 0 0 ${statusConfig.color}` }}
     >
-      <div className="flex items-center gap-2 border-b border-border bg-muted/20 px-5 py-3">
-        <Icon className={`h-3.5 w-3.5 ${statusConfig.iconClass}`} />
-        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+      <div className="flex items-center gap-2 border-b-[3px] border-black bg-[#0d0d11] px-5 py-3">
+        <Icon className="size-3.5" strokeWidth={2.5} style={{ color: statusConfig.color }} />
+        <span className="text-[10px] font-bold uppercase tracking-widest text-white/50">
           Approach Review
         </span>
       </div>
 
       <div className="space-y-4 p-5">
         <span
-          className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wider ring-1 ring-inset ${statusConfig.badgeClass}`}
+          className="inline-flex items-center gap-1.5 rounded-md border-2 border-black px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-black"
+          style={{ background: statusConfig.color }}
         >
-          <Icon className="h-3 w-3" />
+          <Icon className="size-3" strokeWidth={3} />
           {statusConfig.label}
         </span>
 
-        <p className="text-sm leading-relaxed text-foreground">{result.summary}</p>
+        <p className="text-sm font-medium leading-relaxed text-white/85">{result.summary}</p>
 
         {result.suggestions.length > 0 && (
           <div className="space-y-2">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-white/50">
               Things to consider
             </p>
             <ul className="space-y-2">
@@ -96,27 +97,27 @@ export function ApproachReview({
         )}
       </div>
 
-      <div className="flex flex-col-reverse gap-3 border-t border-border bg-muted/10 px-5 py-4 sm:flex-row sm:items-center sm:justify-end">
-        <Button
-          variant="ghost"
+      <div className="flex flex-col-reverse gap-3 border-t-[3px] border-black bg-[#0d0d11] px-5 py-4 sm:flex-row sm:items-center sm:justify-end">
+        <PlayButton
           onClick={onEditApproach}
-          className="h-10 rounded-xl px-5 text-[11px] font-bold uppercase tracking-widest text-muted-foreground transition-all hover:bg-muted hover:text-foreground active:scale-95"
+          fill="#141419"
+          shadow={A.cyan}
+          text="#ffffff"
+          className="!px-5 !py-2.5 text-[11px] uppercase tracking-widest"
         >
-          <PenLine className="h-3.5 w-3.5" />
+          <PenLine className="size-3.5" strokeWidth={2.5} />
           Edit Approach
-        </Button>
+        </PlayButton>
 
-        <Button
+        <PlayButton
           onClick={onContinue}
-          className={`h-10 gap-2 rounded-xl border-none px-6 text-[11px] font-bold uppercase tracking-widest text-foreground shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] transition-all active:scale-95 ${
-            isReady
-              ? "bg-primary hover:bg-primary"
-              : "bg-primary/70 hover:bg-primary/80"
-          }`}
+          fill={A.lime}
+          shadow={A.coral}
+          className="!px-6 !py-2.5 text-[11px] uppercase tracking-widest"
         >
           Continue to Coding
-          <ArrowRight className="h-3.5 w-3.5" />
-        </Button>
+          <ArrowRight className="size-3.5" strokeWidth={3} />
+        </PlayButton>
       </div>
     </motion.div>
   );
@@ -128,38 +129,43 @@ export function ReviewError({ message, onRetry, onContinue }: ReviewErrorProps) 
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, ease: "easeOut" }}
-      className="overflow-hidden rounded-2xl border border-destructive/20 bg-destructive-subtle/30 backdrop-blur-sm"
+      className="overflow-hidden rounded-2xl border-[3px] border-black bg-[#141419]"
+      style={{ boxShadow: `8px 8px 0 0 ${A.coral}` }}
     >
-      <div className="flex items-center gap-2 border-b border-destructive/10 bg-muted/20 px-5 py-3">
-        <AlertCircle className="h-3.5 w-3.5 text-destructive-fg" />
-        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+      <div className="flex items-center gap-2 border-b-[3px] border-black bg-[#0d0d11] px-5 py-3">
+        <AlertCircle className="size-3.5 text-[var(--pg-coral)]" strokeWidth={2.5} />
+        <span className="text-[10px] font-bold uppercase tracking-widest text-white/50">
           Review Failed
         </span>
       </div>
 
       <div className="p-5">
-        <p className="text-sm leading-relaxed text-muted-foreground">
+        <p className="text-sm font-medium leading-relaxed text-white/70">
           {message || "Something went wrong while analyzing your approach."}
         </p>
       </div>
 
-      <div className="flex flex-col-reverse gap-3 border-t border-destructive/10 bg-muted/10 px-5 py-4 sm:flex-row sm:items-center sm:justify-end">
-        <Button
-          variant="ghost"
+      <div className="flex flex-col-reverse gap-3 border-t-[3px] border-black bg-[#0d0d11] px-5 py-4 sm:flex-row sm:items-center sm:justify-end">
+        <PlayButton
           onClick={onContinue}
-          className="h-10 rounded-xl px-5 text-[11px] font-bold uppercase tracking-widest text-muted-foreground transition-all hover:bg-muted hover:text-foreground active:scale-95"
+          fill="#141419"
+          shadow={A.cyan}
+          text="#ffffff"
+          className="!px-5 !py-2.5 text-[11px] uppercase tracking-widest"
         >
           Continue Anyway
-          <ArrowRight className="h-3.5 w-3.5" />
-        </Button>
+          <ArrowRight className="size-3.5" strokeWidth={3} />
+        </PlayButton>
 
-        <Button
+        <PlayButton
           onClick={onRetry}
-          className="h-10 gap-2 rounded-xl border-none bg-primary px-6 text-[11px] font-bold uppercase tracking-widest text-foreground shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] transition-all hover:bg-primary active:scale-95"
+          fill={A.lime}
+          shadow={A.coral}
+          className="!px-6 !py-2.5 text-[11px] uppercase tracking-widest"
         >
-          <RotateCcw className="h-3.5 w-3.5" />
+          <RotateCcw className="size-3.5" strokeWidth={3} />
           Try Again
-        </Button>
+        </PlayButton>
       </div>
     </motion.div>
   );

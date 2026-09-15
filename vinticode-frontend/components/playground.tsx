@@ -12,15 +12,45 @@
   <PlayScreen> MotionConfig wrapper.
 */
 
-import React, { useRef } from "react";
+import React, { useEffect, useLayoutEffect, useRef } from "react";
 import {
   motion,
   MotionConfig,
   useMotionValue,
   useSpring,
 } from "motion/react";
+import gsap from "gsap";
 import confetti from "canvas-confetti";
 import { cn } from "@/lib/utils";
+
+/* useLayoutEffect on the client, useEffect on the server (avoids the SSR warning). */
+const useIsoLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
+
+/*
+  GSAP staggered "pop" reveal. Attach the returned ref to a container, mark
+  the children you want to animate with `data-reveal`, and they spring in with
+  a bouncy back.out ease. Re-runs whenever `active` flips true (e.g. after data
+  loads). Respects prefers-reduced-motion.
+*/
+export function useGsapReveal<T extends HTMLElement = HTMLDivElement>(active = true) {
+  const scope = useRef<T>(null);
+  useIsoLayoutEffect(() => {
+    if (!active || isReduced() || !scope.current) return;
+    const ctx = gsap.context(() => {
+      gsap.from("[data-reveal]", {
+        opacity: 0,
+        y: 30,
+        scale: 0.92,
+        duration: 0.6,
+        ease: "back.out(1.6)",
+        stagger: 0.07,
+        clearProps: "opacity,transform",
+      });
+    }, scope);
+    return () => ctx.revert();
+  }, [active]);
+  return scope;
+}
 
 /* Flat, solid playground accents (the anti-AI-gradient palette). */
 export const A = {

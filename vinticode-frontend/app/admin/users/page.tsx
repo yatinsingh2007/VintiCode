@@ -10,11 +10,10 @@ import {
   ChevronRight,
   ExternalLink,
 } from "lucide-react";
-
 import TableSkeleton from "@/components/admin/TableSkeleton";
 import { toast } from "react-hot-toast";
-import { Button } from "@/components/ui/button";
 import { EmptyState, ErrorState } from "@/components/ui/states";
+import { PlayButton, PlayCard, A } from "@/components/playground";
 
 interface User {
   id: string;
@@ -48,8 +47,6 @@ export default function AdminUsersPage() {
       setUsers(res.data.users ?? []);
       setPagination(res.data.pagination);
     } catch {
-      // try/finally with no catch: a failed request silently rendered the
-      // "No users found" empty state, which reads as "you have no users".
       setError(true);
       setUsers([]);
     } finally {
@@ -70,52 +67,30 @@ export default function AdminUsersPage() {
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    // Per-call inline styling pinned every toast to a dark palette, so
-    // toasts stayed dark on a light page. Theming now lives once in layout.
     toast.success("Copied to clipboard");
   };
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
+    <div className="mx-auto max-w-7xl space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Users</h1>
-          <p className="text-muted-foreground text-sm mt-1">
-            Manage and monitor platform users
-          </p>
-        </div>
+      <div>
+        <h1 className="text-3xl font-black tracking-tighter text-white">Users</h1>
+        <p className="mt-1 text-sm font-medium text-white/55">
+          Manage and monitor platform users
+        </p>
       </div>
 
-      {/*
-        Two of the three cards here were fabricated:
-          • "Active Today"  = Math.floor(total * 0.15) — a made-up ratio
-                              presented as "Estimated active sessions".
-          • "Avg. Solved"   = the hardcoded string "12.4".
-        Neither value exists in the API (/admin/dashboard returns only
-        totals), so both were invented numbers rendered as authoritative
-        platform metrics — the kind of thing an admin makes decisions on.
-        A fake metric is worse than a missing one, so they're gone.
-
-        "Total Users" is real (server-side pagination total). The average
-        below is computed from the rows actually loaded and is labelled as
-        page-scoped rather than passed off as a platform-wide figure.
-      */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="bg-card border border-border rounded-xl p-4">
-          <p className="text-muted-foreground text-xs font-medium uppercase tracking-wider">
-            Total Users
-          </p>
-          <p className="text-2xl font-bold tabular-nums text-foreground mt-1">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <PlayCard color={A.cyan} offset={6} className="p-4">
+          <p className="text-xs font-bold uppercase tracking-wider text-white/50">Total Users</p>
+          <p className="mt-1 text-2xl font-black tabular-nums text-white">
             {loading ? "—" : (pagination?.total ?? 0).toLocaleString()}
           </p>
-          <p className="text-[10px] text-muted-foreground mt-1">Registered accounts</p>
-        </div>
-        <div className="bg-card border border-border rounded-xl p-4">
-          <p className="text-muted-foreground text-xs font-medium uppercase tracking-wider">
-            Avg. Solved
-          </p>
-          <p className="text-2xl font-bold tabular-nums text-foreground mt-1">
+          <p className="mt-1 text-[10px] font-medium text-white/40">Registered accounts</p>
+        </PlayCard>
+        <PlayCard color={A.amber} offset={6} className="p-4">
+          <p className="text-xs font-bold uppercase tracking-wider text-white/50">Avg. Solved</p>
+          <p className="mt-1 text-2xl font-black tabular-nums text-white">
             {loading || users.length === 0
               ? "—"
               : (
@@ -123,37 +98,34 @@ export default function AdminUsersPage() {
                   users.length
                 ).toFixed(1)}
           </p>
-          <p className="text-[10px] text-muted-foreground mt-1">
+          <p className="mt-1 text-[10px] font-medium text-white/40">
             Questions per user · this page only
           </p>
-        </div>
+        </PlayCard>
       </div>
 
       {/* Search */}
       <form
         onSubmit={handleSearch}
-        className="flex gap-3 bg-card border border-border rounded-xl p-3 shadow-sm"
+        className="flex gap-3 rounded-2xl border-[3px] border-black bg-[#141419] p-3"
       >
-        <div className="flex-1 flex items-center gap-2">
-          <Search className="w-4 h-4 text-muted-foreground shrink-0" />
+        <div className="flex flex-1 items-center gap-2">
+          <Search className="size-4 shrink-0 text-white/40" />
           <input
             type="text"
             placeholder="Search by name or email…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="flex-1 bg-transparent text-foreground text-sm placeholder:text-muted-foreground outline-none"
+            className="flex-1 bg-transparent text-sm font-medium text-white placeholder:text-white/30 outline-none"
           />
         </div>
-        <button
-          type="submit"
-          className="px-4 py-1.5 bg-primary hover:bg-primary-hover text-primary-foreground text-sm font-medium rounded-lg transition-colors"
-        >
+        <PlayButton type="submit" fill={A.cyan} shadow="#0d0d11" text="#0a0a0d" className="!px-5 !py-1.5 text-sm">
           Search
-        </button>
+        </PlayButton>
       </form>
 
-      {/* Table Section */}
-      <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm">
+      {/* Table */}
+      <div className="overflow-hidden rounded-2xl border-[3px] border-black bg-[#141419]">
         <div className="overflow-x-auto">
           {loading ? (
             <div className="p-1">
@@ -167,9 +139,6 @@ export default function AdminUsersPage() {
               className="rounded-none border-0"
             />
           ) : users.length === 0 ? (
-            /* Told the admin to "adjust your search criteria" even when no
-               search was active — advice that made no sense on an empty
-               platform. The two cases are now distinguished. */
             <EmptyState
               icon={Users}
               title={search ? "No matching users" : "No users yet"}
@@ -180,9 +149,11 @@ export default function AdminUsersPage() {
               }
               action={
                 search ? (
-                  <Button
-                    variant="outline"
-                    size="sm"
+                  <PlayButton
+                    fill="#0d0d11"
+                    shadow={A.cyan}
+                    text="#ffffff"
+                    className="!px-4 !py-2 text-sm"
                     onClick={() => {
                       setSearch("");
                       setPage(1);
@@ -190,7 +161,7 @@ export default function AdminUsersPage() {
                     }}
                   >
                     Clear search
-                  </Button>
+                  </PlayButton>
                 ) : undefined
               }
               className="rounded-none border-0 bg-transparent"
@@ -198,66 +169,65 @@ export default function AdminUsersPage() {
           ) : (
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-border text-left bg-muted">
-                  <th className="px-5 py-4 text-muted-foreground font-medium">#</th>
-                  <th className="px-5 py-4 text-muted-foreground font-medium">Name</th>
-                  <th className="px-5 py-4 text-muted-foreground font-medium">Email</th>
-                  <th className="px-5 py-4 text-muted-foreground font-medium">Solved</th>
-                  <th className="px-5 py-4 text-muted-foreground font-medium">Joined</th>
-                  <th className="px-5 py-4 text-muted-foreground font-medium text-right">
-                    Actions
-                  </th>
+                <tr className="border-b-[3px] border-black bg-[#0d0d11] text-left">
+                  <th className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-white/50">#</th>
+                  <th className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-white/50">Name</th>
+                  <th className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-white/50">Email</th>
+                  <th className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-white/50">Solved</th>
+                  <th className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-white/50">Joined</th>
+                  <th className="px-5 py-4 text-right text-xs font-bold uppercase tracking-wider text-white/50">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border">
+              <tbody className="divide-y-[3px] divide-black/40">
                 {users.map((u, i) => (
-                  <tr
-                    key={u.id}
-                    className="group transition-colors hover:bg-accent"
-                  >
-                    <td className="px-5 py-4 text-muted-foreground">
+                  <tr key={u.id} className="group transition-colors hover:bg-white/5">
+                    <td className="px-5 py-4 font-mono text-xs text-white/50">
                       {(pagination ? (pagination.page - 1) * 20 : 0) + i + 1}
                     </td>
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-muted border border-border-strong flex items-center justify-center shrink-0">
-                          <span className="text-foreground text-sm font-bold">
+                        <div
+                          className="grid size-9 shrink-0 place-items-center rounded-xl border-2 border-black text-black"
+                          style={{ background: A.lime }}
+                        >
+                          <span className="text-sm font-black">
                             {u.name.charAt(0).toUpperCase()}
                           </span>
                         </div>
-                        <span className="text-foreground font-medium group-hover:text-foreground transition-colors">
-                          {u.name}
-                        </span>
+                        <span className="font-bold text-white">{u.name}</span>
                       </div>
                     </td>
                     <td className="px-5 py-4">
-                      <button 
+                      <button
                         onClick={() => copyToClipboard(u.email)}
-                        className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5"
+                        className="flex items-center gap-1.5 text-white/60 transition-colors hover:text-white"
                         title="Click to copy"
                       >
                         {u.email}
                       </button>
                     </td>
                     <td className="px-5 py-4">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-success-subtle text-success-fg border border-success/20">
+                      <span
+                        className="inline-flex items-center rounded-md border-2 border-black px-2 py-0.5 font-mono text-[10px] font-bold uppercase text-black"
+                        style={{ background: A.lime }}
+                      >
                         {u._count.solvedQuestions} solved
                       </span>
                     </td>
-                    <td className="px-5 py-4 text-muted-foreground">
+                    <td className="px-5 py-4 text-xs font-medium text-white/50">
                       {new Date(u.createdAt).toLocaleDateString(undefined, {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric'
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
                       })}
                     </td>
                     <td className="px-5 py-4 text-right">
                       <Link
                         href={`/admin/users/${u.id}`}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted text-foreground hover:text-foreground hover:bg-accent transition-all border border-transparent hover:border-border"
+                        className="inline-flex items-center gap-1.5 rounded-lg border-2 border-black bg-[#0d0d11] px-3 py-1.5 text-white transition-colors hover:bg-[var(--pg-cyan)] hover:text-black"
                       >
-                        <ExternalLink className="w-3.5 h-3.5" />
-                        <span className="text-xs font-medium">Details</span>
+                        <ExternalLink className="size-3.5" strokeWidth={2.5} />
+                        <span className="text-xs font-bold">Details</span>
                       </Link>
                     </td>
                   </tr>
@@ -268,27 +238,25 @@ export default function AdminUsersPage() {
         </div>
 
         {pagination && pagination.totalPages > 1 && (
-          <div className="flex items-center justify-between px-5 py-3 border-t border-border">
-            <p className="text-muted-foreground text-xs">
-              {pagination.total} total users
-            </p>
+          <div className="flex items-center justify-between border-t-[3px] border-black bg-[#0d0d11] px-5 py-3">
+            <p className="text-xs font-medium text-white/50">{pagination.total} total users</p>
             <div className="flex items-center gap-2">
               <button
                 disabled={page === 1}
                 onClick={() => setPage((p) => p - 1)}
-                className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent disabled:opacity-30 transition-colors"
+                className="rounded-lg border-2 border-transparent p-1.5 text-white/60 transition-all hover:border-black hover:bg-white/5 hover:text-white disabled:opacity-30"
               >
-                <ChevronLeft className="w-4 h-4" />
+                <ChevronLeft className="size-4" strokeWidth={2.5} />
               </button>
-              <span className="text-muted-foreground text-sm">
+              <span className="text-sm font-bold text-white/60">
                 {page} / {pagination.totalPages}
               </span>
               <button
                 disabled={page === pagination.totalPages}
                 onClick={() => setPage((p) => p + 1)}
-                className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent disabled:opacity-30 transition-colors"
+                className="rounded-lg border-2 border-transparent p-1.5 text-white/60 transition-all hover:border-black hover:bg-white/5 hover:text-white disabled:opacity-30"
               >
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRight className="size-4" strokeWidth={2.5} />
               </button>
             </div>
           </div>

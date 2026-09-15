@@ -12,24 +12,28 @@ import { cn } from "@/lib/utils"
   is tuned for dark backgrounds and drops well below AA contrast in light
   mode. These variants read from semantic tokens that are tuned per theme.
 */
+/*
+  Playground badges: flat solid accent, thick black border, black text —
+  a "sticker" pill. Colours come from the --pg-* CSS vars in globals.css.
+*/
 const badgeVariants = cva(
   [
     "inline-flex items-center justify-center gap-1 shrink-0 whitespace-nowrap",
-    "rounded-full border px-2.5 py-0.5 text-xs font-medium w-fit",
+    "rounded-md border-2 border-black px-2 py-0.5 text-xs font-bold font-mono uppercase w-fit",
     "[&>svg]:size-3 [&>svg]:pointer-events-none",
-    "transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50 outline-none",
+    "outline-none",
   ],
   {
     variants: {
       variant: {
-        default: "border-transparent bg-primary text-primary-foreground",
-        secondary: "border-transparent bg-secondary text-secondary-foreground",
-        outline: "border-border text-foreground",
-        muted: "border-border bg-muted text-muted-foreground",
-        success: "border-success/20 bg-success-subtle text-success-fg",
-        warning: "border-warning/20 bg-warning-subtle text-warning-fg",
-        destructive: "border-destructive/20 bg-destructive-subtle text-destructive-fg",
-        info: "border-info/20 bg-info-subtle text-info-fg",
+        default: "bg-[var(--pg-lime)] text-black",
+        secondary: "bg-[#141419] text-white",
+        outline: "border-black bg-transparent text-white",
+        muted: "bg-[#141419] text-white/70",
+        success: "bg-[var(--pg-lime)] text-black",
+        warning: "bg-[var(--pg-amber)] text-black",
+        destructive: "bg-[var(--pg-coral)] text-black",
+        info: "bg-[var(--pg-cyan)] text-black",
       },
     },
     defaultVariants: {

@@ -3,7 +3,6 @@
 import * as React from "react"
 import { AlertTriangle, RefreshCw } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
 
 /*
   Shared feedback states.
@@ -58,20 +57,20 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center text-center",
-        "rounded-xl border border-dashed border-border bg-muted/30",
+        "flex flex-col items-center justify-center text-center text-white",
+        "rounded-2xl border-[3px] border-black bg-[#141419]",
         "px-6 py-14",
         className
       )}
     >
       {Icon && (
-        <div className="mb-4 flex size-11 items-center justify-center rounded-full bg-muted text-muted-foreground">
+        <div className="mb-4 grid size-12 place-items-center rounded-xl border-[3px] border-black bg-[#0d0d11] text-white/60">
           <Icon className="size-5" aria-hidden="true" />
         </div>
       )}
-      <p className="text-base font-medium text-foreground">{title}</p>
+      <p className="text-base font-extrabold">{title}</p>
       {description && (
-        <p className="mt-1 max-w-sm text-sm text-muted-foreground">{description}</p>
+        <p className="mt-1 max-w-sm text-sm font-medium text-white/55">{description}</p>
       )}
       {action && <div className="mt-5">{action}</div>}
     </div>
@@ -93,22 +92,26 @@ export function ErrorState({
     <div
       role="alert"
       className={cn(
-        "flex flex-col items-center justify-center text-center",
-        "rounded-xl border border-destructive/20 bg-destructive-subtle",
+        "flex flex-col items-center justify-center text-center text-white",
+        "rounded-2xl border-[3px] border-black bg-[#141419]",
         "px-6 py-14",
         className
       )}
+      style={{ boxShadow: "8px 8px 0 0 var(--pg-coral)" }}
     >
-      <div className="mb-4 flex size-11 items-center justify-center rounded-full bg-destructive/10 text-destructive-fg">
-        <AlertTriangle className="size-5" aria-hidden="true" />
+      <div className="mb-4 grid size-12 place-items-center rounded-xl border-[3px] border-black bg-[var(--pg-coral)] text-black">
+        <AlertTriangle className="size-5" strokeWidth={2.5} aria-hidden="true" />
       </div>
-      <p className="text-base font-medium text-foreground">{title}</p>
-      <p className="mt-1 max-w-sm text-sm text-muted-foreground">{description}</p>
+      <p className="text-base font-extrabold">{title}</p>
+      <p className="mt-1 max-w-sm text-sm font-medium text-white/55">{description}</p>
       {onRetry && (
-        <Button variant="outline" size="sm" className="mt-5" onClick={onRetry}>
-          <RefreshCw aria-hidden="true" />
+        <button
+          onClick={onRetry}
+          className="mt-5 inline-flex items-center gap-2 rounded-xl border-[3px] border-black bg-[var(--pg-lime)] px-4 py-2 text-sm font-extrabold text-black transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 active:scale-95"
+        >
+          <RefreshCw className="size-4" strokeWidth={2.5} aria-hidden="true" />
           Try again
-        </Button>
+        </button>
       )}
     </div>
   )
@@ -134,11 +137,11 @@ export function PageHeader({
       )}
     >
       <div className="min-w-0">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
+        <h1 className="text-3xl font-black tracking-tighter text-white sm:text-4xl">
           {title}
         </h1>
         {description && (
-          <p className="mt-1 text-sm text-muted-foreground">{description}</p>
+          <p className="mt-1 text-sm font-medium text-white/55">{description}</p>
         )}
       </div>
       {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}

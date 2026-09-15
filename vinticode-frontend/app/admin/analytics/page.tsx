@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import adminApi from "@/lib/adminApi";
 import { ErrorState, PageHeader } from "@/components/ui/states";
+import { A } from "@/components/playground";
 import {
   BarChart3,
   TrendingUp,
@@ -23,70 +24,60 @@ interface Stats {
   rejectedSubmissions: number;
 }
 
-// ─────────────────────────────────────────────
-// Skeleton card
-// ─────────────────────────────────────────────
 function SkeletonCard() {
   return (
-    <div className="bg-card border border-border rounded-xl p-5 animate-pulse">
+    <div className="animate-pulse rounded-2xl border-[3px] border-black bg-[#141419] p-5">
       <div className="flex items-center gap-4">
-        <div className="w-11 h-11 rounded-xl bg-muted" />
+        <div className="size-11 rounded-xl bg-white/10" />
         <div className="flex-1 space-y-2">
-          <div className="h-6 w-16 bg-muted rounded" />
-          <div className="h-3 w-24 bg-muted rounded" />
+          <div className="h-6 w-16 rounded bg-white/10" />
+          <div className="h-3 w-24 rounded bg-white/10" />
         </div>
       </div>
     </div>
   );
 }
 
-// ─────────────────────────────────────────────
-// Stat card with trend indicator
-// ─────────────────────────────────────────────
 function AnalyticCard({
   label,
   value,
   icon: Icon,
-  accent,
+  color = A.cyan,
   sublabel,
   badge,
 }: {
   label: string;
   value: number | string;
   icon: React.ElementType;
-  accent: string;
+  color?: string;
   sublabel?: string;
   badge?: React.ReactNode;
 }) {
   return (
-    <div className="bg-card border border-border rounded-xl p-5 hover:border-border-strong transition-colors duration-200 group">
+    <div
+      className="rounded-2xl border-[3px] border-black bg-[#141419] p-5"
+      style={{ boxShadow: `5px 5px 0 0 ${color}` }}
+    >
       <div className="flex items-start justify-between">
-        {/* The icon inherits the accent's own foreground rather than being
-            forced to text-foreground, which sat at near-zero contrast on the
-            tinted (success/warning) accent chips. */}
         <div
-          className={`w-11 h-11 rounded-xl ${accent} flex items-center justify-center shrink-0`}
+          className="grid size-11 shrink-0 place-items-center rounded-xl border-[3px] border-black text-black"
+          style={{ background: color }}
         >
-          <Icon className="w-5 h-5" aria-hidden="true" />
+          <Icon className="size-5" strokeWidth={2.5} aria-hidden="true" />
         </div>
         {badge && <div>{badge}</div>}
       </div>
       <div className="mt-4">
-        <p className="text-3xl font-bold text-foreground tracking-tight">
+        <p className="text-3xl font-black tracking-tight text-white">
           {typeof value === "number" ? value.toLocaleString() : value}
         </p>
-        <p className="text-muted-foreground text-sm mt-1">{label}</p>
-        {sublabel && (
-          <p className="text-muted-foreground text-xs mt-0.5">{sublabel}</p>
-        )}
+        <p className="mt-1 text-sm font-medium text-white/55">{label}</p>
+        {sublabel && <p className="mt-0.5 text-xs font-medium text-white/40">{sublabel}</p>}
       </div>
     </div>
   );
 }
 
-// ─────────────────────────────────────────────
-// Progress bar
-// ─────────────────────────────────────────────
 function ProgressBar({
   label,
   value,
@@ -104,28 +95,25 @@ function ProgressBar({
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between text-sm">
-        <div className="flex items-center gap-2 text-foreground">
-          <Icon className="w-3.5 h-3.5 text-muted-foreground" />
-          <span>{label}</span>
+        <div className="flex items-center gap-2 text-white">
+          <Icon className="size-3.5 text-white/50" strokeWidth={2.5} />
+          <span className="font-semibold">{label}</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-foreground font-semibold">{value.toLocaleString()}</span>
-          <span className="text-muted-foreground text-xs">({pct}%)</span>
+          <span className="font-bold text-white">{value.toLocaleString()}</span>
+          <span className="text-xs font-medium text-white/50">({pct}%)</span>
         </div>
       </div>
-      <div className="h-2 bg-muted rounded-full overflow-hidden">
+      <div className="h-3 overflow-hidden rounded-full border-2 border-black bg-[#0d0d11]">
         <div
-          className={`h-full ${color} rounded-full transition-all duration-1000 ease-out`}
-          style={{ width: `${pct}%` }}
+          className="h-full rounded-full transition-all duration-1000 ease-out"
+          style={{ width: `${pct}%`, background: color }}
         />
       </div>
     </div>
   );
 }
 
-// ─────────────────────────────────────────────
-// Donut chart (CSS-based)
-// ─────────────────────────────────────────────
 function DonutChart({
   accepted,
   rejected,
@@ -141,49 +129,31 @@ function DonutChart({
 
   return (
     <div className="flex flex-col items-center gap-4">
-      <div className="relative w-36 h-36">
-        {/*
-          Strokes were hardcoded #ffffff / #ef4444 / rgba(255,255,255,0.05).
-          The accepted arc — the whole point of the chart — was pure white
-          and therefore invisible on a white card in light mode, and the
-          track vanished too. Driving them from tokens keeps the chart
-          legible in both themes and consistent with the status colours
-          used everywhere else.
-        */}
+      <div className="relative h-36 w-36">
         <svg
           viewBox="0 0 120 120"
-          className="w-full h-full -rotate-90"
+          className="h-full w-full -rotate-90"
           role="img"
           aria-label={`${pct}% of ${total} submissions accepted`}
         >
-          {/* Track */}
+          <circle cx="60" cy="60" r="54" fill="none" stroke="#0d0d11" strokeWidth="12" />
           <circle
             cx="60"
             cy="60"
             r="54"
             fill="none"
-            stroke="var(--muted)"
+            stroke="var(--pg-coral)"
             strokeWidth="12"
-          />
-          {/* Rejected (full ring, revealed where accepted doesn't cover) */}
-          <circle
-            cx="60"
-            cy="60"
-            r="54"
-            fill="none"
-            stroke="var(--destructive)"
-            strokeWidth="12"
-            strokeOpacity="0.5"
+            strokeOpacity="0.6"
             strokeDasharray={`${circumference}`}
             strokeLinecap="round"
           />
-          {/* Accepted arc */}
           <circle
             cx="60"
             cy="60"
             r="54"
             fill="none"
-            stroke="var(--success)"
+            stroke="var(--pg-lime)"
             strokeWidth="12"
             strokeDasharray={`${acceptedDash} ${circumference}`}
             strokeLinecap="round"
@@ -191,68 +161,59 @@ function DonutChart({
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-2xl font-bold tabular-nums text-foreground">{pct}%</span>
-          <span className="text-muted-foreground text-xs">Acceptance</span>
+          <span className="text-2xl font-black tabular-nums text-white">{pct}%</span>
+          <span className="text-xs font-medium text-white/50">Acceptance</span>
         </div>
       </div>
 
       <div className="flex gap-4 text-xs">
         <div className="flex items-center gap-1.5">
-          <span aria-hidden="true" className="w-2 h-2 rounded-full bg-success" />
-          <span className="text-muted-foreground">Accepted ({accepted})</span>
+          <span aria-hidden="true" className="size-2.5 rounded-full border border-black" style={{ background: A.lime }} />
+          <span className="font-medium text-white/60">Accepted ({accepted})</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span aria-hidden="true" className="w-2 h-2 rounded-full bg-destructive/50" />
-          <span className="text-muted-foreground">Rejected ({rejected})</span>
+          <span aria-hidden="true" className="size-2.5 rounded-full border border-black" style={{ background: A.coral }} />
+          <span className="font-medium text-white/60">Rejected ({rejected})</span>
         </div>
       </div>
     </div>
   );
 }
 
-// ─────────────────────────────────────────────
-// Platform Health score
-// ─────────────────────────────────────────────
 function HealthScore({ score }: { score: number }) {
-  const color =
-    score >= 70
-      ? "text-success-fg"
-      : score >= 40
-      ? "text-warning-fg"
-      : "text-destructive-fg";
-  const label =
-    score >= 70 ? "Healthy" : score >= 40 ? "Moderate" : "Needs Attention";
+  const color = score >= 70 ? A.lime : score >= 40 ? A.amber : A.coral;
+  const label = score >= 70 ? "Healthy" : score >= 40 ? "Moderate" : "Needs Attention";
 
   return (
-    <div className="bg-card border border-border rounded-xl p-6 flex flex-col items-center gap-3">
-      <Activity className="w-6 h-6 text-muted-foreground" />
+    <div
+      className="flex flex-col items-center gap-3 rounded-2xl border-[3px] border-black bg-[#141419] p-6"
+      style={{ boxShadow: `8px 8px 0 0 ${color}` }}
+    >
+      <Activity className="size-6 text-white/50" strokeWidth={2.5} />
       <div className="text-center">
-        <p className={`text-5xl font-bold ${color}`}>{score}</p>
-        <p className="text-muted-foreground text-sm mt-1">Platform Health Score</p>
-        <p className={`text-xs mt-1 ${color}`}>{label}</p>
+        <p className="text-5xl font-black" style={{ color }}>
+          {score}
+        </p>
+        <p className="mt-1 text-sm font-medium text-white/55">Platform Health Score</p>
+        <p className="mt-1 text-xs font-bold" style={{ color }}>
+          {label}
+        </p>
       </div>
-      <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden mt-2">
+      <div className="mt-2 h-2 w-full overflow-hidden rounded-full border-2 border-black bg-[#0d0d11]">
         <div
-          className={`h-full rounded-full ${
-            score >= 70
-              ? "bg-success"
-              : score >= 40
-              ? "bg-warning"
-              : "bg-destructive"
-          }`}
-          style={{ width: `${score}%`, transition: "width 1.2s ease-out" }}
+          className="h-full rounded-full"
+          style={{ width: `${score}%`, background: color, transition: "width 1.2s ease-out" }}
         />
       </div>
-      <p className="text-muted-foreground text-xs text-center">
+      <p className="text-center text-xs font-medium text-white/40">
         Based on acceptance rate, active users & question coverage
       </p>
     </div>
   );
 }
 
-// ─────────────────────────────────────────────
-// Main Analytics Page
-// ─────────────────────────────────────────────
+const panelClass = "rounded-2xl border-[3px] border-black bg-[#141419] p-6";
+
 export default function AdminAnalyticsPage() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -265,9 +226,6 @@ export default function AdminAnalyticsPage() {
       const res = await adminApi.get("/dashboard");
       setStats(res.data.stats);
     } catch {
-      // The .then/.finally chain had no rejection handler, so a failed
-      // request rendered every metric as a confident "0" — worse than an
-      // error, because it looks like real data.
       setError(true);
     } finally {
       setLoading(false);
@@ -280,22 +238,19 @@ export default function AdminAnalyticsPage() {
 
   if (loading) {
     return (
-      <div className="space-y-8 max-w-7xl mx-auto">
+      <div className="mx-auto max-w-7xl space-y-8">
         <div>
-          <div className="h-7 w-32 bg-muted rounded animate-pulse" />
-          <div className="h-4 w-48 bg-muted rounded animate-pulse mt-2" />
+          <div className="h-8 w-32 animate-pulse rounded bg-white/10" />
+          <div className="mt-2 h-4 w-48 animate-pulse rounded bg-white/10" />
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[...Array(4)].map((_, i) => (
             <SkeletonCard key={i} />
           ))}
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           {[...Array(3)].map((_, i) => (
-            <div
-              key={i}
-              className="h-64 bg-muted rounded-xl animate-pulse"
-            />
+            <div key={i} className="h-64 animate-pulse rounded-2xl border-[3px] border-black bg-white/10" />
           ))}
         </div>
       </div>
@@ -304,7 +259,7 @@ export default function AdminAnalyticsPage() {
 
   if (error) {
     return (
-      <div className="space-y-8 max-w-7xl mx-auto">
+      <div className="mx-auto max-w-7xl space-y-8">
         <PageHeader
           title="Analytics"
           description="Platform-wide performance metrics and insights"
@@ -320,67 +275,43 @@ export default function AdminAnalyticsPage() {
 
   const acceptanceRate =
     stats && stats.totalSubmissions > 0
-      ? Math.round(
-          (stats.acceptedSubmissions / stats.totalSubmissions) * 100
-        )
+      ? Math.round((stats.acceptedSubmissions / stats.totalSubmissions) * 100)
       : 0;
 
-  // Health score formula
   const healthScore = Math.min(
     100,
     Math.round(
-      (acceptanceRate * 0.5) +
+      acceptanceRate * 0.5 +
         (Math.min(stats?.totalUsers ?? 0, 100) / 100) * 30 +
         (Math.min(stats?.totalQuestions ?? 0, 50) / 50) * 20
     )
   );
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto">
+    <div className="mx-auto max-w-7xl space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Analytics</h1>
-        <p className="text-muted-foreground text-sm mt-1">
+        <h1 className="text-3xl font-black tracking-tighter text-white">Analytics</h1>
+        <p className="mt-1 text-sm font-medium text-white/55">
           Platform-wide performance metrics and insights
         </p>
       </div>
 
       {/* Top stat cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <AnalyticCard
-          label="Total Users"
-          value={stats?.totalUsers ?? 0}
-          icon={Users}
-          accent="bg-muted text-muted-foreground"
-          sublabel="Registered accounts"
-        />
-        <AnalyticCard
-          label="Total Questions"
-          value={stats?.totalQuestions ?? 0}
-          icon={BookOpen}
-          accent="bg-muted text-muted-foreground"
-          sublabel="Available problems"
-        />
-        <AnalyticCard
-          label="Total Submissions"
-          value={stats?.totalSubmissions ?? 0}
-          icon={FileCode2}
-          accent="bg-muted text-muted-foreground"
-          sublabel="Code submissions"
-        />
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <AnalyticCard label="Total Users" value={stats?.totalUsers ?? 0} icon={Users} color={A.cyan} sublabel="Registered accounts" />
+        <AnalyticCard label="Total Questions" value={stats?.totalQuestions ?? 0} icon={BookOpen} color={A.indigo} sublabel="Available problems" />
+        <AnalyticCard label="Total Submissions" value={stats?.totalSubmissions ?? 0} icon={FileCode2} color={A.amber} sublabel="Code submissions" />
         <AnalyticCard
           label="Acceptance Rate"
           value={`${acceptanceRate}%`}
           icon={Percent}
-          accent="bg-success-subtle text-success-fg"
+          color={A.lime}
           sublabel="Across all submissions"
           badge={
             <span
-              className={`px-2 py-0.5 rounded text-xs font-medium ${
-                acceptanceRate >= 60
-                  ? "bg-success-subtle text-success-fg"
-                  : "bg-warning-subtle text-warning-fg"
-              }`}
+              className="rounded-md border-2 border-black px-2 py-0.5 font-mono text-xs font-bold uppercase text-black"
+              style={{ background: acceptanceRate >= 60 ? A.lime : A.amber }}
             >
               {acceptanceRate >= 60 ? "Good" : "Low"}
             </span>
@@ -389,14 +320,12 @@ export default function AdminAnalyticsPage() {
       </div>
 
       {/* Mid row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Submission breakdown */}
-        <div className="lg:col-span-2 bg-card border border-border rounded-xl p-6 space-y-6">
+        <div className={`${panelClass} space-y-6 lg:col-span-2`}>
           <div className="flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-foreground" />
-            <h2 className="text-foreground font-semibold text-sm">
-              Submission Breakdown
-            </h2>
+            <TrendingUp className="size-4 text-white/60" strokeWidth={2.5} />
+            <h2 className="text-sm font-extrabold text-white">Submission Breakdown</h2>
           </div>
 
           <div className="space-y-5">
@@ -404,59 +333,40 @@ export default function AdminAnalyticsPage() {
               label="Accepted Submissions"
               value={stats?.acceptedSubmissions ?? 0}
               total={stats?.totalSubmissions ?? 0}
-              color="bg-success"
+              color={A.lime}
               icon={CheckCircle2}
             />
             <ProgressBar
               label="Rejected Submissions"
               value={stats?.rejectedSubmissions ?? 0}
               total={stats?.totalSubmissions ?? 0}
-              color="bg-destructive"
+              color={A.coral}
               icon={XCircle}
             />
           </div>
 
-          {/* Quick stats grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-border">
+          <div className="grid grid-cols-2 gap-3 border-t-[3px] border-black pt-4 sm:grid-cols-4">
             {[
-              {
-                label: "Accepted",
-                value: stats?.acceptedSubmissions ?? 0,
-                color: "text-success-fg",
-              },
-              {
-                label: "Rejected",
-                value: stats?.rejectedSubmissions ?? 0,
-                color: "text-destructive-fg",
-              },
-              {
-                label: "Questions",
-                value: stats?.totalQuestions ?? 0,
-                color: "text-foreground",
-              },
-              {
-                label: "Users",
-                value: stats?.totalUsers ?? 0,
-                color: "text-muted-foreground",
-              },
+              { label: "Accepted", value: stats?.acceptedSubmissions ?? 0, color: A.lime },
+              { label: "Rejected", value: stats?.rejectedSubmissions ?? 0, color: A.coral },
+              { label: "Questions", value: stats?.totalQuestions ?? 0, color: "#ffffff" },
+              { label: "Users", value: stats?.totalUsers ?? 0, color: A.cyan },
             ].map(({ label, value, color }) => (
               <div key={label} className="text-center">
-                <p className={`text-xl font-bold ${color}`}>
+                <p className="text-xl font-black" style={{ color }}>
                   {value.toLocaleString()}
                 </p>
-                <p className="text-muted-foreground text-xs mt-0.5">{label}</p>
+                <p className="mt-0.5 text-xs font-medium text-white/50">{label}</p>
               </div>
             ))}
           </div>
         </div>
 
         {/* Donut chart */}
-        <div className="bg-card border border-border rounded-xl p-6 flex flex-col items-center justify-center gap-6">
-          <div className="flex items-center gap-2 w-full">
-            <BarChart3 className="w-4 h-4 text-foreground" />
-            <h2 className="text-foreground font-semibold text-sm">
-              Outcome Distribution
-            </h2>
+        <div className={`${panelClass} flex flex-col items-center justify-center gap-6`}>
+          <div className="flex w-full items-center gap-2">
+            <BarChart3 className="size-4 text-white/60" strokeWidth={2.5} />
+            <h2 className="text-sm font-extrabold text-white">Outcome Distribution</h2>
           </div>
           <DonutChart
             accepted={stats?.acceptedSubmissions ?? 0}
@@ -467,60 +377,46 @@ export default function AdminAnalyticsPage() {
       </div>
 
       {/* Bottom row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Health score */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <HealthScore score={healthScore} />
 
-        {/* Key ratios */}
-        <div className="lg:col-span-2 bg-card border border-border rounded-xl p-6">
-          <div className="flex items-center gap-2 mb-5">
-            <Activity className="w-4 h-4 text-foreground" />
-            <h2 className="text-foreground font-semibold text-sm">
-              Platform Ratios
-            </h2>
+        <div className={`${panelClass} lg:col-span-2`}>
+          <div className="mb-5 flex items-center gap-2">
+            <Activity className="size-4 text-white/60" strokeWidth={2.5} />
+            <h2 className="text-sm font-extrabold text-white">Platform Ratios</h2>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             {[
               {
                 label: "Submissions / User",
-                value:
-                  stats && stats.totalUsers > 0
-                    ? (
-                        stats.totalSubmissions / stats.totalUsers
-                      ).toFixed(1)
-                    : "0",
+                value: stats && stats.totalUsers > 0 ? (stats.totalSubmissions / stats.totalUsers).toFixed(1) : "0",
                 description: "Avg submissions per registered user",
-                accent: "border-border bg-muted",
-                textColor: "text-foreground",
+                color: A.cyan,
               },
               {
                 label: "Solved Rate",
                 value: `${acceptanceRate}%`,
                 description: "Global acceptance across all submissions",
-                accent: "border-success/20 bg-success-subtle",
-                textColor: "text-success-fg",
+                color: A.lime,
               },
               {
                 label: "Questions / User",
-                value:
-                  stats && stats.totalUsers > 0
-                    ? (
-                        stats.totalQuestions / stats.totalUsers
-                      ).toFixed(2)
-                    : "0",
+                value: stats && stats.totalUsers > 0 ? (stats.totalQuestions / stats.totalUsers).toFixed(2) : "0",
                 description: "Available questions per registered user",
-                accent: "border-border bg-muted",
-                textColor: "text-foreground",
+                color: A.amber,
               },
-            ].map(({ label, value, description, accent, textColor }) => (
+            ].map(({ label, value, description, color }) => (
               <div
                 key={label}
-                className={`rounded-xl border p-4 space-y-2 ${accent}`}
+                className="space-y-2 rounded-xl border-[3px] border-black bg-[#0d0d11] p-4"
+                style={{ boxShadow: `4px 4px 0 0 ${color}` }}
               >
-                <p className={`text-2xl font-bold ${textColor}`}>{value}</p>
-                <p className="text-foreground text-sm font-medium">{label}</p>
-                <p className="text-muted-foreground text-xs">{description}</p>
+                <p className="text-2xl font-black" style={{ color }}>
+                  {value}
+                </p>
+                <p className="text-sm font-bold text-white">{label}</p>
+                <p className="text-xs font-medium text-white/45">{description}</p>
               </div>
             ))}
           </div>
