@@ -85,10 +85,12 @@ function diffColor(difficulty?: string) {
 }
 
 /* ── Funky backdrop ──────────────────────────────────────────────────
-   A playful decorative layer behind the trail: sharp outlined brutalist
-   shapes, scattered plus-marks, a squiggle and a star, each drifting on
-   its own slow loop. Purely ornamental (aria-hidden, pointer-events-none,
-   low opacity) and freezes for prefers-reduced-motion. */
+   A bold decorative layer behind the trail: filled "sticker" blobs with
+   hard black offset shadows, a polka-dot field, diagonal hatch stripes,
+   triangles, a semicircle, rings and scattered marks — all flat accent
+   colours (no gradients), each drifting on its own slow loop. Purely
+   ornamental (aria-hidden, pointer-events-none) and freezes for
+   prefers-reduced-motion. */
 function FunkyBackdrop() {
   const reduced = typeof window !== "undefined" && isReduced();
   const float = (dur: number, dy = 16, dr = 6) =>
@@ -98,27 +100,109 @@ function FunkyBackdrop() {
           animate: { y: [0, -dy, 0], rotate: [0, dr, 0] },
           transition: { duration: dur, repeat: Infinity, ease: "easeInOut" as const },
         };
+  const spin = (dur: number) =>
+    reduced
+      ? {}
+      : {
+          animate: { rotate: 360 },
+          transition: { duration: dur, repeat: Infinity, ease: "linear" as const },
+        };
 
   return (
     <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+      {/* Polka-dot field — top right */}
+      <div
+        className="absolute -right-10 -top-10 h-[46vh] w-[46vh] rotate-12"
+        style={{
+          opacity: 0.18,
+          backgroundImage: `radial-gradient(${A.cyan} 3px, transparent 3.5px)`,
+          backgroundSize: "26px 26px",
+          maskImage: "radial-gradient(circle at 70% 30%, #000 20%, transparent 72%)",
+          WebkitMaskImage: "radial-gradient(circle at 70% 30%, #000 20%, transparent 72%)",
+        }}
+      />
+
+      {/* Diagonal hatch stripes — bottom left */}
+      <div
+        className="absolute -bottom-16 -left-16 h-[40vh] w-[40vh] -rotate-12"
+        style={{
+          opacity: 0.16,
+          backgroundImage: `repeating-linear-gradient(45deg, ${A.lime} 0 6px, transparent 6px 16px)`,
+          maskImage: "radial-gradient(circle at 30% 70%, #000 15%, transparent 70%)",
+          WebkitMaskImage: "radial-gradient(circle at 30% 70%, #000 15%, transparent 70%)",
+        }}
+      />
+
+      {/* Filled lime blob sticker — far left gutter */}
+      <motion.div
+        className="absolute left-[4%] top-[30%] size-28 border-[3px] border-black"
+        style={{
+          background: A.lime,
+          opacity: 0.5,
+          borderRadius: "42% 58% 63% 37% / 41% 44% 56% 59%",
+          boxShadow: "7px 7px 0 0 #000",
+        }}
+        {...float(10, 18, 8)}
+      />
+
+      {/* Filled indigo pill sticker — right gutter */}
+      <motion.div
+        className="absolute right-[5%] top-[54%] h-16 w-28 rotate-[-12deg] rounded-full border-[3px] border-black"
+        style={{ background: A.indigo, opacity: 0.45, boxShadow: "6px 6px 0 0 #000" }}
+        {...float(12, 14, -6)}
+      />
+
+      {/* Triangle — upper left */}
+      <motion.svg
+        className="absolute left-[22%] top-[9%]"
+        width="86"
+        height="80"
+        viewBox="0 0 86 80"
+        style={{ opacity: 0.4 }}
+        {...float(9, 16, -10)}
+      >
+        <path
+          d="M43 6 L80 72 L6 72 Z"
+          fill={A.amber}
+          stroke="#000"
+          strokeWidth="3"
+          strokeLinejoin="round"
+        />
+      </motion.svg>
+
+      {/* Semicircle — bottom center-ish */}
+      <motion.div
+        className="absolute bottom-[6%] left-[40%] h-14 w-28 border-[3px] border-black"
+        style={{
+          background: A.coral,
+          opacity: 0.4,
+          borderBottomLeftRadius: 0,
+          borderBottomRightRadius: 0,
+          borderTopLeftRadius: 999,
+          borderTopRightRadius: 999,
+          borderBottom: "none",
+        }}
+        {...float(11, 12, 0)}
+      />
+
       {/* Dashed ring — top left */}
       <motion.div
-        className="absolute left-[6%] top-[14%] size-40 rounded-full border-[3px] border-dashed"
-        style={{ borderColor: A.lime, opacity: 0.22 }}
-        {...float(9, 10, 20)}
+        className="absolute left-[8%] top-[13%] size-40 rounded-full border-[3px] border-dashed"
+        style={{ borderColor: A.lime, opacity: 0.3 }}
+        {...spin(60)}
       />
 
       {/* Tilted hollow square — mid left */}
       <motion.div
-        className="absolute left-[14%] top-[62%] size-24 rounded-2xl border-[3px]"
-        style={{ borderColor: A.cyan, opacity: 0.2, transform: "rotate(18deg)" }}
+        className="absolute left-[16%] top-[64%] size-24 rounded-2xl border-[3px]"
+        style={{ borderColor: A.cyan, opacity: 0.32, transform: "rotate(18deg)" }}
         {...float(11, 20)}
       />
 
       {/* Concentric coral rings — bottom right */}
       <motion.div
-        className="absolute bottom-[10%] right-[8%] grid size-36 place-items-center rounded-full border-[3px]"
-        style={{ borderColor: A.coral, opacity: 0.2 }}
+        className="absolute bottom-[12%] right-[9%] grid size-36 place-items-center rounded-full border-[3px]"
+        style={{ borderColor: A.coral, opacity: 0.32 }}
         {...float(10, 14, -8)}
       >
         <div className="size-20 rounded-full border-[3px]" style={{ borderColor: A.coral }} />
@@ -126,12 +210,12 @@ function FunkyBackdrop() {
 
       {/* Squiggle — top right */}
       <motion.svg
-        className="absolute right-[12%] top-[10%]"
+        className="absolute right-[14%] top-[8%]"
         width="150"
         height="40"
         viewBox="0 0 150 40"
         fill="none"
-        style={{ opacity: 0.28 }}
+        style={{ opacity: 0.42 }}
         {...float(8, 12, 0)}
       >
         <path
@@ -144,33 +228,50 @@ function FunkyBackdrop() {
 
       {/* Star — mid right */}
       <motion.svg
-        className="absolute right-[26%] top-[46%]"
-        width="70"
-        height="70"
+        className="absolute right-[24%] top-[42%]"
+        width="76"
+        height="76"
         viewBox="0 0 24 24"
         fill="none"
-        style={{ opacity: 0.25 }}
-        {...float(12, 18, 30)}
+        style={{ opacity: 0.4 }}
+        {...spin(40)}
       >
         <path
           d="M12 2l2.6 6.6L21 9.3l-5 4.3 1.6 6.4L12 16.9 6.4 20l1.6-6.4-5-4.3 6.4-.7z"
-          stroke={A.indigo}
-          strokeWidth="1.6"
+          fill={A.indigo}
+          stroke="#000"
+          strokeWidth="1.4"
           strokeLinejoin="round"
+          opacity={0.9}
         />
       </motion.svg>
 
+      {/* Small filled dots */}
+      {[
+        { l: "36%", t: "78%", c: A.cyan, s: 18 },
+        { l: "70%", t: "22%", c: A.coral, s: 14 },
+        { l: "88%", t: "40%", c: A.lime, s: 20 },
+      ].map((d, i) => (
+        <motion.div
+          key={`dot-${i}`}
+          className="absolute rounded-full border-[3px] border-black"
+          style={{ left: d.l, top: d.t, width: d.s, height: d.s, background: d.c, opacity: 0.45 }}
+          {...float(7 + i, 10, 0)}
+        />
+      ))}
+
       {/* Scattered plus-marks */}
       {[
-        { l: "40%", t: "20%", c: A.cyan, d: 7 },
-        { l: "78%", t: "68%", c: A.lime, d: 9 },
-        { l: "30%", t: "84%", c: A.amber, d: 8 },
-        { l: "60%", t: "40%", c: A.coral, d: 10 },
+        { l: "42%", t: "18%", c: A.cyan, d: 7 },
+        { l: "80%", t: "70%", c: A.lime, d: 9 },
+        { l: "28%", t: "86%", c: A.amber, d: 8 },
+        { l: "62%", t: "38%", c: A.coral, d: 10 },
+        { l: "54%", t: "6%", c: A.indigo, d: 11 },
       ].map((p, i) => (
         <motion.div
-          key={i}
+          key={`plus-${i}`}
           className="absolute font-black leading-none"
-          style={{ left: p.l, top: p.t, color: p.c, opacity: 0.3, fontSize: 34 }}
+          style={{ left: p.l, top: p.t, color: p.c, opacity: 0.42, fontSize: 38 }}
           {...float(p.d, 12, 0)}
         >
           +
