@@ -45,6 +45,7 @@ import {
   PlayButton,
   PlaySurface,
   A,
+  isReduced,
 } from "@/components/playground";
 
 interface TestCases {
@@ -83,6 +84,102 @@ function diffColor(difficulty?: string) {
   }
 }
 
+/* ── Funky backdrop ──────────────────────────────────────────────────
+   A playful decorative layer behind the trail: sharp outlined brutalist
+   shapes, scattered plus-marks, a squiggle and a star, each drifting on
+   its own slow loop. Purely ornamental (aria-hidden, pointer-events-none,
+   low opacity) and freezes for prefers-reduced-motion. */
+function FunkyBackdrop() {
+  const reduced = typeof window !== "undefined" && isReduced();
+  const float = (dur: number, dy = 16, dr = 6) =>
+    reduced
+      ? {}
+      : {
+          animate: { y: [0, -dy, 0], rotate: [0, dr, 0] },
+          transition: { duration: dur, repeat: Infinity, ease: "easeInOut" as const },
+        };
+
+  return (
+    <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+      {/* Dashed ring — top left */}
+      <motion.div
+        className="absolute left-[6%] top-[14%] size-40 rounded-full border-[3px] border-dashed"
+        style={{ borderColor: A.lime, opacity: 0.22 }}
+        {...float(9, 10, 20)}
+      />
+
+      {/* Tilted hollow square — mid left */}
+      <motion.div
+        className="absolute left-[14%] top-[62%] size-24 rounded-2xl border-[3px]"
+        style={{ borderColor: A.cyan, opacity: 0.2, transform: "rotate(18deg)" }}
+        {...float(11, 20)}
+      />
+
+      {/* Concentric coral rings — bottom right */}
+      <motion.div
+        className="absolute bottom-[10%] right-[8%] grid size-36 place-items-center rounded-full border-[3px]"
+        style={{ borderColor: A.coral, opacity: 0.2 }}
+        {...float(10, 14, -8)}
+      >
+        <div className="size-20 rounded-full border-[3px]" style={{ borderColor: A.coral }} />
+      </motion.div>
+
+      {/* Squiggle — top right */}
+      <motion.svg
+        className="absolute right-[12%] top-[10%]"
+        width="150"
+        height="40"
+        viewBox="0 0 150 40"
+        fill="none"
+        style={{ opacity: 0.28 }}
+        {...float(8, 12, 0)}
+      >
+        <path
+          d="M4 20 Q 22 2, 40 20 T 76 20 T 112 20 T 148 20"
+          stroke={A.amber}
+          strokeWidth="4"
+          strokeLinecap="round"
+        />
+      </motion.svg>
+
+      {/* Star — mid right */}
+      <motion.svg
+        className="absolute right-[26%] top-[46%]"
+        width="70"
+        height="70"
+        viewBox="0 0 24 24"
+        fill="none"
+        style={{ opacity: 0.25 }}
+        {...float(12, 18, 30)}
+      >
+        <path
+          d="M12 2l2.6 6.6L21 9.3l-5 4.3 1.6 6.4L12 16.9 6.4 20l1.6-6.4-5-4.3 6.4-.7z"
+          stroke={A.indigo}
+          strokeWidth="1.6"
+          strokeLinejoin="round"
+        />
+      </motion.svg>
+
+      {/* Scattered plus-marks */}
+      {[
+        { l: "40%", t: "20%", c: A.cyan, d: 7 },
+        { l: "78%", t: "68%", c: A.lime, d: 9 },
+        { l: "30%", t: "84%", c: A.amber, d: 8 },
+        { l: "60%", t: "40%", c: A.coral, d: 10 },
+      ].map((p, i) => (
+        <motion.div
+          key={i}
+          className="absolute font-black leading-none"
+          style={{ left: p.l, top: p.t, color: p.c, opacity: 0.3, fontSize: 34 }}
+          {...float(p.d, 12, 0)}
+        >
+          +
+        </motion.div>
+      ))}
+    </div>
+  );
+}
+
 export default function DashboardHomePage() {
   const [open, setOpen] = useState(false);
   const router = useRouter();
@@ -116,6 +213,7 @@ export default function DashboardHomePage() {
   return (
     <div className="dark relative mx-auto flex h-svh w-full flex-1 flex-col bg-[#0a0a0d] text-white md:flex-row">
       <PlaySurface />
+      <FunkyBackdrop />
       <div className="z-10 border-black bg-[#0d0d11] md:border-r-[3px]">
         <Sidebar open={open} setOpen={setOpen}>
           <SidebarBody className="justify-between gap-8">
