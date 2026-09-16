@@ -26,9 +26,9 @@ interface ReviewErrorProps {
 
 function SuggestionItem({ text }: { text: string }) {
   return (
-    <li className="flex items-start gap-2.5 text-sm font-medium text-white/70">
+    <li className="flex items-start gap-2.5 text-sm font-medium text-pg-text-muted">
       <span
-        className="mt-[6px] size-2 shrink-0 rounded-full border border-black"
+        className="mt-[6px] size-2 shrink-0 rounded-full border border-pg-border"
         style={{ background: A.cyan }}
       />
       {text}
@@ -62,30 +62,30 @@ export function ApproachReview({
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, ease: "easeOut" }}
-      className="overflow-hidden rounded-2xl border-[3px] border-black bg-[#141419]"
+      className="overflow-hidden rounded-2xl border-[3px] border-pg-border bg-pg-surface"
       style={{ boxShadow: `8px 8px 0 0 ${statusConfig.color}` }}
     >
-      <div className="flex items-center gap-2 border-b-[3px] border-black bg-[#0d0d11] px-5 py-3">
+      <div className="flex items-center gap-2 border-b-[3px] border-pg-border bg-pg-surface px-5 py-3">
         <Icon className="size-3.5" strokeWidth={2.5} style={{ color: statusConfig.color }} />
-        <span className="text-[10px] font-bold uppercase tracking-widest text-white/50">
+        <span className="text-[10px] font-bold uppercase tracking-widest text-pg-text-muted">
           Approach Review
         </span>
       </div>
 
       <div className="space-y-4 p-5">
         <span
-          className="inline-flex items-center gap-1.5 rounded-md border-2 border-black px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-black"
+          className="inline-flex items-center gap-1.5 rounded-md border-2 border-pg-border px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-black"
           style={{ background: statusConfig.color }}
         >
           <Icon className="size-3" strokeWidth={3} />
           {statusConfig.label}
         </span>
 
-        <p className="text-sm font-medium leading-relaxed text-white/85">{result.summary}</p>
+        <p className="text-sm font-medium leading-relaxed text-pg-text">{result.summary}</p>
 
         {result.suggestions.length > 0 && (
           <div className="space-y-2">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-white/50">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-pg-text-muted">
               Things to consider
             </p>
             <ul className="space-y-2">
@@ -97,7 +97,7 @@ export function ApproachReview({
         )}
       </div>
 
-      <div className="flex flex-col-reverse gap-3 border-t-[3px] border-black bg-[#0d0d11] px-5 py-4 sm:flex-row sm:items-center sm:justify-end">
+      <div className="flex flex-col-reverse gap-3 border-t-[3px] border-pg-border bg-pg-surface px-5 py-4 sm:flex-row sm:items-center sm:justify-end">
         <PlayButton
           onClick={onEditApproach}
           fill="#141419"
@@ -129,23 +129,23 @@ export function ReviewError({ message, onRetry, onContinue }: ReviewErrorProps) 
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, ease: "easeOut" }}
-      className="overflow-hidden rounded-2xl border-[3px] border-black bg-[#141419]"
+      className="overflow-hidden rounded-2xl border-[3px] border-pg-border bg-pg-surface"
       style={{ boxShadow: `8px 8px 0 0 ${A.coral}` }}
     >
-      <div className="flex items-center gap-2 border-b-[3px] border-black bg-[#0d0d11] px-5 py-3">
-        <AlertCircle className="size-3.5 text-[var(--pg-coral)]" strokeWidth={2.5} />
-        <span className="text-[10px] font-bold uppercase tracking-widest text-white/50">
+      <div className="flex items-center gap-2 border-b-[3px] border-pg-border bg-pg-surface px-5 py-3">
+        <AlertCircle className="size-3.5 text-pg-coral-ink" strokeWidth={2.5} />
+        <span className="text-[10px] font-bold uppercase tracking-widest text-pg-text-muted">
           Review Failed
         </span>
       </div>
 
       <div className="p-5">
-        <p className="text-sm font-medium leading-relaxed text-white/70">
+        <p className="text-sm font-medium leading-relaxed text-pg-text-muted">
           {message || "Something went wrong while analyzing your approach."}
         </p>
       </div>
 
-      <div className="flex flex-col-reverse gap-3 border-t-[3px] border-black bg-[#0d0d11] px-5 py-4 sm:flex-row sm:items-center sm:justify-end">
+      <div className="flex flex-col-reverse gap-3 border-t-[3px] border-pg-border bg-pg-surface px-5 py-4 sm:flex-row sm:items-center sm:justify-end">
         <PlayButton
           onClick={onContinue}
           fill="#141419"

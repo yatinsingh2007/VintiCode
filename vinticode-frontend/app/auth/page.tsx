@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 import { PlayScreen, PlayCard, Sticker, LogoMark, A } from "@/components/playground";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const tabs = [
   { id: "signup", label: "Sign Up" },
@@ -27,10 +28,16 @@ export default function AuthPage(): React.ReactNode {
         whileTap={{ scale: 0.92 }}
         initial={{ boxShadow: "3px 3px 0 0 var(--pg-cyan)" }}
         transition={{ type: "spring", stiffness: 400, damping: 14 }}
-        className="absolute left-4 top-4 z-20 grid size-10 place-items-center rounded-xl border-[3px] border-black bg-[#141419] text-white"
+        className="absolute left-4 top-4 z-20 grid size-10 place-items-center rounded-xl border-[3px] border-pg-border bg-pg-surface text-pg-text"
       >
         <ArrowLeft strokeWidth={2.5} />
       </motion.button>
+
+      {/* Theme toggle */}
+      <ThemeToggle
+        size="icon-sm"
+        className="absolute right-4 top-4 z-20 border-[3px] border-pg-border bg-pg-surface"
+      />
 
       {/* scattered stickers */}
       <Sticker color={A.cyan} className="left-[12%] top-[18%] hidden lg:block" from={-8} to={4}>
@@ -54,7 +61,7 @@ export default function AuthPage(): React.ReactNode {
 
         <PlayCard color={A.cyan} offset={10} className="overflow-hidden p-6">
           {/* Tab switcher */}
-          <div className="mb-6 flex gap-2 rounded-xl border-[3px] border-black bg-[#0d0d11] p-1.5">
+          <div className="mb-6 flex gap-2 rounded-xl border-[3px] border-pg-border bg-pg-surface p-1.5">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
@@ -66,14 +73,14 @@ export default function AuthPage(): React.ReactNode {
                   <motion.span
                     layoutId="auth-tab"
                     transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                    className="absolute inset-0 rounded-lg border-[3px] border-black"
+                    className="absolute inset-0 rounded-lg border-[3px] border-pg-border"
                     style={{ background: A.lime }}
                   />
                 )}
                 <span
                   className={cn(
                     "relative z-10",
-                    activeTab === tab.id ? "text-black" : "text-white/60 hover:text-white"
+                    activeTab === tab.id ? "text-black" : "text-pg-text-muted hover:text-pg-text"
                   )}
                 >
                   {tab.label}

@@ -6,13 +6,13 @@ export const Logo = () => {
   return (
     <Link
       href="/dashboard/home"
-      className="relative z-20 flex items-center gap-2.5 rounded-md py-1 text-sm font-normal text-white"
+      className="relative z-20 flex items-center gap-2.5 rounded-md py-1 text-sm font-normal text-pg-text"
     >
       <LogoMark className="size-7" />
       <motion.span
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="whitespace-pre text-base font-extrabold tracking-tight text-white"
+        className="whitespace-pre text-base font-extrabold tracking-tight text-pg-text"
       >
         VintiCode
       </motion.span>

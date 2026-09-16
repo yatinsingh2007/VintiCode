@@ -116,7 +116,7 @@ export function PlayScreen({
     <MotionConfig reducedMotion="user">
       <div
         className={cn(
-          "dark relative min-h-screen overflow-x-clip bg-[#0a0a0d] text-white",
+          "relative min-h-screen overflow-x-clip bg-pg-ink bg-paper-grid text-pg-text",
           className
         )}
       >
@@ -131,7 +131,6 @@ export function PlayScreen({
 export function PlaySurface() {
   return (
     <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-      <div className="bg-grid-bold absolute inset-0 [mask-image:radial-gradient(130%_100%_at_50%_0%,#000_25%,transparent_75%)]" />
       <div
         className="absolute -left-[10%] -top-[10%] h-[46vh] w-[46vh] rounded-full opacity-[0.12] blur-[90px]"
         style={{ background: A.lime }}
@@ -250,7 +249,7 @@ export function PlayButton({
       disabled={disabled}
       style={{ background: fill, color: text }}
       className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-xl border-[3px] border-black px-6 py-3 text-base font-extrabold tracking-tight",
+        "inline-flex items-center justify-center gap-2 rounded-xl border-[3px] border-pg-border px-6 py-3 text-base font-extrabold tracking-tight",
         "disabled:cursor-not-allowed disabled:opacity-60",
         className
       )}
@@ -283,7 +282,7 @@ export function PlayCard({
 } & React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn("rounded-2xl border-[3px] border-black", className)}
+      className={cn("rounded-2xl border-[3px] border-pg-border", className)}
       style={{ background: surface, boxShadow: `${offset}px ${offset}px 0 0 ${color}`, ...style }}
       {...props}
     >
@@ -305,7 +304,7 @@ export function IconTile({
   return (
     <div
       className={cn(
-        "grid size-12 shrink-0 place-items-center rounded-xl border-[3px] border-black text-black",
+        "grid size-12 shrink-0 place-items-center rounded-xl border-[3px] border-pg-border text-black",
         className
       )}
       style={{ background: color }}
@@ -331,7 +330,7 @@ export function PlayBadge({
     <span
       style={{ background: color, transform: `rotate(${rotate}deg)` }}
       className={cn(
-        "inline-flex items-center rounded-lg border-[3px] border-black px-3 py-1 font-mono text-xs font-bold text-black",
+        "inline-flex items-center rounded-lg border-[3px] border-pg-border px-3 py-1 font-mono text-xs font-bold text-black",
         className
       )}
     >
@@ -370,7 +369,7 @@ export function Sticker({
     >
       <span
         style={{ background: color }}
-        className="inline-block rounded-lg border-[3px] border-black px-3 py-1 font-mono text-sm font-bold text-black shadow-[3px_3px_0_0_#000]"
+        className="inline-block rounded-lg border-[3px] border-pg-border px-3 py-1 font-mono text-sm font-bold text-black shadow-[3px_3px_0_0_#000]"
       >
         {children}
       </span>
@@ -393,7 +392,7 @@ export function PlaySectionHeading({
   return (
     <div className={cn("mx-auto max-w-2xl text-center", className)}>
       <span
-        className="inline-block -rotate-2 rounded-lg border-[3px] border-black px-3 py-1 font-mono text-xs font-bold uppercase tracking-wider text-black shadow-[3px_3px_0_0_#000]"
+        className="inline-block -rotate-2 rounded-lg border-[3px] border-pg-border px-3 py-1 font-mono text-xs font-bold uppercase tracking-wider text-black shadow-[3px_3px_0_0_#000]"
         style={{ background: kickerColor }}
       >
         {kicker}
@@ -414,8 +413,8 @@ export const PlayInput = React.forwardRef<
     <input
       ref={ref}
       className={cn(
-        "w-full rounded-xl border-[3px] border-black bg-[#0d0d11] px-3.5 py-2.5 text-sm font-medium text-white",
-        "placeholder:text-white/35",
+        "w-full rounded-xl border-[3px] border-pg-border bg-pg-surface px-3.5 py-2.5 text-sm font-medium text-pg-text",
+        "placeholder:text-pg-text-faint",
         "outline-none transition-shadow focus:shadow-[4px_4px_0_0_var(--pg-cyan)]",
         className
       )}
@@ -437,7 +436,7 @@ export function PlayLabel({
   return (
     <label
       htmlFor={htmlFor}
-      className={cn("text-xs font-bold uppercase tracking-wider text-white/70", className)}
+      className={cn("text-xs font-bold uppercase tracking-wider text-pg-text-muted", className)}
     >
       {children}
     </label>

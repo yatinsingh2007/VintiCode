@@ -35,25 +35,25 @@ interface Props {
 
 function Label({ children }: { children: React.ReactNode }) {
   return (
-    <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-white/70">
+    <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-pg-text-muted">
       {children}
     </label>
   );
 }
 
 function FieldHint({ children }: { children: React.ReactNode }) {
-  return <p className="mt-1 text-xs font-medium text-white/40">{children}</p>;
+  return <p className="mt-1 text-xs font-medium text-pg-text-faint">{children}</p>;
 }
 
 const textareaClass =
-  "w-full rounded-xl border-[3px] border-black bg-[#0d0d11] px-4 py-3 text-sm font-mono text-white placeholder:text-white/30 outline-none transition-shadow focus:shadow-[4px_4px_0_0_var(--pg-cyan)] resize-y";
+  "w-full rounded-xl border-[3px] border-pg-border bg-pg-surface px-4 py-3 text-sm font-mono text-pg-text placeholder:text-pg-text-faint outline-none transition-shadow focus:shadow-[4px_4px_0_0_var(--pg-cyan)] resize-y";
 
 const inputClass =
-  "w-full rounded-xl border-[3px] border-black bg-[#0d0d11] px-4 py-3 text-sm font-medium text-white placeholder:text-white/30 outline-none transition-shadow focus:shadow-[4px_4px_0_0_var(--pg-cyan)]";
+  "w-full rounded-xl border-[3px] border-pg-border bg-pg-surface px-4 py-3 text-sm font-medium text-pg-text placeholder:text-pg-text-faint outline-none transition-shadow focus:shadow-[4px_4px_0_0_var(--pg-cyan)]";
 
-const errText = "mt-1 text-xs font-semibold text-[var(--pg-coral)]";
-const sectionClass = "rounded-2xl border-[3px] border-black bg-[#141419] p-6 space-y-5";
-const sectionHead = "border-b-[3px] border-black pb-3 text-sm font-extrabold text-white";
+const errText = "mt-1 text-xs font-semibold text-pg-coral-ink";
+const sectionClass = "rounded-2xl border-[3px] border-pg-border bg-pg-surface p-6 space-y-5";
+const sectionHead = "border-b-[3px] border-pg-border pb-3 text-sm font-extrabold text-pg-text";
 
 // ─── Main Component ─────────────────────────────────────────────────────
 
@@ -251,17 +251,17 @@ export default function QuestionForm({
 
       {/* ── Section 3: Test Cases ── */}
       <div className={sectionClass}>
-        <div className="flex items-center justify-between border-b-[3px] border-black pb-3">
+        <div className="flex items-center justify-between border-b-[3px] border-pg-border pb-3">
           <div>
-            <h2 className="text-sm font-extrabold text-white">Test Cases</h2>
-            <p className="mt-0.5 text-xs font-medium text-white/50">
+            <h2 className="text-sm font-extrabold text-pg-text">Test Cases</h2>
+            <p className="mt-0.5 text-xs font-medium text-pg-text-muted">
               {publicCount} public · {hiddenCount} hidden
             </p>
           </div>
           <button
             type="button"
             onClick={addTestCase}
-            className="inline-flex items-center gap-1.5 rounded-lg border-[3px] border-black bg-[#0d0d11] px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-[var(--pg-lime)] hover:text-black"
+            className="inline-flex items-center gap-1.5 rounded-lg border-[3px] border-pg-border bg-pg-surface px-3 py-1.5 text-xs font-bold text-pg-text transition-colors hover:bg-[var(--pg-lime)] hover:text-black"
           >
             <Plus className="size-3.5" strokeWidth={3} />
             Add Test Case
@@ -272,16 +272,16 @@ export default function QuestionForm({
           {testCases.map((tc, i) => (
             <div
               key={i}
-              className="space-y-4 rounded-xl border-[3px] border-black bg-[#0d0d11] p-4"
+              className="space-y-4 rounded-xl border-[3px] border-pg-border bg-pg-surface p-4"
               style={tc.isHidden ? { boxShadow: "5px 5px 0 0 var(--pg-amber)" } : undefined}
             >
               <div className="flex items-center gap-3">
-                <GripVertical className="size-4 shrink-0 text-white/40" />
+                <GripVertical className="size-4 shrink-0 text-pg-text-faint" />
                 <div className="flex flex-1 items-center gap-2">
-                  <span className="text-sm font-bold text-white">Test Case {i + 1}</span>
+                  <span className="text-sm font-bold text-pg-text">Test Case {i + 1}</span>
                   {tc.isHidden ? (
                     <span
-                      className="inline-flex items-center gap-1 rounded-md border-2 border-black px-2 py-0.5 font-mono text-[10px] font-bold uppercase text-black"
+                      className="inline-flex items-center gap-1 rounded-md border-2 border-pg-border px-2 py-0.5 font-mono text-[10px] font-bold uppercase text-black"
                       style={{ background: A.amber }}
                     >
                       <EyeOff className="size-3" strokeWidth={3} />
@@ -289,7 +289,7 @@ export default function QuestionForm({
                     </span>
                   ) : (
                     <span
-                      className="inline-flex items-center gap-1 rounded-md border-2 border-black px-2 py-0.5 font-mono text-[10px] font-bold uppercase text-black"
+                      className="inline-flex items-center gap-1 rounded-md border-2 border-pg-border px-2 py-0.5 font-mono text-[10px] font-bold uppercase text-black"
                       style={{ background: A.lime }}
                     >
                       <Eye className="size-3" strokeWidth={3} />
@@ -300,7 +300,7 @@ export default function QuestionForm({
                 <button
                   type="button"
                   onClick={() => updateTestCase(i, "isHidden", !tc.isHidden)}
-                  className="text-xs font-bold text-white/60 transition-colors hover:text-white"
+                  className="text-xs font-bold text-pg-text-muted transition-colors hover:text-pg-text"
                   title={tc.isHidden ? "Make public" : "Make hidden"}
                 >
                   {tc.isHidden ? "Make Public" : "Make Hidden"}
@@ -309,7 +309,7 @@ export default function QuestionForm({
                   <button
                     type="button"
                     onClick={() => removeTestCase(i)}
-                    className="rounded border-2 border-transparent p-1 text-white/60 transition-colors hover:border-black hover:bg-[var(--pg-coral)] hover:text-black"
+                    className="rounded border-2 border-transparent p-1 text-pg-text-muted transition-colors hover:border-pg-border hover:bg-[var(--pg-coral)] hover:text-black"
                     title="Remove test case"
                   >
                     <Trash2 className="size-3.5" strokeWidth={2.5} />
@@ -361,10 +361,10 @@ export default function QuestionForm({
         </div>
 
         <div
-          className="rounded-xl border-[3px] border-black bg-[#0d0d11] px-4 py-3 text-xs font-medium text-white/70"
+          className="rounded-xl border-[3px] border-pg-border bg-pg-surface px-4 py-3 text-xs font-medium text-pg-text-muted"
           style={{ boxShadow: "5px 5px 0 0 var(--pg-amber)" }}
         >
-          <strong className="text-[var(--pg-amber)]">Security:</strong> Hidden test cases are
+          <strong className="text-pg-amber-ink">Security:</strong> Hidden test cases are
           stored in the database but are never returned to users in any API response. Only
           admin endpoints expose the full <code>test_cases</code> JSON.
         </div>
@@ -373,7 +373,7 @@ export default function QuestionForm({
       {/* ── Global error / Submit ── */}
       {error && (
         <div
-          className="rounded-xl border-[3px] border-black bg-[#141419] px-4 py-3 text-sm font-semibold text-[var(--pg-coral)]"
+          className="rounded-xl border-[3px] border-pg-border bg-pg-surface px-4 py-3 text-sm font-semibold text-pg-coral-ink"
           style={{ boxShadow: "5px 5px 0 0 var(--pg-coral)" }}
         >
           {error}
@@ -383,7 +383,7 @@ export default function QuestionForm({
       <div className="flex justify-end gap-3">
         <PlayButton type="submit" id="q-form-submit" disabled={loading} aria-busy={loading} fill={A.lime} shadow={A.coral}>
           {loading && (
-            <div className="size-4 animate-spin rounded-full border-2 border-black/40 border-t-transparent" />
+            <div className="size-4 animate-spin rounded-full border-2 border-pg-border/40 border-t-transparent" />
           )}
           {submitLabel}
         </PlayButton>

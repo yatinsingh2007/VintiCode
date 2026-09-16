@@ -26,12 +26,12 @@ interface Stats {
 
 function SkeletonCard() {
   return (
-    <div className="animate-pulse rounded-2xl border-[3px] border-black bg-[#141419] p-5">
+    <div className="animate-pulse rounded-2xl border-[3px] border-pg-border bg-pg-surface p-5">
       <div className="flex items-center gap-4">
-        <div className="size-11 rounded-xl bg-white/10" />
+        <div className="size-11 rounded-xl bg-pg-text/10" />
         <div className="flex-1 space-y-2">
-          <div className="h-6 w-16 rounded bg-white/10" />
-          <div className="h-3 w-24 rounded bg-white/10" />
+          <div className="h-6 w-16 rounded bg-pg-text/10" />
+          <div className="h-3 w-24 rounded bg-pg-text/10" />
         </div>
       </div>
     </div>
@@ -55,12 +55,12 @@ function AnalyticCard({
 }) {
   return (
     <div
-      className="rounded-2xl border-[3px] border-black bg-[#141419] p-5"
+      className="rounded-2xl border-[3px] border-pg-border bg-pg-surface p-5"
       style={{ boxShadow: `5px 5px 0 0 ${color}` }}
     >
       <div className="flex items-start justify-between">
         <div
-          className="grid size-11 shrink-0 place-items-center rounded-xl border-[3px] border-black text-black"
+          className="grid size-11 shrink-0 place-items-center rounded-xl border-[3px] border-pg-border text-black"
           style={{ background: color }}
         >
           <Icon className="size-5" strokeWidth={2.5} aria-hidden="true" />
@@ -68,11 +68,11 @@ function AnalyticCard({
         {badge && <div>{badge}</div>}
       </div>
       <div className="mt-4">
-        <p className="text-3xl font-black tracking-tight text-white">
+        <p className="text-3xl font-black tracking-tight text-pg-text">
           {typeof value === "number" ? value.toLocaleString() : value}
         </p>
-        <p className="mt-1 text-sm font-medium text-white/55">{label}</p>
-        {sublabel && <p className="mt-0.5 text-xs font-medium text-white/40">{sublabel}</p>}
+        <p className="mt-1 text-sm font-medium text-pg-text-muted">{label}</p>
+        {sublabel && <p className="mt-0.5 text-xs font-medium text-pg-text-faint">{sublabel}</p>}
       </div>
     </div>
   );
@@ -95,16 +95,16 @@ function ProgressBar({
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between text-sm">
-        <div className="flex items-center gap-2 text-white">
-          <Icon className="size-3.5 text-white/50" strokeWidth={2.5} />
+        <div className="flex items-center gap-2 text-pg-text">
+          <Icon className="size-3.5 text-pg-text-muted" strokeWidth={2.5} />
           <span className="font-semibold">{label}</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="font-bold text-white">{value.toLocaleString()}</span>
-          <span className="text-xs font-medium text-white/50">({pct}%)</span>
+          <span className="font-bold text-pg-text">{value.toLocaleString()}</span>
+          <span className="text-xs font-medium text-pg-text-muted">({pct}%)</span>
         </div>
       </div>
-      <div className="h-3 overflow-hidden rounded-full border-2 border-black bg-[#0d0d11]">
+      <div className="h-3 overflow-hidden rounded-full border-2 border-pg-border bg-pg-surface">
         <div
           className="h-full rounded-full transition-all duration-1000 ease-out"
           style={{ width: `${pct}%`, background: color }}
@@ -161,19 +161,19 @@ function DonutChart({
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-2xl font-black tabular-nums text-white">{pct}%</span>
-          <span className="text-xs font-medium text-white/50">Acceptance</span>
+          <span className="text-2xl font-black tabular-nums text-pg-text">{pct}%</span>
+          <span className="text-xs font-medium text-pg-text-muted">Acceptance</span>
         </div>
       </div>
 
       <div className="flex gap-4 text-xs">
         <div className="flex items-center gap-1.5">
-          <span aria-hidden="true" className="size-2.5 rounded-full border border-black" style={{ background: A.lime }} />
-          <span className="font-medium text-white/60">Accepted ({accepted})</span>
+          <span aria-hidden="true" className="size-2.5 rounded-full border border-pg-border" style={{ background: A.lime }} />
+          <span className="font-medium text-pg-text-muted">Accepted ({accepted})</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span aria-hidden="true" className="size-2.5 rounded-full border border-black" style={{ background: A.coral }} />
-          <span className="font-medium text-white/60">Rejected ({rejected})</span>
+          <span aria-hidden="true" className="size-2.5 rounded-full border border-pg-border" style={{ background: A.coral }} />
+          <span className="font-medium text-pg-text-muted">Rejected ({rejected})</span>
         </div>
       </div>
     </div>
@@ -186,33 +186,33 @@ function HealthScore({ score }: { score: number }) {
 
   return (
     <div
-      className="flex flex-col items-center gap-3 rounded-2xl border-[3px] border-black bg-[#141419] p-6"
+      className="flex flex-col items-center gap-3 rounded-2xl border-[3px] border-pg-border bg-pg-surface p-6"
       style={{ boxShadow: `8px 8px 0 0 ${color}` }}
     >
-      <Activity className="size-6 text-white/50" strokeWidth={2.5} />
+      <Activity className="size-6 text-pg-text-muted" strokeWidth={2.5} />
       <div className="text-center">
         <p className="text-5xl font-black" style={{ color }}>
           {score}
         </p>
-        <p className="mt-1 text-sm font-medium text-white/55">Platform Health Score</p>
+        <p className="mt-1 text-sm font-medium text-pg-text-muted">Platform Health Score</p>
         <p className="mt-1 text-xs font-bold" style={{ color }}>
           {label}
         </p>
       </div>
-      <div className="mt-2 h-2 w-full overflow-hidden rounded-full border-2 border-black bg-[#0d0d11]">
+      <div className="mt-2 h-2 w-full overflow-hidden rounded-full border-2 border-pg-border bg-pg-surface">
         <div
           className="h-full rounded-full"
           style={{ width: `${score}%`, background: color, transition: "width 1.2s ease-out" }}
         />
       </div>
-      <p className="text-center text-xs font-medium text-white/40">
+      <p className="text-center text-xs font-medium text-pg-text-faint">
         Based on acceptance rate, active users & question coverage
       </p>
     </div>
   );
 }
 
-const panelClass = "rounded-2xl border-[3px] border-black bg-[#141419] p-6";
+const panelClass = "rounded-2xl border-[3px] border-pg-border bg-pg-surface p-6";
 
 export default function AdminAnalyticsPage() {
   const [stats, setStats] = useState<Stats | null>(null);
@@ -240,8 +240,8 @@ export default function AdminAnalyticsPage() {
     return (
       <div className="mx-auto max-w-7xl space-y-8">
         <div>
-          <div className="h-8 w-32 animate-pulse rounded bg-white/10" />
-          <div className="mt-2 h-4 w-48 animate-pulse rounded bg-white/10" />
+          <div className="h-8 w-32 animate-pulse rounded bg-pg-text/10" />
+          <div className="mt-2 h-4 w-48 animate-pulse rounded bg-pg-text/10" />
         </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[...Array(4)].map((_, i) => (
@@ -250,7 +250,7 @@ export default function AdminAnalyticsPage() {
         </div>
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="h-64 animate-pulse rounded-2xl border-[3px] border-black bg-white/10" />
+            <div key={i} className="h-64 animate-pulse rounded-2xl border-[3px] border-pg-border bg-pg-text/10" />
           ))}
         </div>
       </div>
@@ -291,8 +291,8 @@ export default function AdminAnalyticsPage() {
     <div className="mx-auto max-w-7xl space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-black tracking-tighter text-white">Analytics</h1>
-        <p className="mt-1 text-sm font-medium text-white/55">
+        <h1 className="text-3xl font-black tracking-tighter text-pg-text">Analytics</h1>
+        <p className="mt-1 text-sm font-medium text-pg-text-muted">
           Platform-wide performance metrics and insights
         </p>
       </div>
@@ -310,7 +310,7 @@ export default function AdminAnalyticsPage() {
           sublabel="Across all submissions"
           badge={
             <span
-              className="rounded-md border-2 border-black px-2 py-0.5 font-mono text-xs font-bold uppercase text-black"
+              className="rounded-md border-2 border-pg-border px-2 py-0.5 font-mono text-xs font-bold uppercase text-black"
               style={{ background: acceptanceRate >= 60 ? A.lime : A.amber }}
             >
               {acceptanceRate >= 60 ? "Good" : "Low"}
@@ -324,8 +324,8 @@ export default function AdminAnalyticsPage() {
         {/* Submission breakdown */}
         <div className={`${panelClass} space-y-6 lg:col-span-2`}>
           <div className="flex items-center gap-2">
-            <TrendingUp className="size-4 text-white/60" strokeWidth={2.5} />
-            <h2 className="text-sm font-extrabold text-white">Submission Breakdown</h2>
+            <TrendingUp className="size-4 text-pg-text-muted" strokeWidth={2.5} />
+            <h2 className="text-sm font-extrabold text-pg-text">Submission Breakdown</h2>
           </div>
 
           <div className="space-y-5">
@@ -345,7 +345,7 @@ export default function AdminAnalyticsPage() {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3 border-t-[3px] border-black pt-4 sm:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 border-t-[3px] border-pg-border pt-4 sm:grid-cols-4">
             {[
               { label: "Accepted", value: stats?.acceptedSubmissions ?? 0, color: A.lime },
               { label: "Rejected", value: stats?.rejectedSubmissions ?? 0, color: A.coral },
@@ -356,7 +356,7 @@ export default function AdminAnalyticsPage() {
                 <p className="text-xl font-black" style={{ color }}>
                   {value.toLocaleString()}
                 </p>
-                <p className="mt-0.5 text-xs font-medium text-white/50">{label}</p>
+                <p className="mt-0.5 text-xs font-medium text-pg-text-muted">{label}</p>
               </div>
             ))}
           </div>
@@ -365,8 +365,8 @@ export default function AdminAnalyticsPage() {
         {/* Donut chart */}
         <div className={`${panelClass} flex flex-col items-center justify-center gap-6`}>
           <div className="flex w-full items-center gap-2">
-            <BarChart3 className="size-4 text-white/60" strokeWidth={2.5} />
-            <h2 className="text-sm font-extrabold text-white">Outcome Distribution</h2>
+            <BarChart3 className="size-4 text-pg-text-muted" strokeWidth={2.5} />
+            <h2 className="text-sm font-extrabold text-pg-text">Outcome Distribution</h2>
           </div>
           <DonutChart
             accepted={stats?.acceptedSubmissions ?? 0}
@@ -382,8 +382,8 @@ export default function AdminAnalyticsPage() {
 
         <div className={`${panelClass} lg:col-span-2`}>
           <div className="mb-5 flex items-center gap-2">
-            <Activity className="size-4 text-white/60" strokeWidth={2.5} />
-            <h2 className="text-sm font-extrabold text-white">Platform Ratios</h2>
+            <Activity className="size-4 text-pg-text-muted" strokeWidth={2.5} />
+            <h2 className="text-sm font-extrabold text-pg-text">Platform Ratios</h2>
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -409,14 +409,14 @@ export default function AdminAnalyticsPage() {
             ].map(({ label, value, description, color }) => (
               <div
                 key={label}
-                className="space-y-2 rounded-xl border-[3px] border-black bg-[#0d0d11] p-4"
+                className="space-y-2 rounded-xl border-[3px] border-pg-border bg-pg-surface p-4"
                 style={{ boxShadow: `4px 4px 0 0 ${color}` }}
               >
                 <p className="text-2xl font-black" style={{ color }}>
                   {value}
                 </p>
-                <p className="text-sm font-bold text-white">{label}</p>
-                <p className="text-xs font-medium text-white/45">{description}</p>
+                <p className="text-sm font-bold text-pg-text">{label}</p>
+                <p className="text-xs font-medium text-pg-text-muted">{description}</p>
               </div>
             ))}
           </div>

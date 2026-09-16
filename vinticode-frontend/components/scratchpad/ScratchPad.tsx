@@ -1,9 +1,12 @@
 "use client";
 
 import Editor, { OnChange } from "@monaco-editor/react";
+import { useContext } from "react";
+import { ThemeContext } from "@/context/ThemeContext";
 import { motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, Lock, NotebookPen, Sparkles } from "lucide-react";
 import { PlayButton, A } from "@/components/playground";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import type { ApproachReviewResult, ReviewState } from "@/lib/scratchpadApi";
 import { ApproachReview, ReviewError } from "./ApproachReview";
 
@@ -80,6 +83,8 @@ export default function ScratchPad({
   reviewError,
   onDismissReview,
 }: ScratchPadProps) {
+  const { theme } = useContext(ThemeContext);
+
   const handleChange: OnChange = (value) => {
     onNotesChange(value ?? "");
   };
@@ -93,13 +98,17 @@ export default function ScratchPad({
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
-      className="dark h-dvh w-full bg-[#0a0a0d] font-sans text-white"
+      className="relative h-dvh w-full bg-pg-ink bg-paper-grid font-sans text-pg-text"
     >
+      <ThemeToggle
+        size="icon-sm"
+        className="absolute right-5 top-5 z-20 border-[3px] border-pg-border bg-pg-surface"
+      />
       <div className="mx-auto flex h-full w-full max-w-4xl flex-col px-5 py-8 sm:px-8 sm:py-12">
         {onBack && (
           <button
             onClick={onBack}
-            className="mb-6 inline-flex w-fit items-center gap-2 rounded-lg border-[3px] border-black bg-[#141419] px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest text-white/80 transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:text-white"
+            className="mb-6 inline-flex w-fit items-center gap-2 rounded-lg border-[3px] border-pg-border bg-pg-surface px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest text-pg-text transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:text-pg-text"
           >
             <ArrowLeft className="size-3.5" strokeWidth={2.5} />
             Questions
@@ -109,19 +118,19 @@ export default function ScratchPad({
         <header className="flex-none space-y-4">
           {loading ? (
             <div className="space-y-4">
-              <div className="h-6 w-20 animate-pulse rounded-lg bg-white/10" />
-              <div className="h-9 w-3/4 animate-pulse rounded-xl bg-white/10" />
+              <div className="h-6 w-20 animate-pulse rounded-lg bg-pg-text/10" />
+              <div className="h-9 w-3/4 animate-pulse rounded-xl bg-pg-text/10" />
             </div>
           ) : (
             <>
               <div className="flex flex-wrap items-center gap-3">
                 <span
-                  className="inline-flex items-center rounded-md border-2 border-black px-2.5 py-1 font-mono text-[11px] font-bold uppercase tracking-wider text-black"
+                  className="inline-flex items-center rounded-md border-2 border-pg-border px-2.5 py-1 font-mono text-[11px] font-bold uppercase tracking-wider text-black"
                   style={{ background: diffColor(difficulty) }}
                 >
                   {difficulty}
                 </span>
-                <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-white/40">
+                <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-pg-text-faint">
                   <Lock className="size-3" />
                   Private
                 </span>
@@ -131,17 +140,17 @@ export default function ScratchPad({
             </>
           )}
 
-          <p className="text-sm font-medium leading-relaxed text-white/55">
+          <p className="text-sm font-medium leading-relaxed text-pg-text-muted">
             Plan your solution before coding. This scratch pad is private and
             optional.
           </p>
         </header>
 
         <div className="mt-8 flex min-h-0 flex-1 flex-col gap-4">
-          <div className="flex min-h-[35vh] flex-1 flex-col overflow-hidden rounded-2xl border-[3px] border-black bg-[#141419]">
-            <div className="flex flex-none items-center gap-2 border-b-[3px] border-black bg-[#0d0d11] px-5 py-3">
-              <NotebookPen className="size-3.5 text-[var(--pg-lime)]" strokeWidth={2.5} />
-              <span className="text-[10px] font-bold uppercase tracking-widest text-white/50">
+          <div className="flex min-h-[35vh] flex-1 flex-col overflow-hidden rounded-2xl border-[3px] border-pg-border bg-pg-surface">
+            <div className="flex flex-none items-center gap-2 border-b-[3px] border-pg-border bg-pg-surface px-5 py-3">
+              <NotebookPen className="size-3.5 text-pg-lime-ink" strokeWidth={2.5} />
+              <span className="text-[10px] font-bold uppercase tracking-widest text-pg-text-muted">
                 Scratch Pad
               </span>
             </div>
@@ -150,7 +159,7 @@ export default function ScratchPad({
               <Editor
                 height="100%"
                 language="markdown"
-                theme="vs-dark"
+                theme={theme === "dark" ? "vs-dark" : "light"}
                 value={notes}
                 onChange={handleChange}
                 options={{
@@ -178,14 +187,14 @@ export default function ScratchPad({
               />
 
               {notes.length === 0 && (
-                <div className="pointer-events-none absolute left-[26px] top-[20px] select-none font-mono text-[14px] leading-[21px] text-white/30">
+                <div className="pointer-events-none absolute left-[26px] top-[20px] select-none font-mono text-[14px] leading-[21px] text-pg-text-faint">
                   {PLACEHOLDER}
                 </div>
               )}
             </div>
 
-            <div className="flex flex-none items-center justify-end border-t-[3px] border-black bg-[#0d0d11] px-5 py-2">
-              <span className="text-[10px] font-bold tabular-nums uppercase tracking-widest text-white/40">
+            <div className="flex flex-none items-center justify-end border-t-[3px] border-pg-border bg-pg-surface px-5 py-2">
+              <span className="text-[10px] font-bold tabular-nums uppercase tracking-widest text-pg-text-faint">
                 {notes.length} {notes.length === 1 ? "character" : "characters"}
               </span>
             </div>

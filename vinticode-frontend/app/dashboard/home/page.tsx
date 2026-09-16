@@ -9,6 +9,7 @@ import React, {
 } from "react";
 import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
 import { Logo, LogoIcon } from "@/components/Logo";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   Search,
   X,
@@ -135,7 +136,7 @@ function FunkyBackdrop() {
 
       {/* Filled lime blob sticker — far left gutter */}
       <motion.div
-        className="absolute left-[4%] top-[30%] size-28 border-[3px] border-black"
+        className="absolute left-[4%] top-[30%] size-28 border-[3px] border-pg-border"
         style={{
           background: A.lime,
           opacity: 0.5,
@@ -147,7 +148,7 @@ function FunkyBackdrop() {
 
       {/* Filled indigo pill sticker — right gutter */}
       <motion.div
-        className="absolute right-[5%] top-[54%] h-16 w-28 rotate-[-12deg] rounded-full border-[3px] border-black"
+        className="absolute right-[5%] top-[54%] h-16 w-28 rotate-[-12deg] rounded-full border-[3px] border-pg-border"
         style={{ background: A.indigo, opacity: 0.45, boxShadow: "6px 6px 0 0 #000" }}
         {...float(12, 14, -6)}
       />
@@ -172,7 +173,7 @@ function FunkyBackdrop() {
 
       {/* Semicircle — bottom center-ish */}
       <motion.div
-        className="absolute bottom-[6%] left-[40%] h-14 w-28 border-[3px] border-black"
+        className="absolute bottom-[6%] left-[40%] h-14 w-28 border-[3px] border-pg-border"
         style={{
           background: A.coral,
           opacity: 0.4,
@@ -254,7 +255,7 @@ function FunkyBackdrop() {
       ].map((d, i) => (
         <motion.div
           key={`dot-${i}`}
-          className="absolute rounded-full border-[3px] border-black"
+          className="absolute rounded-full border-[3px] border-pg-border"
           style={{ left: d.l, top: d.t, width: d.s, height: d.s, background: d.c, opacity: 0.45 }}
           {...float(7 + i, 10, 0)}
         />
@@ -289,12 +290,12 @@ export default function DashboardHomePage() {
     {
       label: "Dashboard",
       href: "/dashboard/home",
-      icon: <IconBrandTabler className="h-5 w-5 shrink-0 text-white/70" />,
+      icon: <IconBrandTabler className="h-5 w-5 shrink-0 text-pg-text-muted" />,
     },
     {
       label: "Profile",
       href: "/dashboard/profile",
-      icon: <IconUserBolt className="h-5 w-5 shrink-0 text-white/70" />,
+      icon: <IconUserBolt className="h-5 w-5 shrink-0 text-pg-text-muted" />,
     },
   ];
 
@@ -312,14 +313,21 @@ export default function DashboardHomePage() {
   };
 
   return (
-    <div className="dark relative mx-auto flex h-svh w-full flex-1 flex-col bg-[#0a0a0d] text-white md:flex-row">
+    <div className="relative mx-auto flex h-svh w-full flex-1 flex-col bg-pg-ink bg-paper-grid text-pg-text md:flex-row">
       <PlaySurface />
       <FunkyBackdrop />
-      <div className="z-10 border-black bg-[#0d0d11] md:border-r-[3px]">
+      <div className="z-10 border-pg-border bg-pg-surface md:border-r-[3px]">
         <Sidebar open={open} setOpen={setOpen}>
           <SidebarBody className="justify-between gap-8">
             <div className="flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
               {open ? <Logo /> : <LogoIcon />}
+
+              <div className="mt-6">
+                <ThemeToggle
+                  size="icon-sm"
+                  className="border-[3px] border-pg-border bg-pg-surface"
+                />
+              </div>
 
               <nav aria-label="Main" className="mt-8 flex flex-col gap-1">
                 {links.map((link, idx) => (
@@ -336,7 +344,7 @@ export default function DashboardHomePage() {
                       label: "Logout",
                       href: "#",
                       icon: (
-                        <IconArrowLeft className="h-5 w-5 shrink-0 text-white/70" />
+                        <IconArrowLeft className="h-5 w-5 shrink-0 text-pg-text-muted" />
                       ),
                     }}
                   />
@@ -372,29 +380,29 @@ const ProgressHero: React.FC<{
   const pct = total > 0 ? Math.round((solved / total) * 100) : 0;
 
   return (
-    <div className="rounded-2xl border-[3px] border-black bg-[#141419] p-5 shadow-[6px_6px_0_0_var(--pg-indigo)] sm:p-6">
+    <div className="rounded-2xl border-[3px] border-pg-border bg-pg-surface p-5 shadow-[6px_6px_0_0_var(--pg-indigo)] sm:p-6">
       <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
         {/* Completion meter */}
         <div className="min-w-0 flex-1">
           <div className="flex items-end justify-between gap-3">
             <div>
-              <p className="font-mono text-[0.7rem] font-bold uppercase tracking-wider text-white/50">
+              <p className="font-mono text-[0.7rem] font-bold uppercase tracking-wider text-pg-text-muted">
                 Your journey
               </p>
-              <p className="mt-1 text-2xl font-black tracking-tight text-white">
+              <p className="mt-1 text-2xl font-black tracking-tight text-pg-text">
                 {solved}
-                <span className="text-white/40"> / {total} cleared</span>
+                <span className="text-pg-text-faint"> / {total} cleared</span>
               </p>
             </div>
             <span
-              className="shrink-0 rounded-lg border-[3px] border-black px-2.5 py-1 font-mono text-sm font-black text-black"
+              className="shrink-0 rounded-lg border-[3px] border-pg-border px-2.5 py-1 font-mono text-sm font-black text-black"
               style={{ background: A.lime }}
             >
               {pct}%
             </span>
           </div>
 
-          <div className="mt-3 h-4 w-full overflow-hidden rounded-full border-[3px] border-black bg-[#0d0d11]">
+          <div className="mt-3 h-4 w-full overflow-hidden rounded-full border-[3px] border-pg-border bg-pg-surface">
             <motion.div
               className="h-full rounded-full"
               style={{ background: A.lime }}
@@ -413,17 +421,17 @@ const ProgressHero: React.FC<{
             return (
               <div
                 key={key}
-                className="rounded-xl border-[3px] border-black bg-[#0d0d11] p-3 text-center"
+                className="rounded-xl border-[3px] border-pg-border bg-pg-surface p-3 text-center"
               >
                 <span
-                  className="inline-block size-3 rounded-full border-2 border-black align-middle"
+                  className="inline-block size-3 rounded-full border-2 border-pg-border align-middle"
                   style={{ background: c }}
                 />
-                <p className="mt-1.5 text-lg font-black tabular-nums text-white">
+                <p className="mt-1.5 text-lg font-black tabular-nums text-pg-text">
                   {b.solved}
-                  <span className="text-sm text-white/35">/{b.total}</span>
+                  <span className="text-sm text-pg-text-faint">/{b.total}</span>
                 </p>
-                <p className="font-mono text-[0.6rem] font-bold uppercase tracking-wider text-white/50">
+                <p className="font-mono text-[0.6rem] font-bold uppercase tracking-wider text-pg-text-muted">
                   {label}
                 </p>
               </div>
@@ -435,7 +443,7 @@ const ProgressHero: React.FC<{
         {next && (
           <Link
             href={`/dashboard/question/${next.id}/scratchpad`}
-            className="group inline-flex shrink-0 items-center justify-center gap-2 self-start rounded-xl border-[3px] border-black px-5 py-3 text-base font-extrabold tracking-tight text-black shadow-[5px_5px_0_0_#000] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 lg:self-auto"
+            className="group inline-flex shrink-0 items-center justify-center gap-2 self-start rounded-xl border-[3px] border-pg-border px-5 py-3 text-base font-extrabold tracking-tight text-black shadow-[5px_5px_0_0_#000] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 lg:self-auto"
             style={{ background: A.cyan }}
           >
             <MapPin className="size-4" strokeWidth={3} />
@@ -566,7 +574,7 @@ const RoadmapTrail: React.FC<{
                       whileHover={{ y: -4, scale: 1.08 }}
                       whileTap={{ scale: 0.94 }}
                       transition={{ type: "spring", stiffness: 400, damping: 12 }}
-                      className="relative grid place-items-center rounded-full border-[3px] border-black font-black"
+                      className="relative grid place-items-center rounded-full border-[3px] border-pg-border font-black"
                       style={{
                         width: CIRC,
                         height: CIRC,
@@ -584,7 +592,7 @@ const RoadmapTrail: React.FC<{
 
                     {isCurrent && (
                       <span
-                        className="absolute -top-3 left-1/2 -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-md border-2 border-black px-2 py-0.5 font-mono text-[0.6rem] font-black uppercase tracking-wider text-black shadow-[2px_2px_0_0_#000]"
+                        className="absolute -top-3 left-1/2 -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-md border-2 border-pg-border px-2 py-0.5 font-mono text-[0.6rem] font-black uppercase tracking-wider text-black shadow-[2px_2px_0_0_#000]"
                         style={{ background: A.cyan }}
                       >
                         You&apos;re here
@@ -597,13 +605,13 @@ const RoadmapTrail: React.FC<{
                     <span
                       className={cn(
                         "line-clamp-1 max-w-full text-sm font-extrabold tracking-tight transition-colors",
-                        solved ? "text-white" : "text-white/80 group-hover:text-white"
+                        solved ? "text-pg-text" : "text-pg-text group-hover:text-pg-text"
                       )}
                     >
                       {q.title}
                     </span>
                     <span
-                      className="mt-1 inline-flex items-center rounded-md border-2 border-black px-1.5 py-0.5 font-mono text-[0.6rem] font-bold uppercase text-black"
+                      className="mt-1 inline-flex items-center rounded-md border-2 border-pg-border px-1.5 py-0.5 font-mono text-[0.6rem] font-bold uppercase text-black"
                       style={{ background: c }}
                     >
                       {q.difficulty}
@@ -625,12 +633,12 @@ const RoadmapTrail: React.FC<{
               }}
             >
               <div
-                className="grid size-14 place-items-center rounded-full border-[3px] border-black shadow-[4px_4px_0_0_#000]"
+                className="grid size-14 place-items-center rounded-full border-[3px] border-pg-border shadow-[4px_4px_0_0_#000]"
                 style={{ background: A.amber }}
               >
                 <Trophy className="size-7 text-black" strokeWidth={2.5} />
               </div>
-              <span className="mt-2 font-mono text-[0.65rem] font-bold uppercase tracking-wider text-white/50">
+              <span className="mt-2 font-mono text-[0.65rem] font-bold uppercase tracking-wider text-pg-text-muted">
                 End of trail
               </span>
             </div>
@@ -650,8 +658,8 @@ const TrailSkeleton = () => (
         className="flex flex-col items-center"
         style={{ transform: `translateX(${[0, 90, 0, -90, 0][i]}px)` }}
       >
-        <div className="size-[62px] animate-pulse rounded-full border-[3px] border-black bg-white/10" />
-        <div className="mt-2.5 h-4 w-28 animate-pulse rounded bg-white/10" />
+        <div className="size-[62px] animate-pulse rounded-full border-[3px] border-pg-border bg-pg-text/10" />
+        <div className="mt-2.5 h-4 w-28 animate-pulse rounded bg-pg-text/10" />
       </div>
     ))}
   </div>
@@ -745,19 +753,19 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="relative z-10 flex min-w-0 flex-1 flex-col overflow-y-auto">
-      <header className="sticky top-0 z-10 space-y-4 border-b-[3px] border-black bg-[#0a0a0d]/85 px-4 py-5 backdrop-blur-md sm:px-6">
+      <header className="sticky top-0 z-10 space-y-4 border-b-[3px] border-pg-border bg-pg-ink/85 px-4 py-5 backdrop-blur-md sm:px-6">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
             <span
-              className="inline-block -rotate-2 rounded-lg border-[3px] border-black px-2.5 py-0.5 font-mono text-[0.7rem] font-bold uppercase tracking-wider text-black shadow-[3px_3px_0_0_#000]"
+              className="inline-block -rotate-2 rounded-lg border-[3px] border-pg-border px-2.5 py-0.5 font-mono text-[0.7rem] font-bold uppercase tracking-wider text-black shadow-[3px_3px_0_0_#000]"
               style={{ background: A.lime }}
             >
               The Trail
             </span>
-            <h1 className="mt-3 text-3xl font-black tracking-tighter text-white">
+            <h1 className="mt-3 text-3xl font-black tracking-tighter text-pg-text">
               Your Coding Journey
             </h1>
-            <p className="mt-1 text-sm font-medium text-white/60">
+            <p className="mt-1 text-sm font-medium text-pg-text-muted">
               Follow the path — plan your approach, then conquer each problem.
             </p>
           </div>
@@ -767,7 +775,7 @@ const Dashboard: React.FC = () => {
           <div className="relative w-full sm:max-w-md">
             <Search
               aria-hidden="true"
-              className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-white/40"
+              className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-pg-text-faint"
             />
             <PlayInput
               type="search"
@@ -781,7 +789,7 @@ const Dashboard: React.FC = () => {
               <button
                 type="button"
                 aria-label="Clear search"
-                className="absolute right-2 top-1/2 flex size-7 -translate-y-1/2 cursor-pointer items-center justify-center rounded-lg text-white/50 transition-colors hover:text-white"
+                className="absolute right-2 top-1/2 flex size-7 -translate-y-1/2 cursor-pointer items-center justify-center rounded-lg text-pg-text-muted transition-colors hover:text-pg-text"
                 onClick={() => setSearchQuery("")}
               >
                 <X className="size-4" aria-hidden="true" />
@@ -793,11 +801,11 @@ const Dashboard: React.FC = () => {
             <Select value={difficultyFilter} onValueChange={setDifficultyFilter}>
               <SelectTrigger
                 aria-label="Filter by difficulty"
-                className="min-w-[140px] rounded-xl border-[3px] border-black bg-[#0d0d11] font-semibold"
+                className="min-w-[140px] rounded-xl border-[3px] border-pg-border bg-pg-surface font-semibold"
               >
                 <SelectValue placeholder="Difficulty" />
               </SelectTrigger>
-              <SelectContent className="border-[3px] border-black bg-[#141419]">
+              <SelectContent className="border-[3px] border-pg-border bg-pg-surface">
                 <SelectItem value="all">All Levels</SelectItem>
                 <SelectItem value="easy">Easy</SelectItem>
                 <SelectItem value="medium">Medium</SelectItem>
@@ -819,7 +827,7 @@ const Dashboard: React.FC = () => {
         </div>
 
         {!loading && !error && (
-          <p aria-live="polite" className="text-xs font-semibold text-white/50">
+          <p aria-live="polite" className="text-xs font-semibold text-pg-text-muted">
             {filteredQuestions.length}{" "}
             {filteredQuestions.length === 1 ? "stop" : "stops"}
             {hasFilters && ` of ${allQuestions.length}`}
@@ -855,7 +863,7 @@ const Dashboard: React.FC = () => {
                 {totalPages > 1 && (
                   <div className="flex items-center justify-center">
                     <span
-                      className="rounded-lg border-[3px] border-black px-3 py-1 font-mono text-[0.7rem] font-bold uppercase tracking-wider text-black shadow-[3px_3px_0_0_#000]"
+                      className="rounded-lg border-[3px] border-pg-border px-3 py-1 font-mono text-[0.7rem] font-bold uppercase tracking-wider text-black shadow-[3px_3px_0_0_#000]"
                       style={{ background: A.amber }}
                     >
                       Stage {page} of {totalPages}
@@ -899,7 +907,7 @@ const Dashboard: React.FC = () => {
       </div>
 
       {!loading && !error && totalPages > 1 && (
-        <div className="sticky bottom-0 border-t-[3px] border-black bg-[#0a0a0d]/85 px-4 py-3 backdrop-blur-md sm:px-6">
+        <div className="sticky bottom-0 border-t-[3px] border-pg-border bg-pg-ink/85 px-4 py-3 backdrop-blur-md sm:px-6">
           <DashboardPagination
             totalPages={totalPages}
             currentPage={page}

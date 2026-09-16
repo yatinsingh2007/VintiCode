@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LogoMark } from "@/components/playground";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import api from "@/lib/axios";
 import toast from "react-hot-toast";
 
@@ -203,7 +204,7 @@ function PlayButton({
       onClick={onClick}
       style={{ background: fill, color: text }}
       className={cn(
-        "inline-flex items-center gap-2 rounded-xl border-[3px] border-black px-6 py-3 text-base font-extrabold tracking-tight",
+        "inline-flex items-center gap-2 rounded-xl border-[3px] border-pg-border px-6 py-3 text-base font-extrabold tracking-tight",
         className
       )}
       initial={{ boxShadow: `5px 5px 0 0 ${shadow}` }}
@@ -247,7 +248,7 @@ function Sticker({
     >
       <span
         style={{ background: color }}
-        className="inline-block rounded-lg border-[3px] border-black px-3 py-1 font-mono text-sm font-bold text-black shadow-[3px_3px_0_0_#000]"
+        className="inline-block rounded-lg border-[3px] border-pg-border px-3 py-1 font-mono text-sm font-bold text-black shadow-[3px_3px_0_0_#000]"
       >
         {children}
       </span>
@@ -302,10 +303,9 @@ export default function LandingPage() {
 
   return (
     <MotionConfig reducedMotion="user">
-      <div className="dark relative min-h-screen overflow-x-clip bg-[#0a0a0d] text-white">
-        {/* ── Background: bold play-grid + faint flat accent blooms ── */}
+      <div className="relative min-h-screen overflow-x-clip bg-pg-ink bg-paper-grid text-pg-text">
+        {/* ── Background: paper grid (on wrapper) + faint flat accent blooms ── */}
         <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-          <div className="bg-grid-bold absolute inset-0 [mask-image:radial-gradient(130%_100%_at_50%_0%,#000_25%,transparent_75%)]" />
           <div
             className="absolute -left-[10%] -top-[10%] h-[46vh] w-[46vh] rounded-full opacity-[0.12] blur-[90px]"
             style={{ background: A.lime }}
@@ -326,7 +326,7 @@ export default function LandingPage() {
             initial={{ y: -30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ type: "spring", stiffness: 220, damping: 18 }}
-            className="mx-auto flex max-w-6xl items-center justify-between rounded-2xl border-[3px] border-black bg-[#141419]/90 px-4 py-2.5 shadow-[5px_5px_0_0_#000] backdrop-blur-md"
+            className="mx-auto flex max-w-6xl items-center justify-between rounded-2xl border-[3px] border-pg-border bg-pg-surface/90 px-4 py-2.5 shadow-[5px_5px_0_0_#000] backdrop-blur-md"
           >
             <Link href="/" className="flex items-center gap-2.5">
               <motion.span
@@ -344,7 +344,7 @@ export default function LandingPage() {
                 <a
                   key={link.href}
                   href={link.href}
-                  className="rounded-lg border-[3px] border-transparent px-3 py-1.5 text-sm font-bold text-white/70 transition-all hover:-translate-y-0.5 hover:border-black hover:bg-white/5 hover:text-white"
+                  className="rounded-lg border-[3px] border-transparent px-3 py-1.5 text-sm font-bold text-pg-text-muted transition-all hover:-translate-y-0.5 hover:border-pg-border hover:bg-pg-text/5 hover:text-pg-text"
                 >
                   {link.label}
                 </a>
@@ -352,9 +352,13 @@ export default function LandingPage() {
             </div>
 
             <div className="flex items-center gap-2">
+              <ThemeToggle
+                size="icon-sm"
+                className="border-[3px] border-pg-border bg-pg-surface"
+              />
               <button
                 onClick={go}
-                className="hidden rounded-lg px-3 py-1.5 text-sm font-bold text-white/80 transition-colors hover:text-white sm:block"
+                className="hidden rounded-lg px-3 py-1.5 text-sm font-bold text-pg-text transition-colors hover:text-pg-text sm:block"
               >
                 Sign in
               </button>
@@ -392,7 +396,7 @@ export default function LandingPage() {
                 initial={{ opacity: 0, scale: 0.7, rotate: -4 }}
                 animate={{ opacity: 1, scale: 1, rotate: -3 }}
                 transition={{ type: "spring", stiffness: 300, damping: 12 }}
-                className="mb-7 inline-flex items-center gap-2 rounded-full border-[3px] border-black bg-white px-4 py-1.5 font-mono text-xs font-bold uppercase tracking-wider text-black shadow-[3px_3px_0_0_var(--pg-coral)]"
+                className="mb-7 inline-flex items-center gap-2 rounded-full border-[3px] border-pg-border bg-white px-4 py-1.5 font-mono text-xs font-bold uppercase tracking-wider text-black shadow-[3px_3px_0_0_var(--pg-coral)]"
               >
                 <Sparkles className="size-3.5" strokeWidth={3} /> Master DSA by doing
               </motion.span>
@@ -414,7 +418,7 @@ export default function LandingPage() {
                   <motion.span
                     whileHover={{ rotate: 2, scale: 1.04 }}
                     transition={{ type: "spring", stiffness: 300, damping: 10 }}
-                    className="inline-block -rotate-2 rounded-xl border-[3px] border-black px-3 py-0.5 text-black shadow-[6px_6px_0_0_#000]"
+                    className="inline-block -rotate-2 rounded-xl border-[3px] border-pg-border px-3 py-0.5 text-black shadow-[6px_6px_0_0_#000]"
                     style={{ background: A.lime }}
                   >
                     algorithms
@@ -426,7 +430,7 @@ export default function LandingPage() {
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5, type: "spring", stiffness: 200, damping: 18 }}
-                className="mt-7 max-w-xl text-pretty text-lg font-medium text-white/70"
+                className="mt-7 max-w-xl text-pretty text-lg font-medium text-pg-text-muted"
               >
                 A loud, hands-on workspace to build a rock-solid foundation in problem
                 solving — before you step into the world of Data Structures & Algorithms.
@@ -470,7 +474,7 @@ export default function LandingPage() {
 
           {/* ── Topics marquee ───────────────────────────────────── */}
           <section aria-label="Topics" className="relative py-8">
-            <div className="border-y-[3px] border-black bg-[#141419] py-4">
+            <div className="border-y-[3px] border-pg-border bg-pg-surface py-4">
               <div className="flex overflow-hidden [mask-image:linear-gradient(to_right,transparent,#000_8%,#000_92%,transparent)]">
                 <div className="animate-marquee flex shrink-0 items-center gap-3 pr-3">
                   {[...TOPICS, ...TOPICS].map((t, i) => {
@@ -479,7 +483,7 @@ export default function LandingPage() {
                       <span
                         key={`${t}-${i}`}
                         style={{ background: colors[i % colors.length] }}
-                        className="inline-block shrink-0 -rotate-1 rounded-lg border-[3px] border-black px-4 py-1.5 font-mono text-sm font-bold text-black odd:rotate-1"
+                        className="inline-block shrink-0 -rotate-1 rounded-lg border-[3px] border-pg-border px-4 py-1.5 font-mono text-sm font-bold text-black odd:rotate-1"
                       >
                         {t}
                       </span>
@@ -500,18 +504,18 @@ export default function LandingPage() {
                   key={f.title}
                   delay={i * 0.06}
                   tilt={f.tilt}
-                  className="rounded-2xl border-[3px] border-black bg-[#141419] p-6"
+                  className="rounded-2xl border-[3px] border-pg-border bg-pg-surface p-6"
                   style={{ ["--pg-shadow" as string]: f.color } as React.CSSProperties}
                 >
                   <div className="pg-shadow-lg -m-6 h-full rounded-2xl p-6" style={{ boxShadow: `8px 8px 0 0 ${f.color}` }}>
                     <div
-                      className="grid size-12 place-items-center rounded-xl border-[3px] border-black text-black"
+                      className="grid size-12 place-items-center rounded-xl border-[3px] border-pg-border text-black"
                       style={{ background: f.color }}
                     >
                       <f.icon className="size-6" strokeWidth={2.5} />
                     </div>
                     <h3 className="mt-5 text-xl font-extrabold tracking-tight">{f.title}</h3>
-                    <p className="mt-2 text-sm font-medium leading-relaxed text-white/65">
+                    <p className="mt-2 text-sm font-medium leading-relaxed text-pg-text-muted">
                       {f.body}
                     </p>
                   </div>
@@ -522,7 +526,7 @@ export default function LandingPage() {
             {/* wide instant-feedback strip */}
             <Bounce
               delay={0.1}
-              className="mt-6 rounded-2xl border-[3px] border-black bg-[#141419] p-6 md:p-8"
+              className="mt-6 rounded-2xl border-[3px] border-pg-border bg-pg-surface p-6 md:p-8"
               hover={false}
             >
               <div
@@ -532,7 +536,7 @@ export default function LandingPage() {
                 <div className="flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:justify-between">
                   <div className="flex items-start gap-4">
                     <div
-                      className="grid size-12 shrink-0 place-items-center rounded-xl border-[3px] border-black text-black"
+                      className="grid size-12 shrink-0 place-items-center rounded-xl border-[3px] border-pg-border text-black"
                       style={{ background: A.indigo }}
                     >
                       <Zap className="size-6" strokeWidth={2.5} />
@@ -541,7 +545,7 @@ export default function LandingPage() {
                       <h3 className="text-xl font-extrabold tracking-tight">
                         Instant feedback loops
                       </h3>
-                      <p className="mt-1 max-w-lg text-sm font-medium text-white/65">
+                      <p className="mt-1 max-w-lg text-sm font-medium text-pg-text-muted">
                         Run against test cases and submit in one click. Tight loops turn
                         practice into intuition.
                       </p>
@@ -551,7 +555,7 @@ export default function LandingPage() {
                     {["Run test cases", "One-click submit", "Results inline"].map((item) => (
                       <li key={item} className="flex items-center gap-2">
                         <span
-                          className="grid size-5 place-items-center rounded border-2 border-black text-black"
+                          className="grid size-5 place-items-center rounded border-2 border-pg-border text-black"
                           style={{ background: A.lime }}
                         >
                           <CheckCircle2 className="size-3.5" strokeWidth={3} />
@@ -575,16 +579,16 @@ export default function LandingPage() {
                 { n: "03", t: "Solve & submit", b: "Write, run, submit — then watch your streak grow.", c: A.amber },
               ].map((s, i) => (
                 <Bounce key={s.n} delay={i * 0.06} tilt={i % 2 === 0 ? -1 : 1}
-                  className="rounded-2xl border-[3px] border-black bg-[#141419] p-6">
+                  className="rounded-2xl border-[3px] border-pg-border bg-pg-surface p-6">
                   <div className="-m-6 rounded-2xl p-6" style={{ boxShadow: `8px 8px 0 0 ${s.c}` }}>
                     <span
-                      className="inline-block -rotate-3 rounded-lg border-[3px] border-black px-3 py-1 font-mono text-2xl font-black text-black"
+                      className="inline-block -rotate-3 rounded-lg border-[3px] border-pg-border px-3 py-1 font-mono text-2xl font-black text-black"
                       style={{ background: s.c }}
                     >
                       {s.n}
                     </span>
                     <h3 className="mt-4 text-xl font-extrabold tracking-tight">{s.t}</h3>
-                    <p className="mt-2 text-sm font-medium leading-relaxed text-white/65">{s.b}</p>
+                    <p className="mt-2 text-sm font-medium leading-relaxed text-pg-text-muted">{s.b}</p>
                   </div>
                 </Bounce>
               ))}
@@ -593,7 +597,7 @@ export default function LandingPage() {
 
           {/* ── CTA ──────────────────────────────────────────────── */}
           <section id="cta" className="mx-auto max-w-6xl scroll-mt-24 px-6 py-20">
-            <Bounce hover={false} className="rounded-3xl border-[3px] border-black bg-[#141419]">
+            <Bounce hover={false} className="rounded-3xl border-[3px] border-pg-border bg-pg-surface">
               <div
                 className="rounded-3xl px-6 py-16 text-center"
                 style={{ boxShadow: `12px 12px 0 0 ${A.lime}` }}
@@ -601,13 +605,13 @@ export default function LandingPage() {
                 <h2 className="mx-auto max-w-2xl text-4xl font-black leading-[0.95] tracking-tighter md:text-6xl">
                   READY TO THINK IN{" "}
                   <span
-                    className="inline-block -rotate-2 rounded-xl border-[3px] border-black px-2 text-black"
+                    className="inline-block -rotate-2 rounded-xl border-[3px] border-pg-border px-2 text-black"
                     style={{ background: A.coral }}
                   >
                     ALGORITHMS?
                   </span>
                 </h2>
-                <p className="mx-auto mt-5 max-w-lg text-lg font-medium text-white/70">
+                <p className="mx-auto mt-5 max-w-lg text-lg font-medium text-pg-text-muted">
                   Start with the fundamentals and code your way to mastery — one deliberate
                   problem at a time.
                 </p>
@@ -624,7 +628,7 @@ export default function LandingPage() {
         </main>
 
         {/* ── Footer ─────────────────────────────────────────────── */}
-        <footer className="border-t-[3px] border-black">
+        <footer className="border-t-[3px] border-pg-border">
           <div className="mx-auto max-w-6xl px-6 py-12">
             <div className="flex flex-col gap-10 md:flex-row md:justify-between">
               <div className="max-w-xs">
@@ -632,7 +636,7 @@ export default function LandingPage() {
                   <LogoMark className="size-8" />
                   <span className="text-lg font-extrabold tracking-tight">VintiCode</span>
                 </Link>
-                <p className="mt-4 text-sm font-medium leading-relaxed text-white/60">
+                <p className="mt-4 text-sm font-medium leading-relaxed text-pg-text-muted">
                   Build real intuition for data structures and algorithms, and code your way
                   to mastery.
                 </p>
@@ -653,8 +657,8 @@ export default function LandingPage() {
                 ]} />
               </div>
             </div>
-            <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t-[3px] border-black pt-6 sm:flex-row">
-              <p className="text-xs font-semibold text-white/60">
+            <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t-[3px] border-pg-border pt-6 sm:flex-row">
+              <p className="text-xs font-semibold text-pg-text-muted">
                 &copy; {new Date().getFullYear()} VintiCode. All rights reserved.
               </p>
               <div className="flex items-center gap-2">
@@ -670,7 +674,7 @@ export default function LandingPage() {
                     whileHover={{ y: -3, rotate: -6 }}
                     whileTap={{ scale: 0.9 }}
                     transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                    className="grid size-9 place-items-center rounded-lg border-[3px] border-black text-black"
+                    className="grid size-9 place-items-center rounded-lg border-[3px] border-pg-border text-black"
                     style={{ background: c }}
                   >
                     <Icon className="size-4" strokeWidth={2.5} />
@@ -690,7 +694,7 @@ function SectionHeading({ kicker, title }: { kicker: string; title: string }) {
   return (
     <div className="mx-auto max-w-2xl text-center">
       <span
-        className="inline-block -rotate-2 rounded-lg border-[3px] border-black px-3 py-1 font-mono text-xs font-bold uppercase tracking-wider text-black shadow-[3px_3px_0_0_#000]"
+        className="inline-block -rotate-2 rounded-lg border-[3px] border-pg-border px-3 py-1 font-mono text-xs font-bold uppercase tracking-wider text-black shadow-[3px_3px_0_0_#000]"
         style={{ background: A.cyan }}
       >
         {kicker}
@@ -706,13 +710,13 @@ function SectionHeading({ kicker, title }: { kicker: string; title: string }) {
 function FooterGroup({ title, links }: { title: string; links: { label: string; href: string }[] }) {
   return (
     <div>
-      <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-white/50">{title}</h4>
+      <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-pg-text-muted">{title}</h4>
       <ul className="mt-4 flex flex-col gap-2.5">
         {links.map((link) => (
           <li key={link.label}>
             <Link
               href={link.href}
-              className="text-sm font-semibold text-white/75 transition-colors hover:text-[var(--pg-lime)]"
+              className="text-sm font-semibold text-pg-text transition-colors hover:text-pg-lime-ink"
             >
               {link.label}
             </Link>
@@ -732,26 +736,26 @@ function ProblemPreview() {
       dragConstraints={{ left: -40, right: 40, top: -24, bottom: 24 }}
       dragTransition={{ bounceStiffness: 300, bounceDamping: 18 }}
       whileDrag={{ scale: 1.02, cursor: "grabbing", rotate: 0 }}
-      className="group relative cursor-grab overflow-hidden rounded-2xl border-[3px] border-black bg-[#111116] text-left shadow-[12px_12px_0_0_var(--pg-cyan)]"
+      className="group relative cursor-grab overflow-hidden rounded-2xl border-[3px] border-pg-border bg-pg-surface text-left shadow-[12px_12px_0_0_var(--pg-cyan)]"
     >
       {/* drag hint */}
-      <div className="pointer-events-none absolute left-1/2 top-2 z-10 -translate-x-1/2 rounded-full border-2 border-black bg-white px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-wider text-black opacity-0 transition-opacity group-hover:opacity-100">
+      <div className="pointer-events-none absolute left-1/2 top-2 z-10 -translate-x-1/2 rounded-full border-2 border-pg-border bg-white px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-wider text-black opacity-0 transition-opacity group-hover:opacity-100">
         <span className="flex items-center gap-1">
           <GripHorizontal className="size-3" strokeWidth={3} /> drag me
         </span>
       </div>
 
       {/* window chrome */}
-      <div className="flex items-center gap-2 border-b-[3px] border-black bg-[#0d0d11] px-4 py-3">
-        <span className="size-3 rounded-full border-2 border-black" style={{ background: A.coral }} />
-        <span className="size-3 rounded-full border-2 border-black" style={{ background: A.amber }} />
-        <span className="size-3 rounded-full border-2 border-black" style={{ background: A.lime }} />
-        <div className="ml-3 flex items-center gap-2 text-xs font-bold text-white/60">
+      <div className="flex items-center gap-2 border-b-[3px] border-pg-border bg-pg-surface px-4 py-3">
+        <span className="size-3 rounded-full border-2 border-pg-border" style={{ background: A.coral }} />
+        <span className="size-3 rounded-full border-2 border-pg-border" style={{ background: A.amber }} />
+        <span className="size-3 rounded-full border-2 border-pg-border" style={{ background: A.lime }} />
+        <div className="ml-3 flex items-center gap-2 text-xs font-bold text-pg-text-muted">
           <Terminal className="size-3.5" strokeWidth={2.5} />
           <span className="font-mono">two-sum.ts</span>
         </div>
         <span
-          className="ml-auto inline-flex items-center rounded-md border-2 border-black px-2 py-0.5 font-mono text-[0.7rem] font-bold text-black"
+          className="ml-auto inline-flex items-center rounded-md border-2 border-pg-border px-2 py-0.5 font-mono text-[0.7rem] font-bold text-black"
           style={{ background: A.lime }}
         >
           EASY
@@ -759,9 +763,9 @@ function ProblemPreview() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2">
-        <div className="border-b-[3px] border-black p-5 md:border-b-0 md:border-r-[3px]">
+        <div className="border-b-[3px] border-pg-border p-5 md:border-b-0 md:border-r-[3px]">
           <h3 className="text-base font-extrabold">Two Sum</h3>
-          <p className="mt-2 text-xs font-medium leading-relaxed text-white/60">
+          <p className="mt-2 text-xs font-medium leading-relaxed text-pg-text-muted">
             Given an array of integers, return the indices of the two numbers that add up to a
             specific target.
           </p>
@@ -770,7 +774,7 @@ function ProblemPreview() {
               <span
                 key={tag}
                 style={{ background: [A.cyan, A.amber, A.lime][i] }}
-                className="inline-flex items-center rounded-md border-2 border-black px-2 py-0.5 font-mono text-[0.7rem] font-bold text-black"
+                className="inline-flex items-center rounded-md border-2 border-pg-border px-2 py-0.5 font-mono text-[0.7rem] font-bold text-black"
               >
                 {tag}
               </span>
@@ -778,8 +782,8 @@ function ProblemPreview() {
           </div>
         </div>
 
-        <div className="bg-[#0d0d11] p-5 font-mono text-xs leading-relaxed">
-          <pre className="overflow-x-auto text-white/70">
+        <div className="bg-pg-surface p-5 font-mono text-xs leading-relaxed">
+          <pre className="overflow-x-auto text-pg-text-muted">
             <code>
               <span style={{ color: A.indigo }}>function</span>{" "}
               <span style={{ color: A.lime }}>twoSum</span>(nums, target) {"{"}

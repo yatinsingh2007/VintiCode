@@ -22,6 +22,7 @@ import {
   useGsapReveal,
   A,
 } from "@/components/playground";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 interface Submission {
   id: string;
@@ -122,36 +123,42 @@ export default function Profile() {
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <span
-              className="inline-block -rotate-2 rounded-lg border-[3px] border-black px-2.5 py-0.5 font-mono text-[0.7rem] font-bold uppercase tracking-wider text-black shadow-[3px_3px_0_0_#000]"
+              className="inline-block -rotate-2 rounded-lg border-[3px] border-pg-border px-2.5 py-0.5 font-mono text-[0.7rem] font-bold uppercase tracking-wider text-black shadow-[3px_3px_0_0_#000]"
               style={{ background: A.amber }}
             >
               You
             </span>
             <h1 className="mt-3 text-4xl font-black tracking-tighter">Profile</h1>
-            <p className="mt-1 text-sm font-medium text-white/60">
+            <p className="mt-1 text-sm font-medium text-pg-text-muted">
               Manage your profile and view your coding journey
             </p>
           </div>
-          <PlayButton
-            onClick={() => router.push("/dashboard/home")}
-            fill="#141419"
-            shadow={A.cyan}
-            text="#ffffff"
-            className="!px-4 !py-2 text-sm"
-          >
-            <ArrowLeft className="size-4" strokeWidth={3} /> Back to Home
-          </PlayButton>
+          <div className="flex items-center gap-2">
+            <ThemeToggle
+              size="icon-sm"
+              className="border-[3px] border-pg-border bg-pg-surface"
+            />
+            <PlayButton
+              onClick={() => router.push("/dashboard/home")}
+              fill="#141419"
+              shadow={A.cyan}
+              text="#ffffff"
+              className="!px-4 !py-2 text-sm"
+            >
+              <ArrowLeft className="size-4" strokeWidth={3} /> Back to Home
+            </PlayButton>
+          </div>
         </div>
 
         {loading ? (
           <div className="w-full space-y-8">
-            <div className="h-28 w-full animate-pulse rounded-2xl border-[3px] border-black bg-[#141419]" />
+            <div className="h-28 w-full animate-pulse rounded-2xl border-[3px] border-pg-border bg-pg-surface" />
             <div className="grid w-full gap-6 md:grid-cols-3">
               {Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="h-28 w-full animate-pulse rounded-2xl border-[3px] border-black bg-[#141419]" />
+                <div key={i} className="h-28 w-full animate-pulse rounded-2xl border-[3px] border-pg-border bg-pg-surface" />
               ))}
             </div>
-            <div className="h-64 w-full animate-pulse rounded-2xl border-[3px] border-black bg-[#141419]" />
+            <div className="h-64 w-full animate-pulse rounded-2xl border-[3px] border-pg-border bg-pg-surface" />
           </div>
         ) : (
           <div ref={scope} className="w-full space-y-8">
@@ -159,18 +166,18 @@ export default function Profile() {
               <PlayCard data-reveal color={A.lime} offset={8} className="p-6">
                 <div className="flex items-center gap-4">
                   <div
-                    className="grid size-16 shrink-0 place-items-center rounded-2xl border-[3px] border-black text-black"
+                    className="grid size-16 shrink-0 place-items-center rounded-2xl border-[3px] border-pg-border text-black"
                     style={{ background: A.lime }}
                   >
                     <User className="size-8" strokeWidth={2.5} />
                   </div>
                   <div>
                     <h2 className="text-2xl font-extrabold tracking-tight">{userData.name}</h2>
-                    <div className="mt-2 flex items-center gap-2 text-white/60">
+                    <div className="mt-2 flex items-center gap-2 text-pg-text-muted">
                       <Mail className="size-4" />
                       <span className="text-sm font-medium">{userData.email}</span>
                     </div>
-                    <div className="mt-1.5 flex items-center gap-2 text-sm font-medium text-white/60">
+                    <div className="mt-1.5 flex items-center gap-2 text-sm font-medium text-pg-text-muted">
                       <Calendar className="size-4" />
                       <span>
                         Joined{" "}
@@ -197,7 +204,7 @@ export default function Profile() {
                 >
                   <div className="mb-3 flex items-center gap-2">
                     <span
-                      className="grid size-9 place-items-center rounded-lg border-[3px] border-black text-black"
+                      className="grid size-9 place-items-center rounded-lg border-[3px] border-pg-border text-black"
                       style={{ background: stat.color }}
                     >
                       <stat.icon className="size-5" strokeWidth={2.5} />
@@ -205,7 +212,7 @@ export default function Profile() {
                     <span className="text-sm font-bold">{stat.label}</span>
                   </div>
                   <p className="mb-1 text-4xl font-black tabular-nums">{stat.value}</p>
-                  <p className="text-xs font-medium text-white/50">{stat.hint}</p>
+                  <p className="text-xs font-medium text-pg-text-muted">{stat.hint}</p>
                 </PlayCard>
               ))}
             </div>
@@ -217,13 +224,13 @@ export default function Profile() {
                   <IconTile icon={FileCode} color={A.indigo} className="size-10" />
                   <div>
                     <h3 className="text-lg font-extrabold tracking-tight">Your Submissions</h3>
-                    <p className="text-sm font-medium text-white/55">
+                    <p className="text-sm font-medium text-pg-text-muted">
                       View all your coding submissions
                     </p>
                   </div>
                 </div>
                 <span
-                  className="rounded-lg border-[3px] border-black px-3 py-1 font-mono text-sm font-bold text-black"
+                  className="rounded-lg border-[3px] border-pg-border px-3 py-1 font-mono text-sm font-bold text-black"
                   style={{ background: A.lime }}
                 >
                   {submissions.length}
@@ -237,7 +244,7 @@ export default function Profile() {
                       key={s.id}
                       role="button"
                       tabIndex={0}
-                      className="cursor-pointer rounded-xl border-[3px] border-black bg-[#0d0d11] p-4 transition-transform duration-150 hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[5px_5px_0_0_var(--pg-cyan)]"
+                      className="cursor-pointer rounded-xl border-[3px] border-pg-border bg-pg-surface p-4 transition-transform duration-150 hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[5px_5px_0_0_var(--pg-cyan)]"
                       onClick={() => router.push(`/dashboard/profile/submission/${s.id}`)}
                       onKeyDown={(e) => {
                         if (e.key === "Enter" || e.key === " ") {
@@ -248,7 +255,7 @@ export default function Profile() {
                       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex items-center gap-3">
                           <span
-                            className="grid size-10 shrink-0 place-items-center rounded-lg border-[3px] border-black text-black"
+                            className="grid size-10 shrink-0 place-items-center rounded-lg border-[3px] border-pg-border text-black"
                             style={{ background: s.status === "accepted" ? A.lime : A.coral }}
                           >
                             {s.status === "accepted" ? (
@@ -261,14 +268,14 @@ export default function Profile() {
                             <p className="font-extrabold">{s.question.title}</p>
                             <div className="mt-1.5 flex items-center gap-2">
                               <span
-                                className="inline-flex items-center rounded-md border-2 border-black px-2 py-0.5 font-mono text-[0.65rem] font-bold text-black"
+                                className="inline-flex items-center rounded-md border-2 border-pg-border px-2 py-0.5 font-mono text-[0.65rem] font-bold text-black"
                                 style={{ background: s.status === "accepted" ? A.lime : A.coral }}
                               >
                                 {s.status.charAt(0).toUpperCase() + s.status.slice(1)}
                               </span>
                               {s.question.difficulty && (
                                 <span
-                                  className="inline-flex items-center rounded-md border-2 border-black px-2 py-0.5 font-mono text-[0.65rem] font-bold text-black"
+                                  className="inline-flex items-center rounded-md border-2 border-pg-border px-2 py-0.5 font-mono text-[0.65rem] font-bold text-black"
                                   style={{ background: diffColor(s.question.difficulty) }}
                                 >
                                   {s.question.difficulty}
@@ -285,7 +292,7 @@ export default function Profile() {
                               year: "numeric",
                             })}
                           </p>
-                          <p className="text-xs font-medium text-white/50">
+                          <p className="text-xs font-medium text-pg-text-muted">
                             {new Date(s.createdAt).toLocaleTimeString("en-IN", {
                               hour: "2-digit",
                               minute: "2-digit",
@@ -297,11 +304,11 @@ export default function Profile() {
                   ))
                 ) : (
                   <div className="flex flex-col items-center justify-center py-16 text-center">
-                    <div className="mb-4 grid size-16 place-items-center rounded-2xl border-[3px] border-black bg-[#0d0d11]">
-                      <AlertCircle className="size-8 text-white/40" />
+                    <div className="mb-4 grid size-16 place-items-center rounded-2xl border-[3px] border-pg-border bg-pg-surface">
+                      <AlertCircle className="size-8 text-pg-text-faint" />
                     </div>
                     <p className="text-lg font-extrabold">No submissions yet</p>
-                    <p className="mt-2 text-sm font-medium text-white/55">
+                    <p className="mt-2 text-sm font-medium text-pg-text-muted">
                       Start solving problems to see your submissions here
                     </p>
                     <PlayButton

@@ -44,11 +44,11 @@ function AdminInput({
 }) {
   return (
     <div>
-      <label htmlFor={id} className="mb-2 block text-xs font-bold uppercase tracking-wider text-white/70">
+      <label htmlFor={id} className="mb-2 block text-xs font-bold uppercase tracking-wider text-pg-text-muted">
         {label}
       </label>
-      <div className="relative flex items-center rounded-xl border-[3px] border-black bg-[#0d0d11] transition-shadow focus-within:shadow-[4px_4px_0_0_var(--pg-cyan)]">
-        <Icon className="absolute left-3.5 size-4 text-white/40" />
+      <div className="relative flex items-center rounded-xl border-[3px] border-pg-border bg-pg-surface transition-shadow focus-within:shadow-[4px_4px_0_0_var(--pg-cyan)]">
+        <Icon className="absolute left-3.5 size-4 text-pg-text-faint" />
         <input
           id={id}
           type={type}
@@ -57,7 +57,7 @@ function AdminInput({
           placeholder={placeholder}
           autoComplete={autoComplete}
           disabled={disabled}
-          className="flex-1 bg-transparent py-3 pl-10 pr-4 text-sm font-medium text-white outline-none placeholder:text-white/30 disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex-1 bg-transparent py-3 pl-10 pr-4 text-sm font-medium text-pg-text outline-none placeholder:text-pg-text-faint disabled:cursor-not-allowed disabled:opacity-50"
         />
         {rightElement && <div className="absolute right-3">{rightElement}</div>}
       </div>
@@ -68,7 +68,7 @@ function AdminInput({
 function FeaturePill({ text, color }: { text: string; color: string }) {
   return (
     <span
-      className="inline-flex items-center gap-1.5 rounded-lg border-[3px] border-black px-3 py-1 text-xs font-bold text-black"
+      className="inline-flex items-center gap-1.5 rounded-lg border-[3px] border-pg-border px-3 py-1 text-xs font-bold text-black"
       style={{ background: color }}
     >
       {text}
@@ -149,17 +149,17 @@ export default function AdminLoginPage() {
   // Show nothing while checking existing session
   if (checkingSession) {
     return (
-      <div className="dark flex min-h-screen items-center justify-center bg-[#0a0a0d] text-white">
+      <div className="flex min-h-screen items-center justify-center bg-pg-ink bg-paper-grid text-pg-text">
         <div className="flex flex-col items-center gap-4">
           <div
-            className="grid size-12 place-items-center rounded-2xl border-[3px] border-black text-black"
+            className="grid size-12 place-items-center rounded-2xl border-[3px] border-pg-border text-black"
             style={{ background: A.lime }}
           >
             <Shield className="size-6" strokeWidth={2.5} />
           </div>
           <div className="flex items-center gap-2">
             <Loader2 className="size-4 animate-spin" />
-            <span className="text-sm font-medium text-white/60">Checking session…</span>
+            <span className="text-sm font-medium text-pg-text-muted">Checking session…</span>
           </div>
         </div>
       </div>
@@ -172,30 +172,30 @@ export default function AdminLoginPage() {
       <div className="relative z-10 hidden w-[45%] flex-col justify-between px-14 py-12 lg:flex">
         <div className="flex items-center gap-3">
           <div
-            className="grid size-10 place-items-center rounded-xl border-[3px] border-black text-black"
+            className="grid size-10 place-items-center rounded-xl border-[3px] border-pg-border text-black"
             style={{ background: A.lime }}
           >
             <Shield className="size-5" strokeWidth={2.5} />
           </div>
           <div>
-            <p className="text-base font-extrabold leading-none text-white">VintiCode</p>
-            <p className="mt-0.5 text-xs font-medium text-white/50">Admin Console</p>
+            <p className="text-base font-extrabold leading-none text-pg-text">VintiCode</p>
+            <p className="mt-0.5 text-xs font-medium text-pg-text-muted">Admin Console</p>
           </div>
         </div>
 
         <div className="space-y-6">
           <div className="space-y-5">
             <span
-              className="inline-flex -rotate-2 items-center gap-2 rounded-lg border-[3px] border-black px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-black shadow-[3px_3px_0_0_#000]"
+              className="inline-flex -rotate-2 items-center gap-2 rounded-lg border-[3px] border-pg-border px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-black shadow-[3px_3px_0_0_#000]"
               style={{ background: A.cyan }}
             >
               Secure Admin Access
             </span>
-            <h1 className="text-5xl font-black leading-[0.95] tracking-tighter text-white">
+            <h1 className="text-5xl font-black leading-[0.95] tracking-tighter text-pg-text">
               Control your
               <br />
               <span
-                className="inline-block -rotate-1 rounded-xl border-[3px] border-black px-2 text-black"
+                className="inline-block -rotate-1 rounded-xl border-[3px] border-pg-border px-2 text-black"
                 style={{ background: A.lime }}
               >
                 platform
@@ -203,7 +203,7 @@ export default function AdminLoginPage() {
               <br />
               with confidence.
             </h1>
-            <p className="max-w-sm text-base font-medium leading-relaxed text-white/60">
+            <p className="max-w-sm text-base font-medium leading-relaxed text-pg-text-muted">
               Manage users, questions, and submissions from a unified dashboard built for
               speed and clarity.
             </p>
@@ -217,8 +217,8 @@ export default function AdminLoginPage() {
           </div>
         </div>
 
-        <div className="border-l-[3px] border-white/20 pl-4">
-          <p className="text-sm font-medium italic text-white/50">
+        <div className="border-l-[3px] border-pg-text/20 pl-4">
+          <p className="text-sm font-medium italic text-pg-text-muted">
             &quot;Access is a privilege. Manage responsibly.&quot;
           </p>
         </div>
@@ -230,19 +230,19 @@ export default function AdminLoginPage() {
           {/* Mobile logo */}
           <div className="mb-8 flex flex-col items-center lg:hidden">
             <div
-              className="mb-4 grid size-14 place-items-center rounded-2xl border-[3px] border-black text-black"
+              className="mb-4 grid size-14 place-items-center rounded-2xl border-[3px] border-pg-border text-black"
               style={{ background: A.lime }}
             >
               <Shield className="size-7" strokeWidth={2.5} />
             </div>
-            <h1 className="text-xl font-extrabold text-white">VintiCode Admin</h1>
-            <p className="mt-1 text-sm font-medium text-white/50">Control Panel</p>
+            <h1 className="text-xl font-extrabold text-pg-text">VintiCode Admin</h1>
+            <p className="mt-1 text-sm font-medium text-pg-text-muted">Control Panel</p>
           </div>
 
           <PlayCard color={A.cyan} offset={10} className="p-8">
             <div className="mb-8">
-              <h2 className="text-2xl font-black tracking-tight text-white">Sign in to Admin</h2>
-              <p className="mt-1 text-sm font-medium text-white/55">
+              <h2 className="text-2xl font-black tracking-tight text-pg-text">Sign in to Admin</h2>
+              <p className="mt-1 text-sm font-medium text-pg-text-muted">
                 Enter your admin credentials to continue
               </p>
             </div>
@@ -274,7 +274,7 @@ export default function AdminLoginPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword((v) => !v)}
-                    className="text-white/50 transition-colors hover:text-white"
+                    className="text-pg-text-muted transition-colors hover:text-pg-text"
                     aria-label={showPassword ? "Hide password" : "Show password"}
                   >
                     {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
@@ -285,7 +285,7 @@ export default function AdminLoginPage() {
               {error && (
                 <div
                   role="alert"
-                  className="flex items-start gap-3 rounded-xl border-[3px] border-black bg-[#0d0d11] px-4 py-3 text-sm font-semibold text-[var(--pg-coral)]"
+                  className="flex items-start gap-3 rounded-xl border-[3px] border-pg-border bg-pg-surface px-4 py-3 text-sm font-semibold text-pg-coral-ink"
                 >
                   <AlertCircle className="mt-0.5 size-4 shrink-0" />
                   <span>{error}</span>
@@ -315,15 +315,15 @@ export default function AdminLoginPage() {
               </PlayButton>
             </form>
 
-            <div className="mt-6 border-t-[3px] border-black pt-5">
-              <div className="flex items-center gap-2 text-xs font-medium text-white/50">
+            <div className="mt-6 border-t-[3px] border-pg-border pt-5">
+              <div className="flex items-center gap-2 text-xs font-medium text-pg-text-muted">
                 <Lock className="size-3" />
                 <span>Protected by JWT · Session expires in 8 hours</span>
               </div>
             </div>
           </PlayCard>
 
-          <p className="mt-6 text-center text-xs font-medium text-white/40">
+          <p className="mt-6 text-center text-xs font-medium text-pg-text-faint">
             Unauthorized access attempts are logged and monitored.
           </p>
         </div>

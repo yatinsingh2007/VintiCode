@@ -90,8 +90,8 @@ export default function AdminQuestionsPage() {
       {/* Header */}
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-3xl font-black tracking-tighter text-white">Questions</h1>
-          <p className="mt-1 text-sm font-medium text-white/55">
+          <h1 className="text-3xl font-black tracking-tighter text-pg-text">Questions</h1>
+          <p className="mt-1 text-sm font-medium text-pg-text-muted">
             Manage your problem set and test cases
           </p>
         </div>
@@ -104,16 +104,16 @@ export default function AdminQuestionsPage() {
       {/* Search */}
       <form
         onSubmit={handleSearch}
-        className="flex gap-3 rounded-2xl border-[3px] border-black bg-[#141419] p-3"
+        className="flex gap-3 rounded-2xl border-[3px] border-pg-border bg-pg-surface p-3"
       >
         <div className="flex flex-1 items-center gap-2">
-          <Search className="size-4 shrink-0 text-white/40" />
+          <Search className="size-4 shrink-0 text-pg-text-faint" />
           <input
             type="text"
             placeholder="Search questions by title or difficulty…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="flex-1 bg-transparent text-sm font-medium text-white placeholder:text-white/30 outline-none"
+            className="flex-1 bg-transparent text-sm font-medium text-pg-text placeholder:text-pg-text-faint outline-none"
           />
         </div>
         <PlayButton type="submit" fill={A.cyan} shadow="#0d0d11" text="#0a0a0d" className="!px-6 !py-1.5 text-sm">
@@ -122,7 +122,7 @@ export default function AdminQuestionsPage() {
       </form>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-2xl border-[3px] border-black bg-[#141419]">
+      <div className="overflow-hidden rounded-2xl border-[3px] border-pg-border bg-pg-surface">
         <div className="overflow-x-auto">
           {loading ? (
             <div className="p-1">
@@ -130,40 +130,40 @@ export default function AdminQuestionsPage() {
             </div>
           ) : questions.length === 0 ? (
             <div className="py-20 text-center">
-              <div className="flex flex-col items-center gap-2 text-white/50">
+              <div className="flex flex-col items-center gap-2 text-pg-text-muted">
                 <BookOpen className="mb-2 size-10 opacity-30" />
-                <p className="text-lg font-extrabold text-white">No questions found</p>
+                <p className="text-lg font-extrabold text-pg-text">No questions found</p>
                 <p className="text-sm font-medium">Try creating a new one or adjusting search</p>
               </div>
             </div>
           ) : (
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b-[3px] border-black bg-[#0d0d11] text-left">
-                  <th className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-white/50">#</th>
-                  <th className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-white/50">Title</th>
-                  <th className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-white/50">Difficulty</th>
-                  <th className="px-5 py-4 text-center text-xs font-bold uppercase tracking-wider text-white/50">Solves</th>
-                  <th className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-white/50">Created</th>
-                  <th className="px-5 py-4 text-right text-xs font-bold uppercase tracking-wider text-white/50">Actions</th>
+                <tr className="border-b-[3px] border-pg-border bg-pg-surface text-left">
+                  <th className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-pg-text-muted">#</th>
+                  <th className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-pg-text-muted">Title</th>
+                  <th className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-pg-text-muted">Difficulty</th>
+                  <th className="px-5 py-4 text-center text-xs font-bold uppercase tracking-wider text-pg-text-muted">Solves</th>
+                  <th className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-pg-text-muted">Created</th>
+                  <th className="px-5 py-4 text-right text-xs font-bold uppercase tracking-wider text-pg-text-muted">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y-[3px] divide-black/40">
                 {questions.map((q, i) => (
-                  <tr key={q.id} className="group transition-colors hover:bg-white/5">
-                    <td className="px-5 py-4 font-mono text-xs text-white/50">
+                  <tr key={q.id} className="group transition-colors hover:bg-pg-text/5">
+                    <td className="px-5 py-4 font-mono text-xs text-pg-text-muted">
                       {(pagination ? (pagination.page - 1) * 20 : 0) + i + 1}
                     </td>
-                    <td className="max-w-xs truncate px-5 py-4 font-bold text-white">{q.title}</td>
+                    <td className="max-w-xs truncate px-5 py-4 font-bold text-pg-text">{q.title}</td>
                     <td className="px-5 py-4">
                       <Badge variant={difficultyVariant(q.difficulty)}>{q.difficulty}</Badge>
                     </td>
                     <td className="px-5 py-4 text-center">
-                      <span className="rounded-md border-2 border-black bg-[#0d0d11] px-2 py-0.5 font-mono text-xs font-bold text-white/70">
+                      <span className="rounded-md border-2 border-pg-border bg-pg-surface px-2 py-0.5 font-mono text-xs font-bold text-pg-text-muted">
                         {q._count.solvedQuestions}
                       </span>
                     </td>
-                    <td className="px-5 py-4 text-xs font-medium text-white/50">
+                    <td className="px-5 py-4 text-xs font-medium text-pg-text-muted">
                       {new Date(q.createdAt).toLocaleDateString(undefined, {
                         year: "numeric",
                         month: "short",
@@ -174,7 +174,7 @@ export default function AdminQuestionsPage() {
                       <div className="flex items-center justify-end gap-1.5">
                         <button
                           onClick={() => router.push(`/admin/questions/${q.id}/edit`)}
-                          className="rounded-lg border-2 border-transparent p-2 text-white/60 transition-all hover:border-black hover:bg-[var(--pg-cyan)] hover:text-black"
+                          className="rounded-lg border-2 border-transparent p-2 text-pg-text-muted transition-all hover:border-pg-border hover:bg-[var(--pg-cyan)] hover:text-black"
                           title="Edit"
                         >
                           <Pencil className="size-3.5" strokeWidth={2.5} />
@@ -182,7 +182,7 @@ export default function AdminQuestionsPage() {
                         <button
                           onClick={() => handleDelete(q.id, q.title)}
                           disabled={deletingId === q.id}
-                          className="rounded-lg border-2 border-transparent p-2 text-white/60 transition-all hover:border-black hover:bg-[var(--pg-coral)] hover:text-black disabled:opacity-30"
+                          className="rounded-lg border-2 border-transparent p-2 text-pg-text-muted transition-all hover:border-pg-border hover:bg-[var(--pg-coral)] hover:text-black disabled:opacity-30"
                           title="Delete"
                         >
                           {deletingId === q.id ? (
@@ -202,26 +202,26 @@ export default function AdminQuestionsPage() {
 
         {/* Pagination */}
         {pagination && pagination.totalPages > 1 && (
-          <div className="flex items-center justify-between border-t-[3px] border-black bg-[#0d0d11] px-5 py-4">
-            <p className="text-xs font-medium text-white/50">
-              Showing <span className="font-bold text-white">{questions.length}</span> of{" "}
-              <span className="font-bold text-white">{pagination.total}</span> questions
+          <div className="flex items-center justify-between border-t-[3px] border-pg-border bg-pg-surface px-5 py-4">
+            <p className="text-xs font-medium text-pg-text-muted">
+              Showing <span className="font-bold text-pg-text">{questions.length}</span> of{" "}
+              <span className="font-bold text-pg-text">{pagination.total}</span> questions
             </p>
             <div className="flex items-center gap-2">
               <button
                 disabled={page === 1}
                 onClick={() => setPage((p) => p - 1)}
-                className="rounded-lg border-2 border-transparent p-2 text-white/60 transition-all hover:border-black hover:bg-white/5 hover:text-white disabled:opacity-30"
+                className="rounded-lg border-2 border-transparent p-2 text-pg-text-muted transition-all hover:border-pg-border hover:bg-pg-text/5 hover:text-pg-text disabled:opacity-30"
               >
                 <ChevronLeft className="size-4" strokeWidth={2.5} />
               </button>
-              <span className="px-2 text-xs font-bold text-white/60">
+              <span className="px-2 text-xs font-bold text-pg-text-muted">
                 Page {page} of {pagination.totalPages}
               </span>
               <button
                 disabled={page === pagination.totalPages}
                 onClick={() => setPage((p) => p + 1)}
-                className="rounded-lg border-2 border-transparent p-2 text-white/60 transition-all hover:border-black hover:bg-white/5 hover:text-white disabled:opacity-30"
+                className="rounded-lg border-2 border-transparent p-2 text-pg-text-muted transition-all hover:border-pg-border hover:bg-pg-text/5 hover:text-pg-text disabled:opacity-30"
               >
                 <ChevronRight className="size-4" strokeWidth={2.5} />
               </button>

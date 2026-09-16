@@ -3,7 +3,8 @@
 import Editor, { OnChange } from "@monaco-editor/react";
 import { useParams, useRouter } from "next/navigation";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { ThemeContext } from "@/context/ThemeContext";
 import api from "@/lib/axios";
 import {
   Select,
@@ -17,6 +18,7 @@ import toast from "react-hot-toast";
 import { ArrowLeft, CheckCircle2, Play, Send, Terminal, AlertCircle, Save } from "lucide-react";
 import { Confetti } from "@/components/magicui/confetti";
 import { PlayButton, PlayCard, A } from "@/components/playground";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 interface submissionReportItem {
   verdict: string;
@@ -175,6 +177,7 @@ export default function Dashboard() {
   const [showConfetti, setShowConfetti] = useState<boolean>(false);
   const [showBackDialog, setShowBackDialog] = useState<boolean>(false);
   const [saveLoader, setSaveLoader] = useState<boolean>(false);
+  const { theme } = useContext(ThemeContext);
 
   const handleSavePlayground = async (): Promise<boolean> => {
     setSaveLoader(true);
@@ -410,22 +413,22 @@ export default function Dashboard() {
     });
   };
 
-  const btnBusy = "h-3 w-3 animate-spin rounded-full border-2 border-black/50 border-t-transparent";
+  const btnBusy = "h-3 w-3 animate-spin rounded-full border-2 border-pg-border/50 border-t-transparent";
 
   return (
     <>
       <Confetti trigger={showConfetti} onComplete={() => setShowConfetti(false)} />
       <PanelGroup
         direction="horizontal"
-        className="dark fixed inset-0 z-50 h-dvh w-screen overflow-hidden bg-[#0a0a0d] font-sans text-white"
+        className="fixed inset-0 z-50 h-dvh w-screen overflow-hidden bg-pg-ink bg-paper-grid font-sans text-pg-text"
       >
         {/* ── Problem panel ─────────────────────────────────────── */}
-        <Panel defaultSize={40} minSize={25} className="flex flex-col border-r-[3px] border-black bg-[#0d0d11]">
-          <div className="flex h-14 flex-none items-center gap-3 border-b-[3px] border-black bg-[#141419] px-4">
+        <Panel defaultSize={40} minSize={25} className="flex flex-col border-r-[3px] border-pg-border bg-pg-surface">
+          <div className="flex h-14 flex-none items-center gap-3 border-b-[3px] border-pg-border bg-pg-surface px-4">
             <button
               onClick={() => setShowBackDialog(true)}
               aria-label="Back"
-              className="grid size-9 place-items-center rounded-xl border-[3px] border-black bg-[#0d0d11] text-white transition-transform active:scale-95 hover:-translate-x-0.5 hover:-translate-y-0.5"
+              className="grid size-9 place-items-center rounded-xl border-[3px] border-pg-border bg-pg-surface text-pg-text transition-transform active:scale-95 hover:-translate-x-0.5 hover:-translate-y-0.5"
             >
               <ArrowLeft className="size-4" strokeWidth={2.5} />
             </button>
@@ -436,7 +439,7 @@ export default function Dashboard() {
               </h1>
               {questionData.done && (
                 <span
-                  className="inline-flex shrink-0 items-center gap-1 rounded-md border-2 border-black px-1.5 py-0.5 font-mono text-[0.6rem] font-bold uppercase text-black"
+                  className="inline-flex shrink-0 items-center gap-1 rounded-md border-2 border-pg-border px-1.5 py-0.5 font-mono text-[0.6rem] font-bold uppercase text-black"
                   style={{ background: A.lime }}
                 >
                   <CheckCircle2 className="size-3" strokeWidth={3} />
@@ -444,6 +447,11 @@ export default function Dashboard() {
                 </span>
               )}
             </div>
+
+            <ThemeToggle
+              size="icon-sm"
+              className="ml-auto shrink-0 border-[3px] border-pg-border bg-pg-surface"
+            />
           </div>
 
           <div className="flex-1 overflow-y-auto p-8">
@@ -451,33 +459,33 @@ export default function Dashboard() {
               <div className="mx-auto max-w-3xl space-y-10 pb-12">
                 <div className="flex items-center gap-4">
                   <span
-                    className="inline-flex items-center rounded-md border-2 border-black px-2.5 py-1 font-mono text-xs font-bold uppercase text-black"
+                    className="inline-flex items-center rounded-md border-2 border-pg-border px-2.5 py-1 font-mono text-xs font-bold uppercase text-black"
                     style={{ background: diffColor(questionData.difficulty) }}
                   >
                     {questionData.difficulty}
                   </span>
-                  <span className="text-[11px] font-bold uppercase tracking-widest text-white/40">
+                  <span className="text-[11px] font-bold uppercase tracking-widest text-pg-text-faint">
                     Memory Limit: 256MB
                   </span>
                 </div>
 
                 <div className="space-y-4">
                   <h2 className="text-xl font-black tracking-tight">Problem Statement</h2>
-                  <p className="text-[15px] font-medium leading-relaxed text-white/70">
+                  <p className="text-[15px] font-medium leading-relaxed text-pg-text-muted">
                     {questionData.description}
                   </p>
                 </div>
 
                 <div className="grid grid-cols-1 gap-8">
                   <div className="space-y-3">
-                    <h3 className="text-[11px] font-bold uppercase tracking-widest text-white/50">Input Format</h3>
-                    <div className="rounded-xl border-[3px] border-black bg-[#141419] p-5 font-mono text-[13px] leading-relaxed text-white/80">
+                    <h3 className="text-[11px] font-bold uppercase tracking-widest text-pg-text-muted">Input Format</h3>
+                    <div className="rounded-xl border-[3px] border-pg-border bg-pg-surface p-5 font-mono text-[13px] leading-relaxed text-pg-text">
                       {questionData.input_format}
                     </div>
                   </div>
                   <div className="space-y-3">
-                    <h3 className="text-[11px] font-bold uppercase tracking-widest text-white/50">Output Format</h3>
-                    <div className="rounded-xl border-[3px] border-black bg-[#141419] p-5 font-mono text-[13px] leading-relaxed text-white/80">
+                    <h3 className="text-[11px] font-bold uppercase tracking-widest text-pg-text-muted">Output Format</h3>
+                    <div className="rounded-xl border-[3px] border-pg-border bg-pg-surface p-5 font-mono text-[13px] leading-relaxed text-pg-text">
                       {questionData.output_format}
                     </div>
                   </div>
@@ -490,19 +498,19 @@ export default function Dashboard() {
                   ].map((block) => (
                     <div key={block.label} className="space-y-3">
                       <div className="flex items-center justify-between">
-                        <h3 className="text-[11px] font-bold uppercase tracking-widest text-white/50">{block.label}</h3>
+                        <h3 className="text-[11px] font-bold uppercase tracking-widest text-pg-text-muted">{block.label}</h3>
                         <button
                           onClick={() => {
                             navigator.clipboard.writeText(block.value || "");
                             toast.success(`Copied ${block.label.split(" ")[1]}`);
                           }}
-                          className="rounded-md border-2 border-black px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-black transition-transform active:scale-95"
+                          className="rounded-md border-2 border-pg-border px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-black transition-transform active:scale-95"
                           style={{ background: block.color }}
                         >
                           Copy
                         </button>
                       </div>
-                      <div className="rounded-xl border-[3px] border-black bg-[#141419] p-5 font-mono text-sm text-white/80">
+                      <div className="rounded-xl border-[3px] border-pg-border bg-pg-surface p-5 font-mono text-sm text-pg-text">
                         <pre className="whitespace-pre-wrap leading-relaxed">{block.value}</pre>
                       </div>
                     </div>
@@ -510,7 +518,7 @@ export default function Dashboard() {
                 </div>
 
                 {questionData.test_cases.length > 0 && (
-                  <div className="border-t-[3px] border-black pt-10">
+                  <div className="border-t-[3px] border-pg-border pt-10">
                     <h3 className="mb-6 px-1 text-sm font-black uppercase tracking-widest">Verification Status</h3>
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                       {questionData.test_cases.map((testCase, index) => {
@@ -518,25 +526,25 @@ export default function Dashboard() {
                         return (
                           <div
                             key={index}
-                            className="flex items-center justify-between rounded-xl border-[3px] border-black bg-[#141419] p-4"
+                            className="flex items-center justify-between rounded-xl border-[3px] border-pg-border bg-pg-surface p-4"
                           >
                             <div className="flex flex-col gap-1">
-                              <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">Test Case</span>
+                              <span className="text-[10px] font-bold uppercase tracking-widest text-pg-text-faint">Test Case</span>
                               <span className="text-sm font-extrabold">Case #0{index + 1}</span>
                             </div>
                             <div className="flex items-center">
                               {status === "pending" && (
-                                <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">Idle</span>
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-pg-text-faint">Idle</span>
                               )}
                               {status === "loading" && (
-                                <div className="flex items-center gap-2 text-[var(--pg-cyan)]">
+                                <div className="flex items-center gap-2 text-pg-cyan-ink">
                                   <span className="animate-pulse text-[10px] font-bold uppercase tracking-widest">Running</span>
                                   <span className="size-3 animate-spin rounded-full border-2 border-[var(--pg-cyan)] border-t-transparent" />
                                 </div>
                               )}
                               {status === "accepted" && (
                                 <span
-                                  className="inline-flex items-center gap-1.5 rounded-md border-2 border-black px-2 py-0.5 text-[10px] font-bold uppercase text-black"
+                                  className="inline-flex items-center gap-1.5 rounded-md border-2 border-pg-border px-2 py-0.5 text-[10px] font-bold uppercase text-black"
                                   style={{ background: A.lime }}
                                 >
                                   Passed
@@ -545,7 +553,7 @@ export default function Dashboard() {
                               )}
                               {status === "failed" && (
                                 <span
-                                  className="inline-flex items-center gap-1.5 rounded-md border-2 border-black px-2 py-0.5 text-[10px] font-bold uppercase text-black"
+                                  className="inline-flex items-center gap-1.5 rounded-md border-2 border-pg-border px-2 py-0.5 text-[10px] font-bold uppercase text-black"
                                   style={{ background: A.coral }}
                                 >
                                   Failed
@@ -562,28 +570,28 @@ export default function Dashboard() {
               </div>
             ) : (
               <div className="mx-auto mt-10 max-w-3xl space-y-8">
-                <div className="h-6 w-20 animate-pulse rounded-lg bg-white/10" />
-                <div className="h-10 w-3/4 animate-pulse rounded-xl bg-white/10" />
+                <div className="h-6 w-20 animate-pulse rounded-lg bg-pg-text/10" />
+                <div className="h-10 w-3/4 animate-pulse rounded-xl bg-pg-text/10" />
                 <div className="space-y-4 pt-6">
-                  <div className="h-4 w-full animate-pulse rounded bg-white/10" />
-                  <div className="h-4 w-full animate-pulse rounded bg-white/10" />
-                  <div className="h-4 w-2/3 animate-pulse rounded bg-white/10" />
+                  <div className="h-4 w-full animate-pulse rounded bg-pg-text/10" />
+                  <div className="h-4 w-full animate-pulse rounded bg-pg-text/10" />
+                  <div className="h-4 w-2/3 animate-pulse rounded bg-pg-text/10" />
                 </div>
-                <div className="h-48 w-full animate-pulse rounded-2xl bg-white/10" />
+                <div className="h-48 w-full animate-pulse rounded-2xl bg-pg-text/10" />
               </div>
             )}
           </div>
         </Panel>
 
-        <PanelResizeHandle className="group relative z-50 flex w-1.5 items-center justify-center bg-black transition-colors hover:bg-[var(--pg-lime)]">
-          <div className="h-8 w-1 rounded-full bg-white/20 transition-colors group-hover:bg-black" />
+        <PanelResizeHandle className="group relative z-50 flex w-1.5 items-center justify-center bg-pg-border transition-colors hover:bg-[var(--pg-lime)]">
+          <div className="h-8 w-1 rounded-full bg-pg-text/20 transition-colors group-hover:bg-pg-border" />
         </PanelResizeHandle>
 
         <Panel defaultSize={60}>
           <PanelGroup direction="vertical">
-            <Panel defaultSize={65} minSize={30} className="flex flex-col bg-[#0a0a0d]">
-              <div className="flex h-14 flex-none items-center justify-between border-b-[3px] border-black bg-[#141419] px-4">
-                <div className="flex items-center gap-1.5 rounded-xl border-[3px] border-black bg-[#0d0d11] p-1">
+            <Panel defaultSize={65} minSize={30} className="flex flex-col bg-pg-ink">
+              <div className="flex h-14 flex-none items-center justify-between border-b-[3px] border-pg-border bg-pg-surface px-4">
+                <div className="flex items-center gap-1.5 rounded-xl border-[3px] border-pg-border bg-pg-surface p-1">
                   <Select
                     onValueChange={(value) => {
                       const selected = languages.find((lang) => lang.language === value);
@@ -591,10 +599,10 @@ export default function Dashboard() {
                     }}
                     value={language.language}
                   >
-                    <SelectTrigger className="h-8 w-[130px] rounded-lg border-none bg-transparent text-[11px] font-bold uppercase tracking-widest text-white/80 focus:ring-0">
+                    <SelectTrigger className="h-8 w-[130px] rounded-lg border-none bg-transparent text-[11px] font-bold uppercase tracking-widest text-pg-text focus:ring-0">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="border-[3px] border-black bg-[#141419]">
+                    <SelectContent className="border-[3px] border-pg-border bg-pg-surface">
                       {languages.map((lang) => (
                         <SelectItem key={lang.id} value={lang.language} className="text-[11px] font-bold uppercase tracking-widest">
                           {lang.language}
@@ -603,16 +611,16 @@ export default function Dashboard() {
                     </SelectContent>
                   </Select>
 
-                  <div className="mx-1 h-4 w-px bg-white/15" />
+                  <div className="mx-1 h-4 w-px bg-pg-text/15" />
 
                   <Select
                     onValueChange={(value) => setFontSize(parseInt(value))}
                     value={fontSize.toString()}
                   >
-                    <SelectTrigger className="h-8 w-[74px] rounded-lg border-none bg-transparent text-[11px] font-bold uppercase tracking-widest text-white/80 focus:ring-0">
+                    <SelectTrigger className="h-8 w-[74px] rounded-lg border-none bg-transparent text-[11px] font-bold uppercase tracking-widest text-pg-text focus:ring-0">
                       <SelectValue placeholder="Size" />
                     </SelectTrigger>
-                    <SelectContent className="border-[3px] border-black bg-[#141419]">
+                    <SelectContent className="border-[3px] border-pg-border bg-pg-surface">
                       {[12, 14, 16, 18, 20, 22, 24].map((size) => (
                         <SelectItem key={size} value={size.toString()} className="text-[11px] font-bold tracking-widest">
                           {size}px
@@ -663,11 +671,11 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div className="relative flex-1 border-t-[3px] border-black bg-[#0a0a0d]">
+              <div className="relative flex-1 border-t-[3px] border-pg-border bg-pg-ink">
                 <Editor
                   height="100%"
                   language={language.language}
-                  theme="vs-dark"
+                  theme={theme === "dark" ? "vs-dark" : "light"}
                   value={code}
                   onChange={handleCodeChange}
                   options={{
@@ -692,22 +700,22 @@ export default function Dashboard() {
               </div>
             </Panel>
 
-            <PanelResizeHandle className="group relative z-50 flex h-1.5 items-center justify-center bg-black transition-colors hover:bg-[var(--pg-lime)]">
-              <div className="h-1 w-8 rounded-full bg-white/20 transition-colors group-hover:bg-black" />
+            <PanelResizeHandle className="group relative z-50 flex h-1.5 items-center justify-center bg-pg-border transition-colors hover:bg-[var(--pg-lime)]">
+              <div className="h-1 w-8 rounded-full bg-pg-text/20 transition-colors group-hover:bg-pg-border" />
             </PanelResizeHandle>
 
-            <Panel defaultSize={35} minSize={20} className="flex flex-col bg-[#0a0a0d]">
-              <div className="flex h-12 flex-none items-center justify-between border-b-[3px] border-black bg-[#141419] px-4">
+            <Panel defaultSize={35} minSize={20} className="flex flex-col bg-pg-ink">
+              <div className="flex h-12 flex-none items-center justify-between border-b-[3px] border-pg-border bg-pg-surface px-4">
                 <div className="flex items-center gap-6">
-                  <div className="flex items-center gap-2 text-[var(--pg-cyan)]">
+                  <div className="flex items-center gap-2 text-pg-cyan-ink">
                     <Terminal className="size-4" strokeWidth={2.5} />
                     <span className="text-[11px] font-bold uppercase tracking-widest">Console</span>
                   </div>
 
                   {output?.status?.id !== 0 && (
-                    <div className="flex items-center gap-4 border-l-[3px] border-black pl-6">
+                    <div className="flex items-center gap-4 border-l-[3px] border-pg-border pl-6">
                       <div className="flex flex-col">
-                        <span className="text-[8px] font-bold uppercase tracking-tighter text-white/40">Status</span>
+                        <span className="text-[8px] font-bold uppercase tracking-tighter text-pg-text-faint">Status</span>
                         <span
                           className="text-[10px] font-bold uppercase tracking-wider"
                           style={{
@@ -723,15 +731,15 @@ export default function Dashboard() {
 
                       {output.time && (
                         <div className="flex flex-col">
-                          <span className="text-[8px] font-bold uppercase tracking-tighter text-white/40">Time</span>
-                          <span className="text-[10px] font-bold tabular-nums tracking-wider text-white/70">{output.time}s</span>
+                          <span className="text-[8px] font-bold uppercase tracking-tighter text-pg-text-faint">Time</span>
+                          <span className="text-[10px] font-bold tabular-nums tracking-wider text-pg-text-muted">{output.time}s</span>
                         </div>
                       )}
 
                       {output.memory && (
                         <div className="flex flex-col">
-                          <span className="text-[8px] font-bold uppercase tracking-tighter text-white/40">Memory</span>
-                          <span className="text-[10px] font-bold tabular-nums tracking-wider text-white/70">{(output.memory / 1024).toFixed(1)}MB</span>
+                          <span className="text-[8px] font-bold uppercase tracking-tighter text-pg-text-faint">Memory</span>
+                          <span className="text-[10px] font-bold tabular-nums tracking-wider text-pg-text-muted">{(output.memory / 1024).toFixed(1)}MB</span>
                         </div>
                       )}
                     </div>
@@ -740,46 +748,46 @@ export default function Dashboard() {
 
                 <button
                   onClick={handleClearOutput}
-                  className="rounded-lg border-2 border-black bg-[#0d0d11] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white/70 transition-colors hover:text-white"
+                  className="rounded-lg border-2 border-pg-border bg-pg-surface px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-pg-text-muted transition-colors hover:text-pg-text"
                 >
                   Clear
                 </button>
               </div>
 
-              <div className="flex flex-1 overflow-hidden bg-[#0a0a0d]">
+              <div className="flex flex-1 overflow-hidden bg-pg-ink">
                 <div className="flex min-w-0 flex-1 flex-col">
                   <div className="flex-1 overflow-auto p-6">
                     <div className="max-w-4xl">
                       {output.stderr ? (
                         <div className="space-y-4">
-                          <div className="flex items-center gap-2 text-[var(--pg-coral)]">
+                          <div className="flex items-center gap-2 text-pg-coral-ink">
                             <AlertCircle className="size-3.5" strokeWidth={3} />
                             <span className="text-[10px] font-bold uppercase tracking-widest">Runtime Error</span>
                           </div>
-                          <pre className="whitespace-pre-wrap break-all rounded-xl border-[3px] border-black bg-[#141419] p-4 font-mono text-[13px] leading-relaxed text-[var(--pg-coral)]">
+                          <pre className="whitespace-pre-wrap break-all rounded-xl border-[3px] border-pg-border bg-pg-surface p-4 font-mono text-[13px] leading-relaxed text-pg-coral-ink">
                             {output.stderr}
                           </pre>
                         </div>
                       ) : output.compile_output ? (
                         <div className="space-y-4">
-                          <div className="flex items-center gap-2 text-[var(--pg-amber)]">
+                          <div className="flex items-center gap-2 text-pg-amber-ink">
                             <AlertCircle className="size-3.5" strokeWidth={3} />
                             <span className="text-[10px] font-bold uppercase tracking-widest">Compilation Error</span>
                           </div>
-                          <pre className="whitespace-pre-wrap break-all rounded-xl border-[3px] border-black bg-[#141419] p-4 font-mono text-[13px] leading-relaxed text-[var(--pg-amber)]">
+                          <pre className="whitespace-pre-wrap break-all rounded-xl border-[3px] border-pg-border bg-pg-surface p-4 font-mono text-[13px] leading-relaxed text-pg-amber-ink">
                             {output.compile_output}
                           </pre>
                         </div>
                       ) : (
                         <div className="space-y-4">
-                          <span className="text-[10px] font-bold uppercase tracking-widest text-white/50">Standard Output</span>
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-pg-text-muted">Standard Output</span>
                           {output.stdout ? (
-                            <pre className="whitespace-pre-wrap break-all font-mono text-[14px] leading-relaxed text-white/90">
+                            <pre className="whitespace-pre-wrap break-all font-mono text-[14px] leading-relaxed text-pg-text">
                               {output.stdout}
                             </pre>
                           ) : (
                             <div className="pointer-events-none flex flex-col items-center justify-center py-12 opacity-30">
-                              <Terminal className="mb-3 size-10 text-white/40" />
+                              <Terminal className="mb-3 size-10 text-pg-text-faint" />
                               <p className="text-xs font-bold uppercase tracking-widest">Console Ready</p>
                             </div>
                           )}
@@ -789,19 +797,19 @@ export default function Dashboard() {
                   </div>
                 </div>
 
-                <div className="flex w-[320px] flex-col border-l-[3px] border-black bg-[#0d0d11]">
-                  <div className="flex h-10 flex-none items-center border-b-[3px] border-black bg-[#141419] px-5">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-white/50">Test Input</span>
+                <div className="flex w-[320px] flex-col border-l-[3px] border-pg-border bg-pg-surface">
+                  <div className="flex h-10 flex-none items-center border-b-[3px] border-pg-border bg-pg-surface px-5">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-pg-text-muted">Test Input</span>
                   </div>
                   <div className="group relative flex-1">
                     <textarea
                       value={customInput}
                       onChange={(e) => setCustomInput(e.target.value)}
-                      className="absolute inset-0 h-full w-full resize-none bg-transparent p-6 font-mono text-[13px] text-white/80 placeholder:text-white/30 focus:outline-none"
+                      className="absolute inset-0 h-full w-full resize-none bg-transparent p-6 font-mono text-[13px] text-pg-text placeholder:text-pg-text-faint focus:outline-none"
                       placeholder="Enter process input..."
                       spellCheck={false}
                     />
-                    <div className="absolute bottom-4 right-4 text-[9px] font-bold uppercase tracking-tighter text-white/40 transition-colors group-focus-within:text-[var(--pg-cyan)]">
+                    <div className="absolute bottom-4 right-4 text-[9px] font-bold uppercase tracking-tighter text-pg-text-faint transition-colors group-focus-within:text-pg-cyan-ink">
                       Editable Stdin
                     </div>
                   </div>
@@ -814,15 +822,15 @@ export default function Dashboard() {
 
       {/* Back-navigation warning dialog */}
       {showBackDialog && (
-        <div className="dark fixed inset-0 z-[100] flex items-center justify-center">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center">
           <div
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             onClick={() => setShowBackDialog(false)}
           />
           <PlayCard color={A.coral} offset={10} className="relative z-10 mx-4 w-full max-w-sm space-y-4 p-6">
             <div className="space-y-1.5">
-              <h2 className="text-lg font-black tracking-tight text-white">Leave without saving?</h2>
-              <p className="text-sm font-medium leading-relaxed text-white/60">
+              <h2 className="text-lg font-black tracking-tight text-pg-text">Leave without saving?</h2>
+              <p className="text-sm font-medium leading-relaxed text-pg-text-muted">
                 Your current code hasn&apos;t been saved to the playground. Save it so it&apos;s restored the next time you open this question.
               </p>
             </div>

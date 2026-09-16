@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils"
 const badgeVariants = cva(
   [
     "inline-flex items-center justify-center gap-1 shrink-0 whitespace-nowrap",
-    "rounded-md border-2 border-black px-2 py-0.5 text-xs font-bold font-mono uppercase w-fit",
+    "rounded-md border-2 border-pg-border px-2 py-0.5 text-xs font-bold font-mono uppercase w-fit",
     "[&>svg]:size-3 [&>svg]:pointer-events-none",
     "outline-none",
   ],
@@ -27,9 +27,9 @@ const badgeVariants = cva(
     variants: {
       variant: {
         default: "bg-[var(--pg-lime)] text-black",
-        secondary: "bg-[#141419] text-white",
-        outline: "border-black bg-transparent text-white",
-        muted: "bg-[#141419] text-white/70",
+        secondary: "bg-pg-surface text-pg-text",
+        outline: "border-pg-border bg-transparent text-pg-text",
+        muted: "bg-pg-surface text-pg-text-muted",
         success: "bg-[var(--pg-lime)] text-black",
         warning: "bg-[var(--pg-amber)] text-black",
         destructive: "bg-[var(--pg-coral)] text-black",

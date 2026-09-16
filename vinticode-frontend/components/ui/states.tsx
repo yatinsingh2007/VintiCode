@@ -57,20 +57,20 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center text-center text-white",
-        "rounded-2xl border-[3px] border-black bg-[#141419]",
+        "flex flex-col items-center justify-center text-center text-pg-text",
+        "rounded-2xl border-[3px] border-pg-border bg-pg-surface",
         "px-6 py-14",
         className
       )}
     >
       {Icon && (
-        <div className="mb-4 grid size-12 place-items-center rounded-xl border-[3px] border-black bg-[#0d0d11] text-white/60">
+        <div className="mb-4 grid size-12 place-items-center rounded-xl border-[3px] border-pg-border bg-pg-surface text-pg-text-muted">
           <Icon className="size-5" aria-hidden="true" />
         </div>
       )}
       <p className="text-base font-extrabold">{title}</p>
       {description && (
-        <p className="mt-1 max-w-sm text-sm font-medium text-white/55">{description}</p>
+        <p className="mt-1 max-w-sm text-sm font-medium text-pg-text-muted">{description}</p>
       )}
       {action && <div className="mt-5">{action}</div>}
     </div>
@@ -92,22 +92,22 @@ export function ErrorState({
     <div
       role="alert"
       className={cn(
-        "flex flex-col items-center justify-center text-center text-white",
-        "rounded-2xl border-[3px] border-black bg-[#141419]",
+        "flex flex-col items-center justify-center text-center text-pg-text",
+        "rounded-2xl border-[3px] border-pg-border bg-pg-surface",
         "px-6 py-14",
         className
       )}
       style={{ boxShadow: "8px 8px 0 0 var(--pg-coral)" }}
     >
-      <div className="mb-4 grid size-12 place-items-center rounded-xl border-[3px] border-black bg-[var(--pg-coral)] text-black">
+      <div className="mb-4 grid size-12 place-items-center rounded-xl border-[3px] border-pg-border bg-[var(--pg-coral)] text-black">
         <AlertTriangle className="size-5" strokeWidth={2.5} aria-hidden="true" />
       </div>
       <p className="text-base font-extrabold">{title}</p>
-      <p className="mt-1 max-w-sm text-sm font-medium text-white/55">{description}</p>
+      <p className="mt-1 max-w-sm text-sm font-medium text-pg-text-muted">{description}</p>
       {onRetry && (
         <button
           onClick={onRetry}
-          className="mt-5 inline-flex items-center gap-2 rounded-xl border-[3px] border-black bg-[var(--pg-lime)] px-4 py-2 text-sm font-extrabold text-black transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 active:scale-95"
+          className="mt-5 inline-flex items-center gap-2 rounded-xl border-[3px] border-pg-border bg-[var(--pg-lime)] px-4 py-2 text-sm font-extrabold text-black transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 active:scale-95"
         >
           <RefreshCw className="size-4" strokeWidth={2.5} aria-hidden="true" />
           Try again
@@ -137,11 +137,11 @@ export function PageHeader({
       )}
     >
       <div className="min-w-0">
-        <h1 className="text-3xl font-black tracking-tighter text-white sm:text-4xl">
+        <h1 className="text-3xl font-black tracking-tighter text-pg-text sm:text-4xl">
           {title}
         </h1>
         {description && (
-          <p className="mt-1 text-sm font-medium text-white/55">{description}</p>
+          <p className="mt-1 text-sm font-medium text-pg-text-muted">{description}</p>
         )}
       </div>
       {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}

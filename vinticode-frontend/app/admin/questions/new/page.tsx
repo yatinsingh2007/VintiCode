@@ -33,7 +33,7 @@ export default function NewQuestionPage() {
       <div className="flex items-center gap-3">
         <Link
           href="/admin/questions"
-          className="flex w-fit items-center gap-1.5 text-sm font-bold text-white/60 transition-colors hover:text-white"
+          className="flex w-fit items-center gap-1.5 text-sm font-bold text-pg-text-muted transition-colors hover:text-pg-text"
         >
           <ChevronLeft className="size-4" strokeWidth={2.5} />
           Back to Questions
@@ -41,8 +41,8 @@ export default function NewQuestionPage() {
       </div>
 
       <div>
-        <h1 className="text-3xl font-black tracking-tighter text-white">New Question</h1>
-        <p className="mt-1 text-sm font-medium text-white/55">
+        <h1 className="text-3xl font-black tracking-tighter text-pg-text">New Question</h1>
+        <p className="mt-1 text-sm font-medium text-pg-text-muted">
           Fill in all fields below. Fields marked * are required.
         </p>
       </div>

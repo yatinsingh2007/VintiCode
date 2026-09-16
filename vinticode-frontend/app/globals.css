@@ -53,6 +53,24 @@
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
   --color-elevated: var(--elevated);
+  /* Playground neo-brutalist tokens — theme-aware (see :root / .dark below) */
+  --color-pg-ink: var(--pg-ink);
+  --color-pg-surface: var(--pg-surface);
+  --color-pg-surface-2: var(--pg-surface-2);
+  --color-pg-border: var(--pg-border);
+  --color-pg-text: var(--pg-text);
+  --color-pg-text-muted: var(--pg-text-muted);
+  --color-pg-text-faint: var(--pg-text-faint);
+  --color-pg-lime: var(--pg-lime);
+  --color-pg-coral: var(--pg-coral);
+  --color-pg-cyan: var(--pg-cyan);
+  --color-pg-amber: var(--pg-amber);
+  --color-pg-indigo: var(--pg-indigo);
+  --color-pg-lime-ink: var(--pg-lime-ink);
+  --color-pg-coral-ink: var(--pg-coral-ink);
+  --color-pg-cyan-ink: var(--pg-cyan-ink);
+  --color-pg-amber-ink: var(--pg-amber-ink);
+  --color-pg-indigo-ink: var(--pg-indigo-ink);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -469,14 +487,55 @@
   in the components; these are the static building blocks.
 */
 :root {
+  /* Accents — identical in both themes; the brand pops on dark AND light. */
   --pg-lime: #b8f230;
   --pg-coral: #ff6a5b;
   --pg-cyan: #34e0e6;
   --pg-amber: #ffc24b;
   --pg-indigo: #7c86ff;
-  --pg-ink: #0a0a0d;
-  --pg-surface: #141419;
-  --pg-line: rgba(255, 255, 255, 0.9);
+
+  /* Accent-as-text — the raw accents are illegible on a light surface, so
+     text/icons use AA-tuned "ink" variants. In .dark these are overridden
+     back to the bright accents (which are legible on dark). */
+  --pg-lime-ink: #5f7d0a;
+  --pg-coral-ink: #d43a2a;
+  --pg-cyan-ink: #0b7a80;
+  --pg-amber-ink: #9a6b00;
+  --pg-indigo-ink: #4a53d6;
+
+  /* Surfaces & frame — LIGHT: "Warm Ivory". Soft paper page, white cards,
+     bold near-black ink borders (the neo-brutalist signature). */
+  --pg-ink: #faf6ee;        /* page background */
+  --pg-surface: #ffffff;    /* card / panel */
+  --pg-surface-2: #fffdf8;  /* raised / nested surface */
+  --pg-border: #12121a;     /* structural frame */
+  --pg-text: #16161c;       /* primary text */
+  --pg-text-muted: #5c5c66; /* secondary text */
+  --pg-text-faint: #9a9aa2; /* placeholders / disabled */
+  --pg-shadow: #12121a;     /* default hard offset shadow (ink on light) */
+  --pg-line: rgba(0, 0, 0, 0.06); /* faint decorative overlay (dots/soft grid) */
+  --pg-grid: rgba(18, 18, 26, 0.14); /* visible paper graph-grid lines */
+}
+
+.dark {
+  /* Playground — DARK overrides. Softer than pure black (#0a0a0d + pure
+     white halates); accents inherit the :root values above. */
+  --pg-lime-ink: var(--pg-lime);
+  --pg-coral-ink: var(--pg-coral);
+  --pg-cyan-ink: var(--pg-cyan);
+  --pg-amber-ink: var(--pg-amber);
+  --pg-indigo-ink: var(--pg-indigo);
+
+  --pg-ink: #0e0e12;
+  --pg-surface: #16161c;
+  --pg-surface-2: #1e1e26;
+  --pg-border: #000000;
+  --pg-text: #f2f2f5;
+  --pg-text-muted: rgba(255, 255, 255, 0.6);
+  --pg-text-faint: rgba(255, 255, 255, 0.3);
+  --pg-shadow: var(--pg-lime);
+  --pg-line: rgba(255, 255, 255, 0.05);
+  --pg-grid: rgba(255, 255, 255, 0.08);
 }
 
 @layer utilities {
@@ -495,9 +554,18 @@
   /* Chunky dotted play-surface, denser and bolder than .bg-dots. */
   .bg-grid-bold {
     background-image:
-      linear-gradient(to right, rgba(255, 255, 255, 0.05) 2px, transparent 2px),
-      linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 2px, transparent 2px);
+      linear-gradient(to right, var(--pg-line) 2px, transparent 2px),
+      linear-gradient(to bottom, var(--pg-line) 2px, transparent 2px);
     background-size: 56px 56px;
+  }
+
+  /* Fine "engineering paper" grid — minute hairline squares over the ivory/ink
+     page, for a graph-paper feel. Theme-aware via --pg-grid. */
+  .bg-paper-grid {
+    background-image:
+      linear-gradient(to right, var(--pg-grid) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--pg-grid) 1px, transparent 1px);
+    background-size: 36px 36px;
   }
 }
 

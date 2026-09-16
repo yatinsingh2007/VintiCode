@@ -57,22 +57,22 @@ function StatCard({
 }) {
   return (
     <div
-      className="flex items-center gap-4 rounded-2xl border-[3px] border-black bg-[#141419] p-5"
+      className="flex items-center gap-4 rounded-2xl border-[3px] border-pg-border bg-pg-surface p-5"
       style={{ boxShadow: `5px 5px 0 0 ${color}` }}
     >
       <div
-        className="grid size-12 shrink-0 place-items-center rounded-xl border-[3px] border-black text-black"
+        className="grid size-12 shrink-0 place-items-center rounded-xl border-[3px] border-pg-border text-black"
         style={{ background: color }}
       >
         <Icon className="size-5" strokeWidth={2.5} aria-hidden="true" />
       </div>
       <div className="min-w-0">
-        <p className="text-2xl font-black tabular-nums tracking-tight text-white">
+        <p className="text-2xl font-black tabular-nums tracking-tight text-pg-text">
           {typeof value === "number" ? value.toLocaleString() : value}
         </p>
-        <p className="mt-0.5 truncate text-xs font-medium text-white/55">
+        <p className="mt-0.5 truncate text-xs font-medium text-pg-text-muted">
           {label}
-          {hint && <span className="text-white/40"> · {hint}</span>}
+          {hint && <span className="text-pg-text-faint"> · {hint}</span>}
         </p>
       </div>
     </div>
@@ -113,10 +113,10 @@ function Panel({
   children: React.ReactNode;
 }) {
   return (
-    <section className="flex flex-col overflow-hidden rounded-2xl border-[3px] border-black bg-[#141419]">
-      <div className="flex items-center gap-2 border-b-[3px] border-black px-5 py-3.5">
-        <Icon className="size-4 text-white/50" strokeWidth={2.5} aria-hidden="true" />
-        <h2 className="text-sm font-extrabold text-white">{title}</h2>
+    <section className="flex flex-col overflow-hidden rounded-2xl border-[3px] border-pg-border bg-pg-surface">
+      <div className="flex items-center gap-2 border-b-[3px] border-pg-border px-5 py-3.5">
+        <Icon className="size-4 text-pg-text-muted" strokeWidth={2.5} aria-hidden="true" />
+        <h2 className="text-sm font-extrabold text-pg-text">{title}</h2>
         {action && <div className="ml-auto">{action}</div>}
       </div>
       {children}
@@ -128,17 +128,17 @@ function DashboardSkeleton() {
   return (
     <div className="mx-auto max-w-7xl space-y-8">
       <div className="space-y-2">
-        <div className="h-8 w-40 animate-pulse rounded bg-white/10" />
-        <div className="h-4 w-64 animate-pulse rounded bg-white/10" />
+        <div className="h-8 w-40 animate-pulse rounded bg-pg-text/10" />
+        <div className="h-4 w-64 animate-pulse rounded bg-pg-text/10" />
       </div>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="h-[86px] animate-pulse rounded-2xl border-[3px] border-black bg-white/10" />
+          <div key={i} className="h-[86px] animate-pulse rounded-2xl border-[3px] border-pg-border bg-pg-text/10" />
         ))}
       </div>
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-        <div className="h-80 animate-pulse rounded-2xl border-[3px] border-black bg-white/10 xl:col-span-2" />
-        <div className="h-80 animate-pulse rounded-2xl border-[3px] border-black bg-white/10" />
+        <div className="h-80 animate-pulse rounded-2xl border-[3px] border-pg-border bg-pg-text/10 xl:col-span-2" />
+        <div className="h-80 animate-pulse rounded-2xl border-[3px] border-pg-border bg-pg-text/10" />
       </div>
     </div>
   );
@@ -217,7 +217,7 @@ export default function AdminDashboardPage() {
             action={
               <Link
                 href="/admin/submissions"
-                className="rounded text-xs font-bold text-[var(--pg-lime)] transition-colors hover:underline"
+                className="rounded text-xs font-bold text-pg-lime-ink transition-colors hover:underline"
               >
                 View all
               </Link>
@@ -235,13 +235,13 @@ export default function AdminDashboardPage() {
                 {recentSubmissions.map((s) => (
                   <li
                     key={s.id}
-                    className="flex items-center gap-4 px-5 py-3 transition-colors hover:bg-white/5"
+                    className="flex items-center gap-4 px-5 py-3 transition-colors hover:bg-pg-text/5"
                   >
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-bold text-white">
+                      <p className="truncate text-sm font-bold text-pg-text">
                         {s.question?.title ?? "—"}
                       </p>
-                      <p className="truncate text-xs font-medium text-white/50">
+                      <p className="truncate text-xs font-medium text-pg-text-muted">
                         {s.user?.name ?? "Unknown"} · {s.user?.email ?? "—"}
                       </p>
                     </div>
@@ -250,7 +250,7 @@ export default function AdminDashboardPage() {
                       <time
                         dateTime={s.createdAt}
                         title={fullDate(s.createdAt)}
-                        className="hidden w-16 text-right text-xs font-medium tabular-nums text-white/50 sm:block"
+                        className="hidden w-16 text-right text-xs font-medium tabular-nums text-pg-text-muted sm:block"
                       >
                         {timeAgo(s.createdAt)}
                       </time>
@@ -268,7 +268,7 @@ export default function AdminDashboardPage() {
           action={
             <Link
               href="/admin/users"
-              className="rounded text-xs font-bold text-[var(--pg-lime)] transition-colors hover:underline"
+              className="rounded text-xs font-bold text-pg-lime-ink transition-colors hover:underline"
             >
               View all
             </Link>
@@ -286,10 +286,10 @@ export default function AdminDashboardPage() {
               {recentUsers.map((u) => (
                 <li
                   key={u.id}
-                  className="flex items-center gap-3 px-5 py-3 transition-colors hover:bg-white/5"
+                  className="flex items-center gap-3 px-5 py-3 transition-colors hover:bg-pg-text/5"
                 >
                   <div
-                    className="grid size-8 shrink-0 place-items-center rounded-full border-2 border-black text-black"
+                    className="grid size-8 shrink-0 place-items-center rounded-full border-2 border-pg-border text-black"
                     style={{ background: A.cyan }}
                   >
                     <span className="text-xs font-black">
@@ -297,13 +297,13 @@ export default function AdminDashboardPage() {
                     </span>
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-bold text-white">{u.name}</p>
-                    <p className="truncate text-xs font-medium text-white/50">{u.email}</p>
+                    <p className="truncate text-sm font-bold text-pg-text">{u.name}</p>
+                    <p className="truncate text-xs font-medium text-pg-text-muted">{u.email}</p>
                   </div>
                   <time
                     dateTime={u.createdAt}
                     title={fullDate(u.createdAt)}
-                    className="shrink-0 text-xs font-medium tabular-nums text-white/50"
+                    className="shrink-0 text-xs font-medium tabular-nums text-pg-text-muted"
                   >
                     {timeAgo(u.createdAt)}
                   </time>

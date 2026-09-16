@@ -55,7 +55,7 @@ function statusBadge(status: string) {
   const accepted = status === "accepted";
   return (
     <span
-      className="inline-flex items-center gap-1.5 rounded-md border-2 border-black px-2.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-black"
+      className="inline-flex items-center gap-1.5 rounded-md border-2 border-pg-border px-2.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-black"
       style={{ background: accepted ? A.lime : A.coral }}
     >
       {accepted ? <CheckCircle2 className="size-3" strokeWidth={3} /> : <XCircle className="size-3" strokeWidth={3} />}
@@ -131,8 +131,8 @@ export default function AdminSubmissionsPage() {
     <div className="mx-auto max-w-7xl space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-black tracking-tighter text-white">Submissions</h1>
-        <p className="mt-1 text-sm font-medium text-white/55">
+        <h1 className="text-3xl font-black tracking-tighter text-pg-text">Submissions</h1>
+        <p className="mt-1 text-sm font-medium text-pg-text-muted">
           Monitor code quality and platform activity
         </p>
       </div>
@@ -140,26 +140,26 @@ export default function AdminSubmissionsPage() {
       {/* Filters */}
       <form
         onSubmit={handleSearch}
-        className="flex flex-wrap gap-3 rounded-2xl border-[3px] border-black bg-[#141419] p-3"
+        className="flex flex-wrap gap-3 rounded-2xl border-[3px] border-pg-border bg-pg-surface p-3"
       >
         <div className="flex min-w-48 flex-1 items-center gap-2">
-          <Search className="size-4 shrink-0 text-white/40" />
+          <Search className="size-4 shrink-0 text-pg-text-faint" />
           <input
             type="text"
             aria-label="Search submissions by user or question"
             placeholder="Search by user or question…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="flex-1 bg-transparent text-sm font-medium text-white placeholder:text-white/30 outline-none"
+            className="flex-1 bg-transparent text-sm font-medium text-pg-text placeholder:text-pg-text-faint outline-none"
           />
         </div>
         <div className="flex items-center gap-2">
-          <Filter className="size-4 text-white/40" aria-hidden="true" />
+          <Filter className="size-4 text-pg-text-faint" aria-hidden="true" />
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
             aria-label="Filter by status"
-            className="cursor-pointer rounded-lg border-[3px] border-black bg-[#0d0d11] px-3 py-1.5 text-sm font-semibold text-white outline-none"
+            className="cursor-pointer rounded-lg border-[3px] border-pg-border bg-pg-surface px-3 py-1.5 text-sm font-semibold text-pg-text outline-none"
           >
             <option value="">All Statuses</option>
             <option value="accepted">Accepted</option>
@@ -172,7 +172,7 @@ export default function AdminSubmissionsPage() {
       </form>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-2xl border-[3px] border-black bg-[#141419]">
+      <div className="overflow-hidden rounded-2xl border-[3px] border-pg-border bg-pg-surface">
         <div className="overflow-x-auto">
           {loading ? (
             <div className="p-1">
@@ -217,35 +217,35 @@ export default function AdminSubmissionsPage() {
           ) : (
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b-[3px] border-black bg-[#0d0d11] text-left">
-                  <th className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-white/50">User</th>
-                  <th className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-white/50">Question</th>
-                  <th className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-white/50">Status</th>
-                  <th className="px-5 py-4 text-center text-xs font-bold uppercase tracking-wider text-white/50">Language</th>
-                  <th className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-white/50">Date</th>
-                  <th className="px-5 py-4 text-right text-xs font-bold uppercase tracking-wider text-white/50">View</th>
+                <tr className="border-b-[3px] border-pg-border bg-pg-surface text-left">
+                  <th className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-pg-text-muted">User</th>
+                  <th className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-pg-text-muted">Question</th>
+                  <th className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-pg-text-muted">Status</th>
+                  <th className="px-5 py-4 text-center text-xs font-bold uppercase tracking-wider text-pg-text-muted">Language</th>
+                  <th className="px-5 py-4 text-xs font-bold uppercase tracking-wider text-pg-text-muted">Date</th>
+                  <th className="px-5 py-4 text-right text-xs font-bold uppercase tracking-wider text-pg-text-muted">View</th>
                 </tr>
               </thead>
               <tbody className="divide-y-[3px] divide-black/40">
                 {submissions.map((s) => (
-                  <tr key={s.id} className="group transition-colors hover:bg-white/5">
+                  <tr key={s.id} className="group transition-colors hover:bg-pg-text/5">
                     <td className="px-5 py-4">
-                      <p className="font-bold text-white">{s.user?.name ?? "—"}</p>
-                      <p className="text-xs font-medium text-white/50">{s.user?.email ?? ""}</p>
+                      <p className="font-bold text-pg-text">{s.user?.name ?? "—"}</p>
+                      <p className="text-xs font-medium text-pg-text-muted">{s.user?.email ?? ""}</p>
                     </td>
                     <td className="px-5 py-4">
-                      <p className="max-w-xs truncate font-bold text-white">{s.question?.title ?? "—"}</p>
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">
+                      <p className="max-w-xs truncate font-bold text-pg-text">{s.question?.title ?? "—"}</p>
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-pg-text-faint">
                         {s.question?.difficulty ?? ""}
                       </span>
                     </td>
                     <td className="px-5 py-4">{statusBadge(s.status)}</td>
                     <td className="px-5 py-4 text-center">
-                      <span className="rounded-md border-2 border-black bg-[#0d0d11] px-2 py-1 font-mono text-[10px] font-bold text-white/70">
+                      <span className="rounded-md border-2 border-pg-border bg-pg-surface px-2 py-1 font-mono text-[10px] font-bold text-pg-text-muted">
                         {getLang(s.languageId)}
                       </span>
                     </td>
-                    <td className="px-5 py-4 text-xs font-medium text-white/50">
+                    <td className="px-5 py-4 text-xs font-medium text-pg-text-muted">
                       {new Date(s.createdAt).toLocaleString(undefined, {
                         month: "short",
                         day: "numeric",
@@ -256,7 +256,7 @@ export default function AdminSubmissionsPage() {
                     <td className="px-5 py-4 text-right">
                       <button
                         onClick={() => setSelected(s)}
-                        className="inline-flex items-center gap-1.5 rounded-lg border-2 border-black bg-[#0d0d11] px-3 py-1.5 text-white transition-colors hover:bg-[var(--pg-cyan)] hover:text-black"
+                        className="inline-flex items-center gap-1.5 rounded-lg border-2 border-pg-border bg-pg-surface px-3 py-1.5 text-pg-text transition-colors hover:bg-[var(--pg-cyan)] hover:text-black"
                       >
                         <FileCode2 className="size-3.5" strokeWidth={2.5} />
                         <span className="text-xs font-bold">Code</span>
@@ -270,26 +270,26 @@ export default function AdminSubmissionsPage() {
         </div>
 
         {pagination && pagination.totalPages > 1 && (
-          <div className="flex items-center justify-between border-t-[3px] border-black bg-[#0d0d11] px-5 py-4">
-            <p className="text-xs font-medium text-white/50">
-              Showing <span className="font-bold text-white">{submissions.length}</span> of{" "}
-              <span className="font-bold text-white">{pagination.total}</span> submissions
+          <div className="flex items-center justify-between border-t-[3px] border-pg-border bg-pg-surface px-5 py-4">
+            <p className="text-xs font-medium text-pg-text-muted">
+              Showing <span className="font-bold text-pg-text">{submissions.length}</span> of{" "}
+              <span className="font-bold text-pg-text">{pagination.total}</span> submissions
             </p>
             <div className="flex items-center gap-2">
               <button
                 disabled={page === 1}
                 onClick={() => setPage((p) => p - 1)}
-                className="rounded-lg border-2 border-transparent p-2 text-white/60 transition-all hover:border-black hover:bg-white/5 hover:text-white disabled:opacity-30"
+                className="rounded-lg border-2 border-transparent p-2 text-pg-text-muted transition-all hover:border-pg-border hover:bg-pg-text/5 hover:text-pg-text disabled:opacity-30"
               >
                 <ChevronLeft className="size-4" strokeWidth={2.5} />
               </button>
-              <span className="px-2 text-xs font-bold text-white/60">
+              <span className="px-2 text-xs font-bold text-pg-text-muted">
                 Page {page} of {pagination.totalPages}
               </span>
               <button
                 disabled={page === pagination.totalPages}
                 onClick={() => setPage((p) => p + 1)}
-                className="rounded-lg border-2 border-transparent p-2 text-white/60 transition-all hover:border-black hover:bg-white/5 hover:text-white disabled:opacity-30"
+                className="rounded-lg border-2 border-transparent p-2 text-pg-text-muted transition-all hover:border-pg-border hover:bg-pg-text/5 hover:text-pg-text disabled:opacity-30"
               >
                 <ChevronRight className="size-4" strokeWidth={2.5} />
               </button>
@@ -308,30 +308,30 @@ export default function AdminSubmissionsPage() {
             role="dialog"
             aria-modal="true"
             aria-labelledby="submission-modal-title"
-            className="flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border-[3px] border-black bg-[#141419]"
+            className="flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border-[3px] border-pg-border bg-pg-surface"
             style={{ boxShadow: "12px 12px 0 0 var(--pg-cyan)" }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between border-b-[3px] border-black bg-[#0d0d11] px-6 py-5">
+            <div className="flex items-center justify-between border-b-[3px] border-pg-border bg-pg-surface px-6 py-5">
               <div className="flex items-center gap-4">
                 <div
-                  className="grid size-10 shrink-0 place-items-center rounded-xl border-[3px] border-black text-black"
+                  className="grid size-10 shrink-0 place-items-center rounded-xl border-[3px] border-pg-border text-black"
                   style={{ background: A.cyan }}
                 >
                   <FileCode2 className="size-5" strokeWidth={2.5} />
                 </div>
                 <div>
-                  <h3 id="submission-modal-title" className="text-lg font-extrabold leading-tight text-white">
+                  <h3 id="submission-modal-title" className="text-lg font-extrabold leading-tight text-pg-text">
                     {selected.question?.title}
                   </h3>
                   <div className="mt-1 flex items-center gap-2">
-                    <span className="text-xs font-medium text-white/55">{selected.user?.name}</span>
-                    <span aria-hidden="true" className="size-1 rounded-full bg-white/30" />
-                    <span className="font-mono text-xs font-bold uppercase text-white">
+                    <span className="text-xs font-medium text-pg-text-muted">{selected.user?.name}</span>
+                    <span aria-hidden="true" className="size-1 rounded-full bg-pg-text/30" />
+                    <span className="font-mono text-xs font-bold uppercase text-pg-text">
                       {getLang(selected.languageId)}
                     </span>
-                    <span aria-hidden="true" className="size-1 rounded-full bg-white/30" />
-                    <span className="text-xs font-medium text-white/55">
+                    <span aria-hidden="true" className="size-1 rounded-full bg-pg-text/30" />
+                    <span className="text-xs font-medium text-pg-text-muted">
                       {new Date(selected.createdAt).toLocaleString()}
                     </span>
                   </div>
@@ -342,7 +342,7 @@ export default function AdminSubmissionsPage() {
                 <button
                   onClick={() => setSelected(null)}
                   aria-label="Close code viewer"
-                  className="cursor-pointer rounded-lg p-2 text-white/50 transition-colors hover:text-white"
+                  className="cursor-pointer rounded-lg p-2 text-pg-text-muted transition-colors hover:text-pg-text"
                 >
                   <X className="size-5" aria-hidden="true" />
                 </button>
@@ -352,7 +352,7 @@ export default function AdminSubmissionsPage() {
             <div className="group relative flex-1 overflow-hidden">
               <button
                 onClick={() => handleCopy(selected.code)}
-                className="absolute right-4 top-4 z-10 flex cursor-pointer items-center gap-2 rounded-lg border-2 border-black bg-[#141419] px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-[var(--pg-lime)] hover:text-black"
+                className="absolute right-4 top-4 z-10 flex cursor-pointer items-center gap-2 rounded-lg border-2 border-pg-border bg-pg-surface px-3 py-1.5 text-xs font-bold text-pg-text transition-colors hover:bg-[var(--pg-lime)] hover:text-black"
               >
                 {copied ? (
                   <Check className="size-3.5" strokeWidth={3} aria-hidden="true" />
@@ -362,17 +362,17 @@ export default function AdminSubmissionsPage() {
                 {copied ? "Copied!" : "Copy Code"}
               </button>
 
-              <div className="h-full overflow-auto bg-[#0a0a0d] p-6 font-mono text-sm leading-relaxed text-white/90">
+              <div className="h-full overflow-auto bg-pg-ink p-6 font-mono text-sm leading-relaxed text-pg-text">
                 <pre className="whitespace-pre-wrap break-all">
                   {selected.code || "// No code stored."}
                 </pre>
               </div>
             </div>
 
-            <div className="flex items-center justify-end border-t-[3px] border-black bg-[#0d0d11] px-6 py-4">
+            <div className="flex items-center justify-end border-t-[3px] border-pg-border bg-pg-surface px-6 py-4">
               <button
                 onClick={() => setSelected(null)}
-                className="rounded-lg px-4 py-2 text-sm font-bold text-white/60 transition-colors hover:text-white"
+                className="rounded-lg px-4 py-2 text-sm font-bold text-pg-text-muted transition-colors hover:text-pg-text"
               >
                 Close
               </button>
