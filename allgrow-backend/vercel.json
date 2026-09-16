@@ -2,5 +2,6 @@
   "version": 2,
   "buildCommand": "npx prisma generate",
   "builds": [{ "src": "app.js", "use": "@vercel/node" }],
-  "routes": [{ "src": "/(.*)", "dest": "app.js" }]
+  "routes": [{ "src": "/(.*)", "dest": "app.js" }],
+  "ignoreCommand": "cd \"$(git rev-parse --show-toplevel)\" && git diff --quiet HEAD^ HEAD -- allgrow-backend/"
 }
