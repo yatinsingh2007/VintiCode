@@ -356,7 +356,9 @@ Redis is **not** used as a database. It is a temporary job-state cache. The fron
 |---------|---------|
 | Framework | Next.js 16 (App Router), React 19, TypeScript |
 | Styling | Tailwind CSS v4, HeroUI |
-| Animations | Framer Motion |
+| Design System | "Playground" neo-brutalist primitives in `components/playground.tsx` |
+| Animations | Framer Motion / Motion, GSAP, canvas-confetti |
+| WebGL Backgrounds | ogl (animated light-rays landing background) |
 | Editor | @monaco-editor/react |
 | Icons | Lucide React, Tabler Icons |
 | HTTP | Axios |
@@ -409,24 +411,35 @@ VintiCode/
     ├── app/
     │   ├── page.tsx                             Landing page
     │   ├── auth/page.tsx                        Login / Register
+    │   ├── [...not-found]/page.tsx              Custom 404
     │   ├── dashboard/
     │   │   ├── home/page.tsx                    Question list
-    │   │   ├── profile/page.tsx                 Submission history
+    │   │   ├── profile/
+    │   │   │   ├── page.tsx                     Submission history
+    │   │   │   └── submission/[submissionId]/   Single submission detail
     │   │   └── question/[questionId]/
     │   │       ├── page.tsx                     Code editor
     │   │       └── scratchpad/page.tsx          Scratch Pad + AI Review
     │   └── admin/
     │       ├── login/page.tsx
     │       ├── dashboard/page.tsx
-    │       ├── questions/page.tsx
+    │       ├── questions/page.tsx               Question list
+    │       ├── questions/new/page.tsx           Create question
+    │       ├── questions/[id]/page.tsx          Edit question
     │       ├── users/page.tsx
+    │       ├── users/[id]/page.tsx              User detail
     │       ├── submissions/page.tsx
     │       └── analytics/page.tsx
     ├── components/
+    │   ├── playground.tsx                       Shared neo-brutalist design system
     │   ├── scratchpad/
     │   │   ├── ScratchPad.tsx
     │   │   └── ApproachReview.tsx
-    │   └── ui/                                  Design system components
+    │   ├── admin/                               Admin-only UI components
+    │   ├── magicui/                             Animated UI effects
+    │   ├── ui/                                  Base design system components
+    │   ├── Logo.tsx, ThemeToggle.tsx            Shared chrome
+    │   └── BlurText.tsx, TextType.tsx, LightRays.tsx   Landing-page effects
     └── lib/
         ├── axios.ts                             Shared axios instance
         ├── authApi.ts
