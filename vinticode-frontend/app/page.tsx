@@ -505,20 +505,18 @@ export default function LandingPage() {
                   delay={i * 0.06}
                   tilt={f.tilt}
                   className="rounded-2xl border-[3px] border-pg-border bg-pg-surface p-6"
-                  style={{ ["--pg-shadow" as string]: f.color } as React.CSSProperties}
+                  style={{ boxShadow: `8px 8px 0 0 ${f.color}` }}
                 >
-                  <div className="pg-shadow-lg -m-6 h-full rounded-2xl p-6" style={{ boxShadow: `8px 8px 0 0 ${f.color}` }}>
-                    <div
-                      className="grid size-12 place-items-center rounded-xl border-[3px] border-pg-border text-black"
-                      style={{ background: f.color }}
-                    >
-                      <f.icon className="size-6" strokeWidth={2.5} />
-                    </div>
-                    <h3 className="mt-5 text-xl font-extrabold tracking-tight">{f.title}</h3>
-                    <p className="mt-2 text-sm font-medium leading-relaxed text-pg-text-muted">
-                      {f.body}
-                    </p>
+                  <div
+                    className="grid size-12 place-items-center rounded-xl border-[3px] border-pg-border text-black"
+                    style={{ background: f.color }}
+                  >
+                    <f.icon className="size-6" strokeWidth={2.5} />
                   </div>
+                  <h3 className="mt-5 text-xl font-extrabold tracking-tight">{f.title}</h3>
+                  <p className="mt-2 text-sm font-medium leading-relaxed text-pg-text-muted">
+                    {f.body}
+                  </p>
                 </Bounce>
               ))}
             </div>
