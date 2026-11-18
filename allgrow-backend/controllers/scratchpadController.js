@@ -2,7 +2,9 @@ const axios = require("axios");
 const { prisma } = require("../prisma/prismaClient");
 
 const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
-const GROQ_MODEL = "llama-3.1-8b-instant";
+// llama-3.1-8b-instant was shut down by Groq on 2026-08-16; gpt-oss-20b is
+// Groq's recommended replacement. Override with GROQ_MODEL if needed.
+const GROQ_MODEL = process.env.GROQ_MODEL || "openai/gpt-oss-20b";
 
 const buildPrompt = (questionTitle, questionDescription, approach) => `
 You are a supportive but honest software engineering mentor. A student is preparing to solve a coding problem and has written notes in a scratch pad. Your job is to decide whether they have thought about it enough to start coding — and give them useful, honest feedback either way.
@@ -132,7 +134,10 @@ const reviewApproach = async (req, res) => {
         model: GROQ_MODEL,
         messages: [{ role: "user", content: prompt }],
         temperature: 0.4,
-        max_tokens: 512,
+        // gpt-oss is a reasoning model: keep reasoning short so it doesn't
+        // eat the token budget before the JSON answer is written.
+        reasoning_effort: "low",
+        max_tokens: 1024,
         response_format: { type: "json_object" },
       },
       {
