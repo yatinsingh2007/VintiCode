@@ -33,13 +33,6 @@ import {
 import { cn } from "@/lib/utils";
 import api from "@/lib/axios";
 import { toast } from "react-hot-toast";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import DashboardPagination from "@/section/Pagination";
 import {
   PlayInput,
@@ -369,6 +362,11 @@ const DIFFS: { key: DiffKey; label: string }[] = [
   { key: "easy", label: "Easy" },
   { key: "medium", label: "Medium" },
   { key: "hard", label: "Hard" },
+];
+
+const DIFF_FILTERS: { key: "all" | DiffKey; label: string }[] = [
+  { key: "all", label: "All" },
+  ...DIFFS,
 ];
 
 const ProgressHero: React.FC<{
@@ -753,26 +751,28 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="relative z-10 flex min-w-0 flex-1 flex-col overflow-y-auto">
-      <header className="sticky top-0 z-10 space-y-4 border-b-[3px] border-pg-border bg-pg-ink/85 px-4 py-5 backdrop-blur-md sm:px-6">
-        <div className="flex items-start justify-between gap-4">
-          <div className="min-w-0">
-            <span
-              className="inline-block -rotate-2 rounded-lg border-[3px] border-pg-border px-2.5 py-0.5 font-mono text-[0.7rem] font-bold uppercase tracking-wider text-black shadow-[3px_3px_0_0_#000]"
-              style={{ background: A.lime }}
-            >
-              The Trail
-            </span>
-            <h1 className="mt-3 text-3xl font-black tracking-tighter text-pg-text">
-              Your Coding Journey
-            </h1>
-            <p className="mt-1 text-sm font-medium text-pg-text-muted">
-              Follow the path — plan your approach, then conquer each problem.
-            </p>
-          </div>
+      {/* Title — scrolls away so the trail gets the room. */}
+      <header className="px-4 pb-4 pt-6 sm:px-6">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+          <h1 className="text-2xl font-black tracking-tighter text-pg-text sm:text-3xl">
+            Your Coding Journey
+          </h1>
+          <span
+            className="inline-block -rotate-2 rounded-lg border-[3px] border-pg-border px-2 py-0.5 font-mono text-[0.65rem] font-bold uppercase tracking-wider text-black shadow-[3px_3px_0_0_#000]"
+            style={{ background: A.lime }}
+          >
+            The Trail
+          </span>
         </div>
+        <p className="mt-1 text-sm font-medium text-pg-text-muted">
+          Follow the path — plan your approach, then conquer each problem.
+        </p>
+      </header>
 
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="relative w-full sm:max-w-md">
+      {/* Toolbar — search, difficulty and count stay pinned while you scroll. */}
+      <div className="sticky top-0 z-10 border-y-[3px] border-pg-border bg-pg-ink/85 px-4 py-3 backdrop-blur-md sm:px-6">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center">
+          <div className="relative w-full md:max-w-sm">
             <Search
               aria-hidden="true"
               className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-pg-text-faint"
@@ -783,7 +783,7 @@ const Dashboard: React.FC = () => {
               placeholder="Search the trail…"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-10"
+              className="!py-2 pl-10 pr-10"
             />
             {searchQuery && (
               <button
@@ -797,44 +797,67 @@ const Dashboard: React.FC = () => {
             )}
           </div>
 
-          <div className="flex items-center gap-2">
-            <Select value={difficultyFilter} onValueChange={setDifficultyFilter}>
-              <SelectTrigger
-                aria-label="Filter by difficulty"
-                className="min-w-[140px] rounded-xl border-[3px] border-pg-border bg-pg-surface font-semibold"
-              >
-                <SelectValue placeholder="Difficulty" />
-              </SelectTrigger>
-              <SelectContent className="border-[3px] border-pg-border bg-pg-surface">
-                <SelectItem value="all">All Levels</SelectItem>
-                <SelectItem value="easy">Easy</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="hard">Hard</SelectItem>
-              </SelectContent>
-            </Select>
-            {hasFilters && (
-              <PlayButton
-                onClick={clearFilters}
-                fill="#141419"
-                shadow={A.cyan}
-                text="#ffffff"
-                className="!px-4 !py-2 text-sm"
-              >
-                Clear
-              </PlayButton>
-            )}
+          <div className="flex flex-wrap items-center gap-3 md:flex-1">
+            <div
+              role="group"
+              aria-label="Filter by difficulty"
+              className="flex items-center gap-1.5"
+            >
+              {DIFF_FILTERS.map(({ key, label }) => {
+                const active = difficultyFilter === key;
+                const color = key === "all" ? A.cyan : diffColor(key);
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    aria-pressed={active}
+                    onClick={() => setDifficultyFilter(key)}
+                    className={cn(
+                      "inline-flex cursor-pointer items-center gap-1.5 rounded-lg border-[3px] border-pg-border px-2.5 py-1 font-mono text-[0.7rem] font-bold uppercase tracking-wider transition-[transform,box-shadow] duration-150",
+                      active
+                        ? "-translate-x-0.5 -translate-y-0.5 text-black shadow-[3px_3px_0_0_var(--pg-shadow)]"
+                        : "bg-pg-surface text-pg-text-muted hover:text-pg-text"
+                    )}
+                    style={active ? { background: color } : undefined}
+                  >
+                    {key !== "all" && (
+                      <span
+                        aria-hidden="true"
+                        className="size-2 rounded-full border-[1.5px] border-pg-border"
+                        style={{ background: color }}
+                      />
+                    )}
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="ml-auto flex items-center gap-3">
+              {!loading && !error && (
+                <p
+                  aria-live="polite"
+                  className="font-mono text-xs font-bold tabular-nums text-pg-text-muted"
+                >
+                  {filteredQuestions.length}
+                  {hasFilters && `/${allQuestions.length}`}{" "}
+                  {filteredQuestions.length === 1 ? "stop" : "stops"}
+                  {solvedCount > 0 && !hasFilters && ` · ${solvedCount} cleared`}
+                </p>
+              )}
+              {hasFilters && (
+                <button
+                  type="button"
+                  onClick={clearFilters}
+                  className="cursor-pointer text-xs font-bold text-pg-text-muted underline decoration-2 underline-offset-4 hover:text-pg-text"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
           </div>
         </div>
-
-        {!loading && !error && (
-          <p aria-live="polite" className="text-xs font-semibold text-pg-text-muted">
-            {filteredQuestions.length}{" "}
-            {filteredQuestions.length === 1 ? "stop" : "stops"}
-            {hasFilters && ` of ${allQuestions.length}`}
-            {solvedCount > 0 && !hasFilters && ` · ${solvedCount} cleared`}
-          </p>
-        )}
-      </header>
+      </div>
 
       <div className="mx-auto w-full max-w-3xl flex-1 space-y-6 p-4 sm:p-6">
         {loading && <TrailSkeleton />}

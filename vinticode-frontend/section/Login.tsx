@@ -54,7 +54,7 @@ export default function Login() {
     <div>
       <div className="mb-6">
         <h2 className="text-2xl font-black tracking-tight">Welcome back</h2>
-        <p className="mt-1 text-sm font-medium text-white/60">
+        <p className="mt-1 text-sm font-medium text-pg-text-muted">
           Enter your credentials to jump back in.
         </p>
       </div>
@@ -90,7 +90,7 @@ export default function Login() {
               onClick={() =>
                 setPasswordType(passwordType === "password" ? "text" : "password")
               }
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 transition-colors hover:text-white"
+              className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-pg-text-muted transition-colors hover:text-pg-text"
             >
               {passwordType === "password" ? (
                 <EyeOff className="size-5" />
