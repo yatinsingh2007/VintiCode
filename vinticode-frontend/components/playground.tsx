@@ -270,7 +270,7 @@ export function PlayCard({
   className,
   color = A.lime,
   offset = 8,
-  surface = "#141419",
+  surface = "var(--pg-surface)",
   style,
   ...props
 }: {
