@@ -43,28 +43,18 @@ export interface ScratchPadProps {
   onDismissReview: () => void;
 }
 
-function Spinner() {
+/* Three chunky accent blocks hopping in sequence — the playground's busy state. */
+function HopLoader() {
   return (
-    <svg
-      className="h-3.5 w-3.5 animate-spin"
-      viewBox="0 0 24 24"
-      fill="none"
-      aria-hidden="true"
-    >
-      <circle
-        className="opacity-25"
-        cx="12"
-        cy="12"
-        r="10"
-        stroke="currentColor"
-        strokeWidth="3"
-      />
-      <path
-        className="opacity-75"
-        fill="currentColor"
-        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-      />
-    </svg>
+    <span aria-hidden="true" className="inline-flex items-end gap-1">
+      {[A.lime, A.cyan, A.coral].map((color, i) => (
+        <span
+          key={i}
+          className="animate-block-hop size-2 rounded-[2px] border-[1.5px] border-black"
+          style={{ background: color, animationDelay: `${i * 0.12}s` }}
+        />
+      ))}
+    </span>
   );
 }
 
@@ -238,12 +228,14 @@ export default function ScratchPad({
                 fill="#0d0d11"
                 shadow={A.cyan}
                 text="#ffffff"
-                className="!px-5 !py-2.5 text-[11px] uppercase tracking-widest"
+                className={`!px-5 !py-2.5 text-[11px] uppercase tracking-widest ${
+                  isReviewing ? "disabled:cursor-wait disabled:opacity-100" : ""
+                }`}
               >
                 {isReviewing ? (
                   <>
-                    <Spinner />
-                    Analyzing...
+                    <HopLoader />
+                    Analyzing…
                   </>
                 ) : (
                   <>

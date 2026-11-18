@@ -576,6 +576,13 @@
 }
 .animate-wiggle { animation: wiggle 3.5s ease-in-out infinite; }
 
+/* Busy indicator: chunky blocks hop in sequence. Stagger with animationDelay. */
+@keyframes block-hop {
+  0%, 60%, 100% { transform: translateY(0) rotate(0deg); }
+  30%           { transform: translateY(-5px) rotate(-12deg); }
+}
+.animate-block-hop { animation: block-hop 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) infinite; }
+
 /*
   Respect the OS "reduce motion" setting. The app leans on GSAP/WebGL
   ray effects, meteors, confetti and hover-lift transitions — all of
